@@ -33,9 +33,10 @@ Levels 1–10 were won on the first attempt in every final campaign. Retrying a 
 player: up to 8 attempts per level, each retry with a plan not tried yet (levels 11–12 have 8 different plans,
 the others 3–5).
 
-**Video:** a rendered replay of the full campaign of final seed 6001 (each level re-played and verified to reach
-exactly the same end state as the logged final run) is attached to the
-[GitHub release](../../releases).
+**Video:** a rendered replay of the full campaign of final seed 6001: each level re-played by the same operator
+network and verified to reach exactly the same end state (SHA256) as the logged final run. Highlights (1.8 min):
+[`media/kingdom-rush-ml-agent_seed6001_highlights.mp4`](media/kingdom-rush-ml-agent_seed6001_highlights.mp4);
+full campaign (25 min, about 8–19× game speed) and a 4× faster cut: [GitHub release](../../releases).
 
 ## Verify it yourself (no game needed)
 

@@ -135,6 +135,10 @@ class Recorder:
         user32.SetWindowPos(hwnd, 1, 40, 40, 0, 0, 0x0001 | 0x0010)  # HWND_BOTTOM, keep size, no activate
         time.sleep(0.8)
         # Windows Graphics Capture of this window's own surface only (never other screen content).
+        if os.environ.get("REC_ALPHA_PNG"):
+            subprocess.run([FFMPEG, "-y", "-loglevel", "error", "-f", "lavfi",
+                            "-i", f"gfxcapture=hwnd={hwnd}:max_framerate=30:capture_cursor=0",
+                            "-vf", "hwdownload,format=bgra", "-frames:v", "3", str(OUT / "alpha_test_%d.png")])
         self.ffmpeg = subprocess.Popen(
             [FFMPEG, "-y", "-loglevel", "error", "-f", "lavfi",
              "-i", f"gfxcapture=hwnd={hwnd}:max_framerate=30:capture_cursor=0",

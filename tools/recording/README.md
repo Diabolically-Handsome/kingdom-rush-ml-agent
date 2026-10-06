@@ -5,7 +5,7 @@ an empty one. For the video, a separate recording copy of the host (`recording-h
 `alpharush_rl/assets/host.lua` and `wrapper.lua`, active only with `ALPHARUSH_RECORD=1`) keeps drawing:
 
 * random numbers drawn while rendering come from their own generator, so drawing cannot change the game;
-* tutorial pop-ups (which wait for a human "OK") are not drawn;
+* tutorial pop-ups (which wait for a human "OK") and the dark overlay they put behind them are not drawn;
 * steps arrive pipelined, a few ticks per rendered frame; a step queued after the level has ended does nothing.
 
 `record_final.py` re-plays each winning attempt of a final seed with the same operator network, plan, save

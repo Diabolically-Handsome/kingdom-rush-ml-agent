@@ -332,8 +332,8 @@
   },
   {
    "path": "tools/recording/record_final.py",
-   "original_sha256": "8026c4898bafd1e569c877d97f690712b4e4d3d30973144870ab452e1a596186",
-   "published_sha256": "3ebb0f5f200e306e5d2a087b1aa6bb27a6e2262a08b84585c4e3d685de129930",
+   "original_sha256": "a8d877a809759bacc158f766e05c964d5f72f51d97f7daf784d8988f166288c3",
+   "published_sha256": "bbe980590c46b71fcc72824e2cf6f1e4d42d005f721f1f9592de826e24c3d083",
    "categories": [
     "local user-name paths"
    ]

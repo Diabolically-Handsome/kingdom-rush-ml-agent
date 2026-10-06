@@ -1,5 +1,5 @@
 --- a/alpharush_rl/assets/host.lua	2026-10-06 13:39:34.817792100 -0400
-+++ b/alpharush_rl/assets/host.lua	2026-10-06 13:39:34.850115000 -0400
++++ b/alpharush_rl/assets/host.lua	2026-10-06 14:16:51.874516100 -0400
 @@ -604,9 +604,14 @@
  end
  M._meta = meta
@@ -34,7 +34,7 @@
      elseif cmd.action == "pause" then
          controlled = true
          if game and game.store then game.store.paused=true end
-@@ -772,7 +777,27 @@
+@@ -772,7 +777,30 @@
  function M.update(dt)
      if not controlled then
          original_update(1/60)
@@ -51,6 +51,9 @@
 +                    local gui = game and game.game_gui
 +                    local nv = type(gui) == "table" and gui.notiview
 +                    if type(nv) == "table" and nv.hidden == false then nv.hidden = true end
++                    -- ... and so is the dark modal overlay those pop-ups (and the pause view) put behind them.
++                    local ov = type(gui) == "table" and gui.overlay
++                    if type(ov) == "table" and ov.hidden == false then ov.hidden = true end
 +                    ALPHARUSH_DRAWING = true
 +                    local ok, e = pcall(game_draw)
 +                    ALPHARUSH_DRAWING = false
@@ -64,7 +67,7 @@
      local c = server:accept()
      if c then c:settimeout(0); clients[#clients+1]={socket=c, buffer=""} end
 --- a/alpharush_rl/assets/wrapper.lua	2026-10-06 13:39:34.826551400 -0400
-+++ b/alpharush_rl/assets/wrapper.lua	2026-10-06 13:39:34.859205100 -0400
++++ b/alpharush_rl/assets/wrapper.lua	2026-10-06 14:16:51.882614200 -0400
 @@ -84,7 +84,17 @@
          local key = kind .. "@" .. tostring(info and info.source) .. ":" .. tostring(info and info.linedefined)
          audit[key] = (audit[key] or 0) + 1
