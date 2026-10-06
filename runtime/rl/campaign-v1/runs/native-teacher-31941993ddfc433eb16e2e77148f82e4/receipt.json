@@ -1,0 +1,18 @@
+{
+  "config_sha256": "94f40ccff9e78cc428e691fdfb42ac563064f6669f18d062d5afa87d32846944",
+  "error": null,
+  "games_played": 45,
+  "job_kind": "native-teacher",
+  "ledger_close_sha256": "4a63e4cdd451abc9f2d06f1ba4461e7eb65f90d10080fa31107c7c1c7a1d2cc8",
+  "ledger_open_sha256": "4a4b23726e224a50957402c4deec7abf1b6966dc55e3f4692621e5b4eb2ceb89",
+  "max_games": 90,
+  "meaning": "Process/budget receipt only; the job must verify its own result",
+  "phase_id": "campaign-v1",
+  "pins_sha256": "3d6efd3538c9a824b85636f4bb94f479bbde99623d045af57efbffb08e7f15ba",
+  "pools_sha256": "acbff340a9c0c5f49f47701af9753d912b391c08fb06e651f84dab0bb8e98c19",
+  "run_id": "native-teacher-31941993ddfc433eb16e2e77148f82e4",
+  "schema_version": 1,
+  "status": "ok",
+  "verified": false,
+  "wall_seconds": 284.25
+}

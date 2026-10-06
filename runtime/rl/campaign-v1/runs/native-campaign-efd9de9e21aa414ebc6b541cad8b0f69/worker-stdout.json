@@ -1,0 +1,1529 @@
+{
+  "schema": "alpharush-campaign-run-v1",
+  "run_id": "native-campaign-efd9de9e21aa414ebc6b541cad8b0f69",
+  "policy": "operator",
+  "seeds": [
+    5001,
+    5002,
+    5003,
+    5004,
+    5005,
+    5006,
+    5007,
+    5008,
+    5009,
+    5010
+  ],
+  "campaigns": [
+    {
+      "seed": 5001,
+      "completed": true,
+      "won": {
+        "1": 3,
+        "2": 3,
+        "3": 3,
+        "4": 2,
+        "5": 2,
+        "6": 3,
+        "7": 3,
+        "8": 2,
+        "9": 3,
+        "10": 3,
+        "11": 2,
+        "12": 3
+      },
+      "total_stars": 32,
+      "failed_level": null,
+      "stopped_reason": null,
+      "attempts": [
+        {
+          "level": 1,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 7
+        },
+        {
+          "level": 2,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 7
+        },
+        {
+          "level": 3,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 11
+        },
+        {
+          "level": 4,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 16,
+          "wave": 13
+        },
+        {
+          "level": 5,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 16,
+          "wave": 15
+        },
+        {
+          "level": 6,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 17
+        },
+        {
+          "level": 7,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 16
+        },
+        {
+          "level": 8,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 13,
+          "wave": 18
+        },
+        {
+          "level": 9,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 19
+        },
+        {
+          "level": 10,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 19
+        },
+        {
+          "level": 11,
+          "attempt": 0,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 13
+        },
+        {
+          "level": 11,
+          "attempt": 1,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 9
+        },
+        {
+          "level": 11,
+          "attempt": 2,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 9
+        },
+        {
+          "level": 11,
+          "attempt": 3,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 9
+        },
+        {
+          "level": 11,
+          "attempt": 4,
+          "won": true,
+          "stars": 2,
+          "lives": 7,
+          "wave": 19
+        },
+        {
+          "level": 12,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 18,
+          "wave": 15
+        }
+      ],
+      "final_upgrades": {
+        "archers": 2,
+        "barracks": 2,
+        "mages": 2,
+        "engineers": 5,
+        "rain": 3,
+        "reinforcements": 2
+      },
+      "brain": "8b",
+      "wall_seconds": 755.8119999999763
+    },
+    {
+      "seed": 5002,
+      "completed": true,
+      "won": {
+        "1": 3,
+        "2": 3,
+        "3": 3,
+        "4": 2,
+        "5": 3,
+        "6": 2,
+        "7": 3,
+        "8": 3,
+        "9": 2,
+        "10": 3,
+        "11": 2,
+        "12": 2
+      },
+      "total_stars": 31,
+      "failed_level": null,
+      "stopped_reason": null,
+      "attempts": [
+        {
+          "level": 1,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 7
+        },
+        {
+          "level": 2,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 7
+        },
+        {
+          "level": 3,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 11
+        },
+        {
+          "level": 4,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 15,
+          "wave": 13
+        },
+        {
+          "level": 5,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 15
+        },
+        {
+          "level": 6,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 17,
+          "wave": 17
+        },
+        {
+          "level": 7,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 16
+        },
+        {
+          "level": 8,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 18
+        },
+        {
+          "level": 9,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 15,
+          "wave": 19
+        },
+        {
+          "level": 10,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 19
+        },
+        {
+          "level": 11,
+          "attempt": 0,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 14
+        },
+        {
+          "level": 11,
+          "attempt": 1,
+          "won": true,
+          "stars": 2,
+          "lives": 7,
+          "wave": 19
+        },
+        {
+          "level": 12,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 11,
+          "wave": 15
+        }
+      ],
+      "final_upgrades": {
+        "archers": 2,
+        "barracks": 2,
+        "mages": 2,
+        "engineers": 5,
+        "rain": 3,
+        "reinforcements": 2
+      },
+      "brain": "8b",
+      "wall_seconds": 654.2189999999828
+    },
+    {
+      "seed": 5003,
+      "completed": true,
+      "won": {
+        "1": 3,
+        "2": 3,
+        "3": 3,
+        "4": 2,
+        "5": 3,
+        "6": 3,
+        "7": 3,
+        "8": 3,
+        "9": 3,
+        "10": 3,
+        "11": 2,
+        "12": 3
+      },
+      "total_stars": 34,
+      "failed_level": null,
+      "stopped_reason": null,
+      "attempts": [
+        {
+          "level": 1,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 7
+        },
+        {
+          "level": 2,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 7
+        },
+        {
+          "level": 3,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 11
+        },
+        {
+          "level": 4,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 17,
+          "wave": 13
+        },
+        {
+          "level": 5,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 15
+        },
+        {
+          "level": 6,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 17
+        },
+        {
+          "level": 7,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 16
+        },
+        {
+          "level": 8,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 18
+        },
+        {
+          "level": 9,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 19
+        },
+        {
+          "level": 10,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 19
+        },
+        {
+          "level": 11,
+          "attempt": 0,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 13
+        },
+        {
+          "level": 11,
+          "attempt": 1,
+          "won": true,
+          "stars": 2,
+          "lives": 12,
+          "wave": 19
+        },
+        {
+          "level": 12,
+          "attempt": 0,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 15
+        },
+        {
+          "level": 12,
+          "attempt": 1,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 15
+        }
+      ],
+      "final_upgrades": {
+        "archers": 3,
+        "barracks": 2,
+        "mages": 2,
+        "engineers": 5,
+        "rain": 3,
+        "reinforcements": 2
+      },
+      "brain": "8b",
+      "wall_seconds": 741.6399999999558
+    },
+    {
+      "seed": 5004,
+      "completed": true,
+      "won": {
+        "1": 3,
+        "2": 3,
+        "3": 3,
+        "4": 3,
+        "5": 3,
+        "6": 3,
+        "7": 3,
+        "8": 2,
+        "9": 3,
+        "10": 3,
+        "11": 2,
+        "12": 3
+      },
+      "total_stars": 34,
+      "failed_level": null,
+      "stopped_reason": null,
+      "attempts": [
+        {
+          "level": 1,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 7
+        },
+        {
+          "level": 2,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 7
+        },
+        {
+          "level": 3,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 11
+        },
+        {
+          "level": 4,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 13
+        },
+        {
+          "level": 5,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 15
+        },
+        {
+          "level": 6,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 17
+        },
+        {
+          "level": 7,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 16
+        },
+        {
+          "level": 8,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 17,
+          "wave": 18
+        },
+        {
+          "level": 9,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 19
+        },
+        {
+          "level": 10,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 19
+        },
+        {
+          "level": 11,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 6,
+          "wave": 19
+        },
+        {
+          "level": 12,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 15
+        }
+      ],
+      "final_upgrades": {
+        "archers": 3,
+        "barracks": 2,
+        "mages": 2,
+        "engineers": 5,
+        "rain": 3,
+        "reinforcements": 2
+      },
+      "brain": "8b",
+      "wall_seconds": 605.25
+    },
+    {
+      "seed": 5005,
+      "completed": true,
+      "won": {
+        "1": 3,
+        "2": 3,
+        "3": 3,
+        "4": 3,
+        "5": 3,
+        "6": 3,
+        "7": 3,
+        "8": 3,
+        "9": 3,
+        "10": 3,
+        "11": 1,
+        "12": 3
+      },
+      "total_stars": 34,
+      "failed_level": null,
+      "stopped_reason": null,
+      "attempts": [
+        {
+          "level": 1,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 7
+        },
+        {
+          "level": 2,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 7
+        },
+        {
+          "level": 3,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 11
+        },
+        {
+          "level": 4,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 13
+        },
+        {
+          "level": 5,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 15
+        },
+        {
+          "level": 6,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 18,
+          "wave": 17
+        },
+        {
+          "level": 7,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 16
+        },
+        {
+          "level": 8,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 18
+        },
+        {
+          "level": 9,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 19
+        },
+        {
+          "level": 10,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 19
+        },
+        {
+          "level": 11,
+          "attempt": 0,
+          "won": true,
+          "stars": 1,
+          "lives": 4,
+          "wave": 19
+        },
+        {
+          "level": 12,
+          "attempt": 0,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 15
+        },
+        {
+          "level": 12,
+          "attempt": 1,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 15
+        }
+      ],
+      "final_upgrades": {
+        "archers": 3,
+        "barracks": 2,
+        "mages": 2,
+        "engineers": 5,
+        "rain": 3,
+        "reinforcements": 2
+      },
+      "brain": "8b",
+      "wall_seconds": 731.5469999999623
+    },
+    {
+      "seed": 5006,
+      "completed": true,
+      "won": {
+        "1": 3,
+        "2": 3,
+        "3": 3,
+        "4": 3,
+        "5": 3,
+        "6": 3,
+        "7": 3,
+        "8": 2,
+        "9": 3,
+        "10": 3,
+        "11": 2,
+        "12": 3
+      },
+      "total_stars": 34,
+      "failed_level": null,
+      "stopped_reason": null,
+      "attempts": [
+        {
+          "level": 1,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 7
+        },
+        {
+          "level": 2,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 7
+        },
+        {
+          "level": 3,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 11
+        },
+        {
+          "level": 4,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 18,
+          "wave": 13
+        },
+        {
+          "level": 5,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 15
+        },
+        {
+          "level": 6,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 17
+        },
+        {
+          "level": 7,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 16
+        },
+        {
+          "level": 8,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 17,
+          "wave": 18
+        },
+        {
+          "level": 9,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 19
+        },
+        {
+          "level": 10,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 19
+        },
+        {
+          "level": 11,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 8,
+          "wave": 19
+        },
+        {
+          "level": 12,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 15
+        }
+      ],
+      "final_upgrades": {
+        "archers": 3,
+        "barracks": 2,
+        "mages": 2,
+        "engineers": 5,
+        "rain": 3,
+        "reinforcements": 2
+      },
+      "brain": "8b",
+      "wall_seconds": 616.4689999999828
+    },
+    {
+      "seed": 5007,
+      "completed": true,
+      "won": {
+        "1": 3,
+        "2": 3,
+        "3": 3,
+        "4": 2,
+        "5": 3,
+        "6": 3,
+        "7": 3,
+        "8": 2,
+        "9": 3,
+        "10": 3,
+        "11": 2,
+        "12": 2
+      },
+      "total_stars": 32,
+      "failed_level": null,
+      "stopped_reason": null,
+      "attempts": [
+        {
+          "level": 1,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 7
+        },
+        {
+          "level": 2,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 7
+        },
+        {
+          "level": 3,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 11
+        },
+        {
+          "level": 4,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 16,
+          "wave": 13
+        },
+        {
+          "level": 5,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 15
+        },
+        {
+          "level": 6,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 17
+        },
+        {
+          "level": 7,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 18,
+          "wave": 16
+        },
+        {
+          "level": 8,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 8,
+          "wave": 18
+        },
+        {
+          "level": 9,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 19
+        },
+        {
+          "level": 10,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 19
+        },
+        {
+          "level": 11,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 17,
+          "wave": 19
+        },
+        {
+          "level": 12,
+          "attempt": 0,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 15
+        },
+        {
+          "level": 12,
+          "attempt": 1,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 15
+        },
+        {
+          "level": 12,
+          "attempt": 2,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 15
+        },
+        {
+          "level": 12,
+          "attempt": 3,
+          "won": true,
+          "stars": 2,
+          "lives": 8,
+          "wave": 15
+        }
+      ],
+      "final_upgrades": {
+        "archers": 3,
+        "barracks": 2,
+        "mages": 2,
+        "engineers": 5,
+        "rain": 3,
+        "reinforcements": 2
+      },
+      "brain": "8b",
+      "wall_seconds": 938.7189999999828
+    },
+    {
+      "seed": 5008,
+      "completed": true,
+      "won": {
+        "1": 3,
+        "2": 2,
+        "3": 3,
+        "4": 2,
+        "5": 2,
+        "6": 3,
+        "7": 3,
+        "8": 2,
+        "9": 3,
+        "10": 2,
+        "11": 1,
+        "12": 2
+      },
+      "total_stars": 28,
+      "failed_level": null,
+      "stopped_reason": null,
+      "attempts": [
+        {
+          "level": 1,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 7
+        },
+        {
+          "level": 2,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 14,
+          "wave": 7
+        },
+        {
+          "level": 3,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 11
+        },
+        {
+          "level": 4,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 16,
+          "wave": 13
+        },
+        {
+          "level": 5,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 16,
+          "wave": 15
+        },
+        {
+          "level": 6,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 17
+        },
+        {
+          "level": 7,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 16
+        },
+        {
+          "level": 8,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 8,
+          "wave": 18
+        },
+        {
+          "level": 9,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 19
+        },
+        {
+          "level": 10,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 12,
+          "wave": 19
+        },
+        {
+          "level": 11,
+          "attempt": 0,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 9
+        },
+        {
+          "level": 11,
+          "attempt": 1,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 9
+        },
+        {
+          "level": 11,
+          "attempt": 2,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 10
+        },
+        {
+          "level": 11,
+          "attempt": 3,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 13
+        },
+        {
+          "level": 11,
+          "attempt": 4,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 9
+        },
+        {
+          "level": 11,
+          "attempt": 5,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 10
+        },
+        {
+          "level": 11,
+          "attempt": 6,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 13
+        },
+        {
+          "level": 11,
+          "attempt": 7,
+          "won": true,
+          "stars": 1,
+          "lives": 3,
+          "wave": 19
+        },
+        {
+          "level": 12,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 9,
+          "wave": 15
+        }
+      ],
+      "final_upgrades": {
+        "archers": 2,
+        "barracks": 2,
+        "mages": 2,
+        "engineers": 5,
+        "rain": 2,
+        "reinforcements": 2
+      },
+      "brain": "8b",
+      "wall_seconds": 871.0779999999795
+    },
+    {
+      "seed": 5009,
+      "completed": true,
+      "won": {
+        "1": 3,
+        "2": 3,
+        "3": 3,
+        "4": 2,
+        "5": 2,
+        "6": 3,
+        "7": 3,
+        "8": 3,
+        "9": 3,
+        "10": 3,
+        "11": 1,
+        "12": 2
+      },
+      "total_stars": 31,
+      "failed_level": null,
+      "stopped_reason": null,
+      "attempts": [
+        {
+          "level": 1,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 7
+        },
+        {
+          "level": 2,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 7
+        },
+        {
+          "level": 3,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 11
+        },
+        {
+          "level": 4,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 15,
+          "wave": 13
+        },
+        {
+          "level": 5,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 16,
+          "wave": 15
+        },
+        {
+          "level": 6,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 17
+        },
+        {
+          "level": 7,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 16
+        },
+        {
+          "level": 8,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 18,
+          "wave": 18
+        },
+        {
+          "level": 9,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 19
+        },
+        {
+          "level": 10,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 18,
+          "wave": 19
+        },
+        {
+          "level": 11,
+          "attempt": 0,
+          "won": true,
+          "stars": 1,
+          "lives": 3,
+          "wave": 19
+        },
+        {
+          "level": 12,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 17,
+          "wave": 15
+        }
+      ],
+      "final_upgrades": {
+        "archers": 2,
+        "barracks": 2,
+        "mages": 2,
+        "engineers": 5,
+        "rain": 3,
+        "reinforcements": 2
+      },
+      "brain": "8b",
+      "wall_seconds": 667.5
+    },
+    {
+      "seed": 5010,
+      "completed": false,
+      "won": {
+        "1": 3,
+        "2": 3,
+        "3": 3,
+        "4": 2,
+        "5": 2,
+        "6": 2,
+        "7": 2,
+        "8": 3,
+        "9": 3,
+        "10": 3,
+        "11": 1
+      },
+      "total_stars": 27,
+      "failed_level": 12,
+      "stopped_reason": "level_failed",
+      "attempts": [
+        {
+          "level": 1,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 7
+        },
+        {
+          "level": 2,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 7
+        },
+        {
+          "level": 3,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 20,
+          "wave": 11
+        },
+        {
+          "level": 4,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 17,
+          "wave": 13
+        },
+        {
+          "level": 5,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 17,
+          "wave": 15
+        },
+        {
+          "level": 6,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 17,
+          "wave": 17
+        },
+        {
+          "level": 7,
+          "attempt": 0,
+          "won": true,
+          "stars": 2,
+          "lives": 17,
+          "wave": 16
+        },
+        {
+          "level": 8,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 18,
+          "wave": 18
+        },
+        {
+          "level": 9,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 19
+        },
+        {
+          "level": 10,
+          "attempt": 0,
+          "won": true,
+          "stars": 3,
+          "lives": 19,
+          "wave": 19
+        },
+        {
+          "level": 11,
+          "attempt": 0,
+          "won": true,
+          "stars": 1,
+          "lives": 2,
+          "wave": 19
+        },
+        {
+          "level": 12,
+          "attempt": 0,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 9
+        },
+        {
+          "level": 12,
+          "attempt": 1,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 9
+        },
+        {
+          "level": 12,
+          "attempt": 2,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 9
+        },
+        {
+          "level": 12,
+          "attempt": 3,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 9
+        },
+        {
+          "level": 12,
+          "attempt": 4,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 9
+        },
+        {
+          "level": 12,
+          "attempt": 5,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 9
+        },
+        {
+          "level": 12,
+          "attempt": 6,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 9
+        },
+        {
+          "level": 12,
+          "attempt": 7,
+          "won": false,
+          "stars": 0,
+          "lives": 0,
+          "wave": 9
+        }
+      ],
+      "final_upgrades": {
+        "archers": 3,
+        "barracks": 2,
+        "mages": 2,
+        "engineers": 5,
+        "rain": 2,
+        "reinforcements": 2
+      },
+      "brain": "8b",
+      "wall_seconds": 866.7969999999623
+    }
+  ],
+  "completed": 9,
+  "games_played": 145,
+  "stopped_reason": null,
+  "protocol": {
+    "name": "kr1-episode-v1"
+  },
+  "episodes_journal": {
+    "integrity_verified": true,
+    "entries": 425,
+    "tip_sha256": "1438c4e8184cb65d8e0b9a9ad83c45c8df280d5e6c03114e2e78fe68e1ca9f09",
+    "engine_replay_verified": false
+  },
+  "optimizer_steps": 0,
+  "engine": {
+    "manifest_sha256": "caeb9bc9aff53d233671797950cdab5488b60475b619a0e19e4c7ce8bcfd075c",
+    "recipe_sha256": "8e06a59561d8c50eeaf5341aec8ebcab72aa1d06d135b239748d889a4db6c72c",
+    "exe_sha256": "24fa97ab51c3f850141e0d4db4d5177c1b445c7bba6f556e2e7c598a6b1825a4",
+    "host_copy_sha256": "5627fb089d21ff538fba4971eb550912dd7e03463dbc361cce1cbee969efe84f"
+  },
+  "rng_mode": "isolate_sound+stable_pairs",
+  "action_scope": "v2"
+}

@@ -1,0 +1,1408 @@
+{
+  "schema": "alpharush-campaign-search-v1",
+  "run_id": "native-search-48a52f561338494fb802410be34e62b1",
+  "spec": {
+    "levels": [
+      11,
+      12
+    ],
+    "search_seed": 1001,
+    "search_seeds": [
+      1001,
+      1002,
+      1003
+    ],
+    "population": 40,
+    "evaluations_per_level": 230,
+    "min_evaluations": 0,
+    "stop_lives": 18,
+    "profile_stars_per_level": 2.75,
+    "workers": 48,
+    "validate_seeds": [
+      1001,
+      1002,
+      1003,
+      1004,
+      1005,
+      1006,
+      1007,
+      1008,
+      1009,
+      1010
+    ],
+    "validate_top": 8,
+    "rng_seed": "campaign-v1-search-15",
+    "warm_start": {
+      "runs": [
+        "native-search-ce87df5686784367b9a5499c8a52f66e",
+        "native-search-e6aa0943993a4e77925310873b7d4c23",
+        "native-search-1ee38d3eb2954a689dff7a67dea035ab"
+      ],
+      "top": 24,
+      "reevaluate": true
+    }
+  },
+  "games_played": 1454,
+  "max_games": 1700,
+  "levels": {
+    "11": {
+      "evaluations": 230,
+      "best_fitness": 11065.778993333333,
+      "best_genome_id": "c8e48c413b6a29e5",
+      "best_genome": {
+        "hero": "hero_ignus",
+        "steps": [
+          [
+            "b",
+            "15",
+            "mage"
+          ],
+          [
+            "b",
+            "8",
+            "engineer"
+          ],
+          [
+            "b",
+            "13",
+            "archer"
+          ],
+          [
+            "b",
+            "14",
+            "barrack"
+          ],
+          [
+            "b",
+            "11",
+            "mage"
+          ],
+          [
+            "b",
+            "4",
+            "archer"
+          ],
+          [
+            "u",
+            "14"
+          ],
+          [
+            "b",
+            "10",
+            "barrack"
+          ],
+          [
+            "b",
+            "16",
+            "mage"
+          ],
+          [
+            "u",
+            "4"
+          ],
+          [
+            "u",
+            "15"
+          ],
+          [
+            "u",
+            "4"
+          ],
+          [
+            "u",
+            "13"
+          ],
+          [
+            "u",
+            "4"
+          ],
+          [
+            "u",
+            "15"
+          ],
+          [
+            "u",
+            "11"
+          ],
+          [
+            "u",
+            "8"
+          ],
+          [
+            "u",
+            "15"
+          ],
+          [
+            "k",
+            "16"
+          ],
+          [
+            "u",
+            "15"
+          ],
+          [
+            "b",
+            "5",
+            "archer"
+          ],
+          [
+            "b",
+            "1",
+            "archer"
+          ],
+          [
+            "u",
+            "4"
+          ],
+          [
+            "u",
+            "4"
+          ],
+          [
+            "b",
+            "2",
+            "engineer"
+          ],
+          [
+            "u",
+            "4"
+          ]
+        ],
+        "cast": 70,
+        "early": 1,
+        "branches": {
+          "archer": "tower_musketeer",
+          "barrack": "tower_paladin",
+          "mage": "tower_sorcerer",
+          "engineer": "tower_bfg"
+        }
+      },
+      "validated": [
+        {
+          "genome_id": "0e170b702e1e32a4",
+          "games": 8,
+          "wins": 6,
+          "min_fitness": 867.3882,
+          "genome": {
+            "hero": "hero_ignus",
+            "steps": [
+              [
+                "b",
+                "15",
+                "mage"
+              ],
+              [
+                "b",
+                "8",
+                "engineer"
+              ],
+              [
+                "b",
+                "18",
+                "barrack"
+              ],
+              [
+                "b",
+                "13",
+                "archer"
+              ],
+              [
+                "b",
+                "11",
+                "mage"
+              ],
+              [
+                "u",
+                "18"
+              ],
+              [
+                "b",
+                "4",
+                "archer"
+              ],
+              [
+                "b",
+                "10",
+                "barrack"
+              ],
+              [
+                "b",
+                "16",
+                "mage"
+              ],
+              [
+                "k",
+                "13"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "u",
+                "13"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "u",
+                "11"
+              ],
+              [
+                "u",
+                "8"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "k",
+                "16"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "u",
+                "13"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "u",
+                "11"
+              ],
+              [
+                "u",
+                "8"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "k",
+                "8"
+              ],
+              [
+                "k",
+                "16"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "b",
+                "5",
+                "archer"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "b",
+                "2",
+                "engineer"
+              ]
+            ],
+            "cast": 70,
+            "early": 1,
+            "branches": {
+              "archer": "tower_musketeer",
+              "barrack": "tower_paladin",
+              "mage": "tower_sorcerer",
+              "engineer": "tower_bfg"
+            }
+          }
+        },
+        {
+          "genome_id": "35b39b71c69e1373",
+          "games": 8,
+          "wins": 4,
+          "min_fitness": 1252.8922,
+          "genome": {
+            "hero": "hero_ignus",
+            "steps": [
+              [
+                "b",
+                "15",
+                "mage"
+              ],
+              [
+                "b",
+                "8",
+                "engineer"
+              ],
+              [
+                "b",
+                "18",
+                "barrack"
+              ],
+              [
+                "b",
+                "13",
+                "archer"
+              ],
+              [
+                "b",
+                "11",
+                "mage"
+              ],
+              [
+                "b",
+                "4",
+                "archer"
+              ],
+              [
+                "u",
+                "18"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "b",
+                "10",
+                "barrack"
+              ],
+              [
+                "b",
+                "16",
+                "mage"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "u",
+                "13"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "u",
+                "11"
+              ],
+              [
+                "u",
+                "8"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "k",
+                "16"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "b",
+                "5",
+                "archer"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "b",
+                "2",
+                "engineer"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "u",
+                "4"
+              ]
+            ],
+            "cast": 70,
+            "early": 1,
+            "branches": {
+              "archer": "tower_musketeer",
+              "barrack": "tower_paladin",
+              "mage": "tower_sorcerer",
+              "engineer": "tower_bfg"
+            }
+          }
+        },
+        {
+          "genome_id": "2805f3b8ca3eb40a",
+          "games": 8,
+          "wins": 3,
+          "min_fitness": 1153.3818,
+          "genome": {
+            "hero": "hero_ignus",
+            "steps": [
+              [
+                "b",
+                "15",
+                "mage"
+              ],
+              [
+                "b",
+                "8",
+                "engineer"
+              ],
+              [
+                "b",
+                "18",
+                "barrack"
+              ],
+              [
+                "b",
+                "13",
+                "archer"
+              ],
+              [
+                "b",
+                "11",
+                "mage"
+              ],
+              [
+                "u",
+                "18"
+              ],
+              [
+                "b",
+                "4",
+                "archer"
+              ],
+              [
+                "b",
+                "10",
+                "barrack"
+              ],
+              [
+                "b",
+                "16",
+                "mage"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "u",
+                "13"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "u",
+                "11"
+              ],
+              [
+                "u",
+                "8"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "k",
+                "16"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "b",
+                "5",
+                "archer"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "b",
+                "2",
+                "engineer"
+              ]
+            ],
+            "cast": 60,
+            "early": 1,
+            "branches": {
+              "archer": "tower_musketeer",
+              "barrack": "tower_paladin",
+              "mage": "tower_sorcerer",
+              "engineer": "tower_bfg"
+            }
+          }
+        },
+        {
+          "genome_id": "be067a23a70a3c19",
+          "games": 8,
+          "wins": 3,
+          "min_fitness": 854.3514,
+          "genome": {
+            "hero": "hero_ignus",
+            "steps": [
+              [
+                "b",
+                "15",
+                "mage"
+              ],
+              [
+                "b",
+                "8",
+                "engineer"
+              ],
+              [
+                "b",
+                "18",
+                "barrack"
+              ],
+              [
+                "b",
+                "13",
+                "archer"
+              ],
+              [
+                "b",
+                "11",
+                "mage"
+              ],
+              [
+                "b",
+                "4",
+                "archer"
+              ],
+              [
+                "u",
+                "18"
+              ],
+              [
+                "b",
+                "10",
+                "barrack"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "b",
+                "16",
+                "mage"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "u",
+                "13"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "u",
+                "11"
+              ],
+              [
+                "u",
+                "8"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "u",
+                "13"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "u",
+                "11"
+              ],
+              [
+                "u",
+                "8"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "k",
+                "16"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "b",
+                "5",
+                "archer"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "b",
+                "3",
+                "engineer"
+              ]
+            ],
+            "cast": 70,
+            "early": 1,
+            "branches": {
+              "archer": "tower_musketeer",
+              "barrack": "tower_paladin",
+              "mage": "tower_sorcerer",
+              "engineer": "tower_bfg"
+            }
+          }
+        },
+        {
+          "genome_id": "c8e48c413b6a29e5",
+          "games": 8,
+          "wins": 2,
+          "min_fitness": 854.3342,
+          "genome": {
+            "hero": "hero_ignus",
+            "steps": [
+              [
+                "b",
+                "15",
+                "mage"
+              ],
+              [
+                "b",
+                "8",
+                "engineer"
+              ],
+              [
+                "b",
+                "13",
+                "archer"
+              ],
+              [
+                "b",
+                "14",
+                "barrack"
+              ],
+              [
+                "b",
+                "11",
+                "mage"
+              ],
+              [
+                "b",
+                "4",
+                "archer"
+              ],
+              [
+                "u",
+                "14"
+              ],
+              [
+                "b",
+                "10",
+                "barrack"
+              ],
+              [
+                "b",
+                "16",
+                "mage"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "u",
+                "13"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "u",
+                "11"
+              ],
+              [
+                "u",
+                "8"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "k",
+                "16"
+              ],
+              [
+                "u",
+                "15"
+              ],
+              [
+                "b",
+                "5",
+                "archer"
+              ],
+              [
+                "b",
+                "1",
+                "archer"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "u",
+                "4"
+              ],
+              [
+                "b",
+                "2",
+                "engineer"
+              ],
+              [
+                "u",
+                "4"
+              ]
+            ],
+            "cast": 70,
+            "early": 1,
+            "branches": {
+              "archer": "tower_musketeer",
+              "barrack": "tower_paladin",
+              "mage": "tower_sorcerer",
+              "engineer": "tower_bfg"
+            }
+          }
+        }
+      ]
+    },
+    "12": {
+      "evaluations": 230,
+      "best_fitness": 8392.82123160616,
+      "best_genome_id": "0455bd32fe22d736",
+      "best_genome": {
+        "ratio": "3122",
+        "pkg": "rain",
+        "hero": "hero_bolin",
+        "steps": [
+          [
+            "b",
+            "3",
+            "engineer"
+          ],
+          [
+            "b",
+            "8",
+            "engineer"
+          ],
+          [
+            "b",
+            "6",
+            "archer"
+          ],
+          [
+            "b",
+            "10",
+            "barrack"
+          ],
+          [
+            "u",
+            "10"
+          ],
+          [
+            "b",
+            "5",
+            "mage"
+          ],
+          [
+            "u",
+            "6"
+          ],
+          [
+            "b",
+            "2",
+            "archer"
+          ],
+          [
+            "u",
+            "5"
+          ],
+          [
+            "u",
+            "6"
+          ],
+          [
+            "b",
+            "7",
+            "barrack"
+          ],
+          [
+            "u",
+            "8"
+          ],
+          [
+            "u",
+            "5"
+          ],
+          [
+            "u",
+            "3"
+          ],
+          [
+            "u",
+            "3"
+          ],
+          [
+            "b",
+            "11",
+            "archer"
+          ],
+          [
+            "u",
+            "2"
+          ],
+          [
+            "b",
+            "13",
+            "mage"
+          ],
+          [
+            "u",
+            "3"
+          ],
+          [
+            "u",
+            "2"
+          ],
+          [
+            "u",
+            "2"
+          ],
+          [
+            "u",
+            "2"
+          ],
+          [
+            "u",
+            "5"
+          ],
+          [
+            "u",
+            "6"
+          ],
+          [
+            "u",
+            "8"
+          ],
+          [
+            "u",
+            "5"
+          ],
+          [
+            "u",
+            "2"
+          ],
+          [
+            "u",
+            "11"
+          ],
+          [
+            "u",
+            "3"
+          ],
+          [
+            "u",
+            "2"
+          ],
+          [
+            "u",
+            "2"
+          ],
+          [
+            "u",
+            "5"
+          ],
+          [
+            "u",
+            "2"
+          ],
+          [
+            "u",
+            "10"
+          ],
+          [
+            "u",
+            "10"
+          ],
+          [
+            "b",
+            "1",
+            "barrack"
+          ],
+          [
+            "b",
+            "12",
+            "engineer"
+          ],
+          [
+            "u",
+            "1"
+          ],
+          [
+            "u",
+            "6"
+          ],
+          [
+            "u",
+            "6"
+          ],
+          [
+            "u",
+            "1"
+          ],
+          [
+            "b",
+            "9",
+            "archer"
+          ],
+          [
+            "u",
+            "5"
+          ],
+          [
+            "u",
+            "6"
+          ],
+          [
+            "u",
+            "1"
+          ],
+          [
+            "b",
+            "4",
+            "barrack"
+          ],
+          [
+            "u",
+            "9"
+          ],
+          [
+            "u",
+            "5"
+          ],
+          [
+            "u",
+            "13"
+          ],
+          [
+            "k",
+            "5"
+          ],
+          [
+            "u",
+            "11"
+          ],
+          [
+            "u",
+            "13"
+          ],
+          [
+            "u",
+            "13"
+          ]
+        ],
+        "cast": 30,
+        "early": 0,
+        "branches": {
+          "archer": "tower_ranger",
+          "barrack": "tower_barbarian",
+          "mage": "tower_sorcerer",
+          "engineer": "tower_bfg"
+        }
+      },
+      "validated": [
+        {
+          "genome_id": "0455bd32fe22d736",
+          "games": 8,
+          "wins": 1,
+          "min_fitness": 822.0936,
+          "genome": {
+            "ratio": "3122",
+            "pkg": "rain",
+            "hero": "hero_bolin",
+            "steps": [
+              [
+                "b",
+                "3",
+                "engineer"
+              ],
+              [
+                "b",
+                "8",
+                "engineer"
+              ],
+              [
+                "b",
+                "6",
+                "archer"
+              ],
+              [
+                "b",
+                "10",
+                "barrack"
+              ],
+              [
+                "u",
+                "10"
+              ],
+              [
+                "b",
+                "5",
+                "mage"
+              ],
+              [
+                "u",
+                "6"
+              ],
+              [
+                "b",
+                "2",
+                "archer"
+              ],
+              [
+                "u",
+                "5"
+              ],
+              [
+                "u",
+                "6"
+              ],
+              [
+                "b",
+                "7",
+                "barrack"
+              ],
+              [
+                "u",
+                "8"
+              ],
+              [
+                "u",
+                "5"
+              ],
+              [
+                "u",
+                "3"
+              ],
+              [
+                "u",
+                "3"
+              ],
+              [
+                "b",
+                "11",
+                "archer"
+              ],
+              [
+                "u",
+                "2"
+              ],
+              [
+                "b",
+                "13",
+                "mage"
+              ],
+              [
+                "u",
+                "3"
+              ],
+              [
+                "u",
+                "2"
+              ],
+              [
+                "u",
+                "2"
+              ],
+              [
+                "u",
+                "2"
+              ],
+              [
+                "u",
+                "5"
+              ],
+              [
+                "u",
+                "6"
+              ],
+              [
+                "u",
+                "8"
+              ],
+              [
+                "u",
+                "5"
+              ],
+              [
+                "u",
+                "2"
+              ],
+              [
+                "u",
+                "11"
+              ],
+              [
+                "u",
+                "3"
+              ],
+              [
+                "u",
+                "2"
+              ],
+              [
+                "u",
+                "2"
+              ],
+              [
+                "u",
+                "5"
+              ],
+              [
+                "u",
+                "2"
+              ],
+              [
+                "u",
+                "10"
+              ],
+              [
+                "u",
+                "10"
+              ],
+              [
+                "b",
+                "1",
+                "barrack"
+              ],
+              [
+                "b",
+                "12",
+                "engineer"
+              ],
+              [
+                "u",
+                "1"
+              ],
+              [
+                "u",
+                "6"
+              ],
+              [
+                "u",
+                "6"
+              ],
+              [
+                "u",
+                "1"
+              ],
+              [
+                "b",
+                "9",
+                "archer"
+              ],
+              [
+                "u",
+                "5"
+              ],
+              [
+                "u",
+                "6"
+              ],
+              [
+                "u",
+                "1"
+              ],
+              [
+                "b",
+                "4",
+                "barrack"
+              ],
+              [
+                "u",
+                "9"
+              ],
+              [
+                "u",
+                "5"
+              ],
+              [
+                "u",
+                "13"
+              ],
+              [
+                "k",
+                "5"
+              ],
+              [
+                "u",
+                "11"
+              ],
+              [
+                "u",
+                "13"
+              ],
+              [
+                "u",
+                "13"
+              ]
+            ],
+            "cast": 30,
+            "early": 0,
+            "branches": {
+              "archer": "tower_ranger",
+              "barrack": "tower_barbarian",
+              "mage": "tower_sorcerer",
+              "engineer": "tower_bfg"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "episode_errors": [],
+  "replays_sampled": 30,
+  "replays_verified": 30,
+  "replay_failures": [],
+  "stopped_reason": null,
+  "protocol": {
+    "name": "kr1-episode-v1",
+    "wait_ticks": 120,
+    "max_interval_ticks": 600,
+    "max_ticks": 240000,
+    "max_decisions": 3000,
+    "first_wave_deadline_ticks": null,
+    "reset_on_trivial_menu": true
+  },
+  "episodes_journal": {
+    "integrity_verified": true,
+    "entries": 1502,
+    "tip_sha256": "fd78da4e32965dbb18254dbdbd9918a135f5e0ad9ec06e049313a4d111b8b173",
+    "engine_replay_verified": false
+  },
+  "optimizer_steps": 0,
+  "engine": {
+    "manifest_sha256": "caeb9bc9aff53d233671797950cdab5488b60475b619a0e19e4c7ce8bcfd075c",
+    "recipe_sha256": "8e06a59561d8c50eeaf5341aec8ebcab72aa1d06d135b239748d889a4db6c72c",
+    "exe_sha256": "24fa97ab51c3f850141e0d4db4d5177c1b445c7bba6f556e2e7c598a6b1825a4",
+    "host_copy_sha256": "5627fb089d21ff538fba4971eb550912dd7e03463dbc361cce1cbee969efe84f"
+  },
+  "rng_mode": "isolate_sound+stable_pairs",
+  "action_scope": "v2"
+}

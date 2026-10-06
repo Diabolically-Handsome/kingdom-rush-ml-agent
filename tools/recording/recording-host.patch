@@ -1,0 +1,99 @@
+--- a/alpharush_rl/assets/host.lua	2026-10-06 13:39:34.817792100 -0400
++++ b/alpharush_rl/assets/host.lua	2026-10-06 13:39:34.850115000 -0400
+@@ -604,9 +604,14 @@
+ end
+ M._meta = meta
+ 
+-local function step(count)
++local function step(count, quiet)
+     local store = game and game.store
+     if not store then error("No native level is loaded") end
++    if quiet and store.game_outcome and type(store.game_outcome.victory) == "boolean" then
++        -- RECORDING COPY ONLY: a pipelined step queued behind the level's end does nothing.
++        return {tick_before=store.tick, tick_after=store.tick, requested_ticks=count, native_updates=0,
++                terminated=true}
++    end
+     count = tonumber(count) or 1
+     if count < 0 or count > 3600 or count ~= math.floor(count) then error("Invalid tick count") end
+     controlled = true
+@@ -625,7 +630,7 @@
+     store.step = false
+     store.paused = true
+     return {tick_before=start_tick, tick_after=store.tick, requested_ticks=count,
+-            native_updates=updates, terminated=store.game_outcome~=nil, state=state()}
++            native_updates=updates, terminated=store.game_outcome~=nil, state=(not quiet) and state() or nil}
+ end
+ 
+ -- v2: the command must equal one catalog entry on every identifying key (absent = nil).
+@@ -694,7 +699,7 @@
+                 rng_mode=ALPHARUSH_RNG and ALPHARUSH_RNG.mode or "", action_scope=ACTION_SCOPE,
+                 headless=os.getenv("ALPHARUSH_HEADLESS") == "1" and love.joystick == nil}
+     elseif cmd.action == "state" then return state()
+-    elseif cmd.action == "step" then return step(cmd.ticks)
++    elseif cmd.action == "step" then return step(cmd.ticks, cmd.quiet == true)
+     elseif cmd.action == "pause" then
+         controlled = true
+         if game and game.store then game.store.paused=true end
+@@ -772,7 +777,27 @@
+ function M.update(dt)
+     if not controlled then
+         original_update(1/60)
+-        if ready() then controlled=true; game.store.paused=true; love.draw=function() end end
++        if ready() then
++            controlled=true; game.store.paused=true
++            if os.getenv("ALPHARUSH_RECORD") == "1" then
++                -- RECORDING COPY ONLY: keep drawing; random draws made while rendering use their own
++                -- generator (wrapper.lua), so the gameplay random stream is the same as in evaluation.
++                local game_draw = love.draw
++                love.draw = function()
++                    -- Tutorial pop-ups wait for a human "OK" (the agent plays through the API, not the
++                    -- GUI); they are simply not drawn, so they do not cover the map in the video.
++                    local gui = game and game.game_gui
++                    local nv = type(gui) == "table" and gui.notiview
++                    if type(nv) == "table" and nv.hidden == false then nv.hidden = true end
++                    ALPHARUSH_DRAWING = true
++                    local ok, e = pcall(game_draw)
++                    ALPHARUSH_DRAWING = false
++                    if not ok then print("[AlphaRush draw error] " .. tostring(e)) end
++                end
++            else
++                love.draw=function() end
++            end
++        end
+     end
+     local c = server:accept()
+     if c then c:settimeout(0); clients[#clients+1]={socket=c, buffer=""} end
+--- a/alpharush_rl/assets/wrapper.lua	2026-10-06 13:39:34.826551400 -0400
++++ b/alpharush_rl/assets/wrapper.lua	2026-10-06 13:39:34.859205100 -0400
+@@ -84,7 +84,17 @@
+         local key = kind .. "@" .. tostring(info and info.source) .. ":" .. tostring(info and info.linedefined)
+         audit[key] = (audit[key] or 0) + 1
+     end
++    -- RECORDING COPY ONLY: random draws made while rendering (host sets ALPHARUSH_DRAWING) use their
++    -- own generator, so drawing every frame cannot shift the gameplay stream.
++    local recording = os.getenv("ALPHARUSH_RECORD") == "1"
++    local draw_generator = recording and love.math.newRandomGenerator(seed + 1) or nil
++    local function draw_random(a, b)
++        if a == nil then return draw_generator:random() end
++        if b == nil then return draw_generator:random(a) end
++        return draw_generator:random(a, b)
++    end
+     math.random = function(...)
++        if recording and ALPHARUSH_DRAWING then return draw_random(...) end
+         local info = getinfo(2, "S")
+         if audit_on then count("math", info) end
+         if sound_random and info and info.source and info.source:find("sound_db", 1, true) then
+@@ -92,10 +102,11 @@
+         end
+         return base_random(...)
+     end
+-    if audit_on and love.math and love.math.random then
++    if (audit_on or recording) and love.math and love.math.random then
+         local base_love_random = love.math.random
+         love.math.random = function(...)
+-            count("love", getinfo(2, "S"))
++            if recording and ALPHARUSH_DRAWING then return draw_random(...) end
++            if audit_on then count("love", getinfo(2, "S")) end
+             return base_love_random(...)
+         end
+     end

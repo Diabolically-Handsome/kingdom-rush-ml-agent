@@ -1,0 +1,1130 @@
+{
+  "action_scope": "v2",
+  "engine": {
+    "exe_sha256": "463bd82ecd965224f00d4ca09fd96c2d13231ae5e12cd9506a107d372a9f2a80",
+    "host_copy_sha256": "9431ddebbf7a07065231710aacb742002fb5fdbe09386c53389235c053d2eddb",
+    "manifest_sha256": "d82463bbf4bbbdc62bfd9fa72e86c17676f2eb01bfcf3a612937a181d7e1745c",
+    "recipe_sha256": "300daa117f93531c700308cb1b754a0c72f712ac4bb94c89fad88e0fe876d51e"
+  },
+  "episode_errors": [
+    257,
+    258,
+    259,
+    260,
+    261,
+    262,
+    263,
+    264,
+    265,
+    266,
+    267,
+    268,
+    269,
+    270,
+    271,
+    272,
+    273,
+    274,
+    275,
+    276,
+    277,
+    278,
+    279,
+    280,
+    281,
+    282,
+    283,
+    284,
+    285,
+    286,
+    287,
+    288,
+    289,
+    290,
+    291,
+    292,
+    293,
+    294,
+    295,
+    296,
+    297,
+    298,
+    299,
+    300,
+    301,
+    302,
+    303,
+    304,
+    305,
+    306,
+    307,
+    308,
+    309,
+    310,
+    311,
+    312,
+    313,
+    314,
+    315,
+    316,
+    317,
+    318,
+    319,
+    320,
+    321,
+    322,
+    323,
+    324,
+    325,
+    326,
+    327,
+    328,
+    329,
+    330,
+    331,
+    332,
+    333,
+    334,
+    335,
+    336,
+    337,
+    338,
+    339,
+    340,
+    341,
+    342,
+    343,
+    344,
+    345,
+    346,
+    347,
+    348,
+    349,
+    350,
+    351,
+    352,
+    353,
+    354
+  ],
+  "episodes_journal": {
+    "engine_replay_verified": false,
+    "entries": 354,
+    "integrity_verified": true,
+    "tip_sha256": "dd29defe54f2ae34e64d57a58b3422ebd9eb10666a80ef11612ff70cf51e6f27"
+  },
+  "games_played": 354,
+  "levels": {
+    "1": {
+      "best_fitness": 11999.86387,
+      "best_genome": {
+        "branches": {
+          "archer": "tower_ranger",
+          "barrack": "tower_paladin",
+          "engineer": "tower_bfg",
+          "mage": "tower_arcane_wizard"
+        },
+        "cast": 50,
+        "early": 1,
+        "hero": null,
+        "steps": [
+          [
+            "b",
+            "8",
+            "archer"
+          ],
+          [
+            "b",
+            "1",
+            "archer"
+          ],
+          [
+            "b",
+            "2",
+            "barrack"
+          ],
+          [
+            "b",
+            "3",
+            "mage"
+          ],
+          [
+            "b",
+            "4",
+            "engineer"
+          ],
+          [
+            "b",
+            "5",
+            "engineer"
+          ],
+          [
+            "u",
+            "2"
+          ],
+          [
+            "b",
+            "6",
+            "archer"
+          ]
+        ]
+      },
+      "best_genome_id": "c16dc2f66866f0db",
+      "evaluations": 29,
+      "validated": []
+    },
+    "10": {
+      "best_fitness": 1667.316,
+      "best_genome": {
+        "branches": {
+          "archer": "tower_musketeer",
+          "barrack": "tower_barbarian",
+          "engineer": "tower_tesla",
+          "mage": "tower_arcane_wizard"
+        },
+        "cast": 60,
+        "early": 1,
+        "hero": "hero_bolin",
+        "steps": [
+          [
+            "b",
+            "11",
+            "archer"
+          ],
+          [
+            "b",
+            "9",
+            "archer"
+          ],
+          [
+            "b",
+            "13",
+            "engineer"
+          ],
+          [
+            "b",
+            "8",
+            "barrack"
+          ],
+          [
+            "b",
+            "6",
+            "engineer"
+          ],
+          [
+            "u",
+            "11"
+          ],
+          [
+            "b",
+            "3",
+            "archer"
+          ],
+          [
+            "b",
+            "1",
+            "mage"
+          ],
+          [
+            "u",
+            "6"
+          ],
+          [
+            "u",
+            "1"
+          ],
+          [
+            "b",
+            "5",
+            "engineer"
+          ],
+          [
+            "u",
+            "3"
+          ],
+          [
+            "u",
+            "1"
+          ],
+          [
+            "u",
+            "11"
+          ],
+          [
+            "k",
+            "13"
+          ]
+        ]
+      },
+      "best_genome_id": "13204a7b2c6551fa",
+      "evaluations": 28,
+      "validated": []
+    },
+    "11": {
+      "best_fitness": 936.012,
+      "best_genome": {
+        "branches": {
+          "archer": "tower_ranger",
+          "barrack": "tower_barbarian",
+          "engineer": "tower_tesla",
+          "mage": "tower_arcane_wizard"
+        },
+        "cast": 30,
+        "early": 1,
+        "hero": "hero_ignus",
+        "steps": [
+          [
+            "b",
+            "14",
+            "mage"
+          ],
+          [
+            "b",
+            "1",
+            "engineer"
+          ],
+          [
+            "u",
+            "14"
+          ],
+          [
+            "b",
+            "4",
+            "archer"
+          ],
+          [
+            "b",
+            "10",
+            "barrack"
+          ],
+          [
+            "b",
+            "15",
+            "archer"
+          ],
+          [
+            "u",
+            "1"
+          ],
+          [
+            "b",
+            "2",
+            "archer"
+          ],
+          [
+            "u",
+            "15"
+          ],
+          [
+            "u",
+            "4"
+          ],
+          [
+            "u",
+            "10"
+          ],
+          [
+            "u",
+            "15"
+          ],
+          [
+            "u",
+            "10"
+          ],
+          [
+            "u",
+            "4"
+          ],
+          [
+            "u",
+            "4"
+          ],
+          [
+            "u",
+            "14"
+          ],
+          [
+            "u",
+            "1"
+          ],
+          [
+            "u",
+            "10"
+          ],
+          [
+            "u",
+            "4"
+          ],
+          [
+            "u",
+            "15"
+          ],
+          [
+            "u",
+            "4"
+          ],
+          [
+            "u",
+            "1"
+          ]
+        ]
+      },
+      "best_genome_id": "c6ce4c3ea0ce3cea",
+      "evaluations": 28,
+      "validated": []
+    },
+    "12": {
+      "best_fitness": 534.503,
+      "best_genome": {
+        "branches": {
+          "archer": "tower_musketeer",
+          "barrack": "tower_paladin",
+          "engineer": "tower_tesla",
+          "mage": "tower_sorcerer"
+        },
+        "cast": 30,
+        "early": 1,
+        "hero": "hero_gerald",
+        "steps": [
+          [
+            "b",
+            "8",
+            "barrack"
+          ],
+          [
+            "b",
+            "9",
+            "archer"
+          ],
+          [
+            "b",
+            "5",
+            "barrack"
+          ],
+          [
+            "u",
+            "9"
+          ],
+          [
+            "b",
+            "3",
+            "mage"
+          ],
+          [
+            "b",
+            "13",
+            "archer"
+          ],
+          [
+            "b",
+            "10",
+            "archer"
+          ],
+          [
+            "b",
+            "7",
+            "archer"
+          ],
+          [
+            "b",
+            "2",
+            "mage"
+          ],
+          [
+            "u",
+            "8"
+          ],
+          [
+            "k",
+            "2"
+          ]
+        ]
+      },
+      "best_genome_id": "4358eab8704b704e",
+      "evaluations": 28,
+      "validated": []
+    },
+    "2": {
+      "best_fitness": 11899.81993,
+      "best_genome": {
+        "branches": {
+          "archer": "tower_ranger",
+          "barrack": "tower_paladin",
+          "engineer": "tower_tesla",
+          "mage": "tower_sorcerer"
+        },
+        "cast": 40,
+        "early": 0,
+        "hero": null,
+        "steps": [
+          [
+            "b",
+            "6",
+            "mage"
+          ],
+          [
+            "b",
+            "3",
+            "engineer"
+          ],
+          [
+            "b",
+            "1",
+            "archer"
+          ],
+          [
+            "b",
+            "2",
+            "barrack"
+          ],
+          [
+            "u",
+            "6"
+          ],
+          [
+            "b",
+            "5",
+            "archer"
+          ],
+          [
+            "u",
+            "5"
+          ]
+        ]
+      },
+      "best_genome_id": "fd9fb3571c071be0",
+      "evaluations": 29,
+      "validated": []
+    },
+    "3": {
+      "best_fitness": 11999.62389,
+      "best_genome": {
+        "branches": {
+          "archer": "tower_ranger",
+          "barrack": "tower_paladin",
+          "engineer": "tower_bfg",
+          "mage": "tower_sorcerer"
+        },
+        "cast": 50,
+        "early": 1,
+        "hero": null,
+        "steps": [
+          [
+            "b",
+            "9",
+            "mage"
+          ],
+          [
+            "b",
+            "12",
+            "barrack"
+          ],
+          [
+            "b",
+            "7",
+            "engineer"
+          ],
+          [
+            "b",
+            "8",
+            "mage"
+          ],
+          [
+            "b",
+            "4",
+            "barrack"
+          ],
+          [
+            "k",
+            "7"
+          ]
+        ]
+      },
+      "best_genome_id": "3d35fc565720fd8a",
+      "evaluations": 29,
+      "validated": []
+    },
+    "4": {
+      "best_fitness": 11599.56081,
+      "best_genome": {
+        "branches": {
+          "archer": "tower_ranger",
+          "barrack": "tower_paladin",
+          "engineer": "tower_tesla",
+          "mage": "tower_arcane_wizard"
+        },
+        "cast": 30,
+        "early": 1,
+        "hero": "hero_gerald",
+        "steps": [
+          [
+            "b",
+            "14",
+            "engineer"
+          ],
+          [
+            "b",
+            "01",
+            "mage"
+          ],
+          [
+            "b",
+            "08",
+            "archer"
+          ],
+          [
+            "u",
+            "01"
+          ],
+          [
+            "b",
+            "15",
+            "mage"
+          ],
+          [
+            "b",
+            "05",
+            "mage"
+          ],
+          [
+            "u",
+            "05"
+          ],
+          [
+            "u",
+            "08"
+          ],
+          [
+            "u",
+            "08"
+          ],
+          [
+            "u",
+            "15"
+          ],
+          [
+            "u",
+            "14"
+          ],
+          [
+            "u",
+            "01"
+          ],
+          [
+            "b",
+            "10",
+            "engineer"
+          ],
+          [
+            "u",
+            "10"
+          ],
+          [
+            "u",
+            "15"
+          ],
+          [
+            "u",
+            "08"
+          ],
+          [
+            "b",
+            "03",
+            "archer"
+          ],
+          [
+            "u",
+            "05"
+          ],
+          [
+            "u",
+            "14"
+          ],
+          [
+            "u",
+            "15"
+          ],
+          [
+            "b",
+            "06",
+            "archer"
+          ],
+          [
+            "u",
+            "05"
+          ],
+          [
+            "u",
+            "03"
+          ],
+          [
+            "u",
+            "03"
+          ],
+          [
+            "u",
+            "06"
+          ],
+          [
+            "u",
+            "05"
+          ],
+          [
+            "u",
+            "03"
+          ],
+          [
+            "u",
+            "06"
+          ],
+          [
+            "u",
+            "14"
+          ],
+          [
+            "u",
+            "05"
+          ],
+          [
+            "u",
+            "01"
+          ],
+          [
+            "k",
+            "08"
+          ]
+        ]
+      },
+      "best_genome_id": "d5b32c7e3bd1ecb5",
+      "evaluations": 29,
+      "validated": []
+    },
+    "5": {
+      "best_fitness": 11599.58161,
+      "best_genome": {
+        "branches": {
+          "archer": "tower_ranger",
+          "barrack": "tower_paladin",
+          "engineer": "tower_bfg",
+          "mage": "tower_arcane_wizard"
+        },
+        "cast": 50,
+        "early": 1,
+        "hero": "hero_gerald",
+        "steps": [
+          [
+            "b",
+            "11",
+            "archer"
+          ],
+          [
+            "b",
+            "6",
+            "barrack"
+          ],
+          [
+            "b",
+            "12",
+            "mage"
+          ],
+          [
+            "b",
+            "1",
+            "engineer"
+          ],
+          [
+            "b",
+            "14",
+            "archer"
+          ],
+          [
+            "b",
+            "3",
+            "archer"
+          ]
+        ]
+      },
+      "best_genome_id": "c4295a6de46b9773",
+      "evaluations": 29,
+      "validated": []
+    },
+    "6": {
+      "best_fitness": 1555.638,
+      "best_genome": {
+        "branches": {
+          "archer": "tower_musketeer",
+          "barrack": "tower_barbarian",
+          "engineer": "tower_bfg",
+          "mage": "tower_sorcerer"
+        },
+        "cast": 60,
+        "early": 0,
+        "hero": "hero_alleria",
+        "steps": [
+          [
+            "b",
+            "3",
+            "mage"
+          ],
+          [
+            "b",
+            "2",
+            "archer"
+          ],
+          [
+            "u",
+            "3"
+          ],
+          [
+            "b",
+            "9",
+            "mage"
+          ],
+          [
+            "b",
+            "12",
+            "archer"
+          ],
+          [
+            "b",
+            "6",
+            "mage"
+          ],
+          [
+            "u",
+            "6"
+          ],
+          [
+            "b",
+            "14",
+            "barrack"
+          ],
+          [
+            "u",
+            "3"
+          ],
+          [
+            "u",
+            "2"
+          ],
+          [
+            "u",
+            "9"
+          ],
+          [
+            "b",
+            "11",
+            "archer"
+          ]
+        ]
+      },
+      "best_genome_id": "1ca9fbac181ad98d",
+      "evaluations": 28,
+      "validated": []
+    },
+    "7": {
+      "best_fitness": 11899.45948,
+      "best_genome": {
+        "branches": {
+          "archer": "tower_ranger",
+          "barrack": "tower_barbarian",
+          "engineer": "tower_bfg",
+          "mage": "tower_sorcerer"
+        },
+        "cast": 70,
+        "early": 1,
+        "hero": "hero_gerald",
+        "steps": [
+          [
+            "b",
+            "7",
+            "barrack"
+          ],
+          [
+            "b",
+            "5",
+            "archer"
+          ],
+          [
+            "b",
+            "9",
+            "mage"
+          ],
+          [
+            "b",
+            "10",
+            "archer"
+          ],
+          [
+            "u",
+            "5"
+          ],
+          [
+            "u",
+            "5"
+          ],
+          [
+            "b",
+            "1",
+            "mage"
+          ],
+          [
+            "b",
+            "2",
+            "mage"
+          ],
+          [
+            "u",
+            "2"
+          ],
+          [
+            "b",
+            "11",
+            "engineer"
+          ],
+          [
+            "b",
+            "3",
+            "archer"
+          ],
+          [
+            "u",
+            "9"
+          ],
+          [
+            "u",
+            "3"
+          ],
+          [
+            "u",
+            "11"
+          ],
+          [
+            "u",
+            "10"
+          ],
+          [
+            "u",
+            "7"
+          ],
+          [
+            "b",
+            "6",
+            "engineer"
+          ],
+          [
+            "u",
+            "1"
+          ],
+          [
+            "u",
+            "9"
+          ],
+          [
+            "u",
+            "5"
+          ],
+          [
+            "u",
+            "2"
+          ],
+          [
+            "u",
+            "6"
+          ],
+          [
+            "u",
+            "1"
+          ],
+          [
+            "u",
+            "7"
+          ],
+          [
+            "u",
+            "2"
+          ],
+          [
+            "k",
+            "10"
+          ],
+          [
+            "k",
+            "3"
+          ]
+        ]
+      },
+      "best_genome_id": "4af65996a4ea4ea8",
+      "evaluations": 28,
+      "validated": []
+    },
+    "8": {
+      "best_fitness": 1780.005,
+      "best_genome": {
+        "branches": {
+          "archer": "tower_musketeer",
+          "barrack": "tower_paladin",
+          "engineer": "tower_bfg",
+          "mage": "tower_sorcerer"
+        },
+        "cast": 70,
+        "early": 1,
+        "hero": "hero_malik",
+        "steps": [
+          [
+            "b",
+            "06",
+            "barrack"
+          ],
+          [
+            "b",
+            "11",
+            "mage"
+          ],
+          [
+            "b",
+            "07",
+            "mage"
+          ],
+          [
+            "k",
+            "07"
+          ],
+          [
+            "k",
+            "06"
+          ]
+        ]
+      },
+      "best_genome_id": "1ce3f3d2d1313b6d",
+      "evaluations": 28,
+      "validated": []
+    },
+    "9": {
+      "best_fitness": 1244.205,
+      "best_genome": {
+        "branches": {
+          "archer": "tower_ranger",
+          "barrack": "tower_barbarian",
+          "engineer": "tower_bfg",
+          "mage": "tower_sorcerer"
+        },
+        "cast": 50,
+        "early": 0,
+        "hero": "hero_bolin",
+        "steps": [
+          [
+            "b",
+            "11",
+            "barrack"
+          ],
+          [
+            "b",
+            "6",
+            "mage"
+          ],
+          [
+            "b",
+            "5",
+            "archer"
+          ],
+          [
+            "u",
+            "5"
+          ],
+          [
+            "b",
+            "4",
+            "archer"
+          ],
+          [
+            "u",
+            "5"
+          ],
+          [
+            "u",
+            "4"
+          ],
+          [
+            "u",
+            "6"
+          ],
+          [
+            "u",
+            "6"
+          ],
+          [
+            "b",
+            "14",
+            "archer"
+          ],
+          [
+            "k",
+            "14"
+          ],
+          [
+            "k",
+            "4"
+          ]
+        ]
+      },
+      "best_genome_id": "cc16f54bfaa4348b",
+      "evaluations": 28,
+      "validated": []
+    }
+  },
+  "max_games": 5600,
+  "optimizer_steps": 0,
+  "protocol": {
+    "first_wave_deadline_ticks": null,
+    "max_decisions": 1500,
+    "max_interval_ticks": 600,
+    "max_ticks": 120000,
+    "name": "kr1-episode-v1",
+    "reset_on_trivial_menu": true,
+    "wait_ticks": 120
+  },
+  "replay_failures": [],
+  "replays_sampled": 1,
+  "replays_verified": 1,
+  "rng_mode": "isolate_sound+stable_pairs",
+  "run_id": "native-search-3682d5b62e0140a7b2e8aeb58dcf9289",
+  "schema": "alpharush-campaign-search-v1",
+  "spec": {
+    "evaluations_per_level": 400,
+    "levels": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "min_evaluations": 48,
+    "population": 24,
+    "profile_stars_per_level": 2,
+    "rng_seed": "campaign-v1-search-1",
+    "search_seed": 1001,
+    "stop_lives": 18,
+    "validate_seeds": [
+      1001,
+      1002,
+      1003,
+      1004,
+      1005,
+      1006,
+      1007,
+      1008,
+      1009,
+      1010
+    ],
+    "validate_top": 3,
+    "workers": 28
+  },
+  "stopped_reason": "engine_errors"
+}

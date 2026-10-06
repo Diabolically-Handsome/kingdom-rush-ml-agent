@@ -1,0 +1,342 @@
+{
+ "note": "Files changed only by redaction; original_sha256 is the file as used in the runs (pins.json/ledger reference the originals). Hash-chained journals are unmodified.",
+ "files": [
+  {
+   "path": "alpharush_rl/model_broker.py",
+   "original_sha256": "7d425e8bee60a36c3d1e63b39c46be3c451ed63424e61bff3c73f59fad8eb0d7",
+   "published_sha256": "bda445735ad8d52729e35b3f4e552f68f3e147c042f1362a9a3f87dac567c02e",
+   "categories": [
+    "local user-name paths",
+    "name of an unrelated private project"
+   ]
+  },
+  {
+   "path": "tools/collect-level1-rewards.py",
+   "original_sha256": "436fdcf95f4460ee2191b9d33c32557a5b11b8edd7ba4f5f75163630fa4562d6",
+   "published_sha256": "b1a6bea5c2584fd09106dabc8e6ef73671c61cce5963df8bc22dcc868c423b06",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "tools/create-model-manifests.py",
+   "original_sha256": "80f95bd4050fc4edd4fa00e9ddf1ae2955b5b0c3cb8e9134cfe4128bc6444250",
+   "published_sha256": "72ce25fbd3517f00d6c3f6d690bb6bdea60c5bbb708e90a449ec6f549d8632fd",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "tools/model-preflight.py",
+   "original_sha256": "a7984f13ecd557c67f2d46b0bed4dbf2a474d52645ac2f9f6985f18e0682747f",
+   "published_sha256": "09dd9cbada20cb6a5b45f8e50a2f203b6999703a5ca07d6828ce5700d7643c66",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "tools/setup-model-env.sh",
+   "original_sha256": "42d41b25b183ee2a7552847748df03f8451ace81554540a4da743e81e7a12930",
+   "published_sha256": "7b6583cc2fdd99feada4790355e2eed02d0b4e5c82c4d04079908e57712b6d90",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "tools/train-level1-24b.py",
+   "original_sha256": "031e3b32dbac8d7123c9469c25d2ffbdfa1e6918093e355813652909f67bb751",
+   "published_sha256": "a1f794e52172af13a3a0b26f0b325e04c5b037d357a791543a3927d8dde8e043",
+   "categories": [
+    "local user-name paths",
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "tools/train-llm-smoke.py",
+   "original_sha256": "1ca11a94c5e519448fe7c4b30f3ee52367bca28c9ac0f83dce19b91139d65bdc",
+   "published_sha256": "725f50ee56cb094b6a7abb23f12a7843a5921fdf0a6e5b2ea3d32509b05d2f2f",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "tests/test_phase.py",
+   "original_sha256": "0ac05d3f46362ea96e996e1a75c43384d2de625691a864c44775f4bfd5af17cb",
+   "published_sha256": "b742ac4bf9a99a3be3e85989534189ffa1aa12657963259b3d093fe198464e3b",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "configs/level1-24b-training.json",
+   "original_sha256": "818ef9e49b10e5f77386a2ff6d9e424df51d70ca09ada956b560cdc58a7ca4db",
+   "published_sha256": "cda699dbb0de6d53ce068a8e1163205afab6a032c29cb516f5b695211ef12beb",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "configs/llm-smoke-r2.json",
+   "original_sha256": "3894302bf14d6cafb51c884bffcdee687eee37d593cb5ff747a8b80d76bbf497",
+   "published_sha256": "3bf098355ce61cf3eaeb6d15710ed65775a84f20e2aa2b6141411ff23cf62298",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "configs/llm-smoke.json",
+   "original_sha256": "051605203c38082d8ce6efaa17aeb5e57d8a2161020a0fc2bed6b72c757ed214",
+   "published_sha256": "2d6dad54a413646a34ac9fe2242ba7a4812438c12b7657d817bf53e4fd9ef481",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "configs/models-comparison.json",
+   "original_sha256": "c6f3688d827aa7775e3cca1a2c09f03129c1deac3cc630421663a7840a425f68",
+   "published_sha256": "be0fd647877811bbbc1f1f25bcaab7ec953a9440039d47f7fb7d947327865058",
+   "categories": [
+    "name of an unrelated private project"
+   ]
+  },
+  {
+   "path": "configs/phases/campaign-v1.json",
+   "original_sha256": "fd051a84cabd204fe2410b463882944ba035ea8f5333e05af59f5cef6c89a364",
+   "published_sha256": "4973b19886cd3dac4316f33e96a9b0717b1f0e48887f443050fe8bc41222f7cb",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "configs/rl-deployment.json",
+   "original_sha256": "ca8d046556c6359c6d7558a7b76fa980075b18fe94d6cec063e62ce8e14111ec",
+   "published_sha256": "64efdf1aaaac2aeadc83a2fa4281608d2fb10fed14aa3aadf461e3cae89db7af",
+   "categories": [
+    "local user-name paths",
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "docs/LEVEL1-TRAINING.md",
+   "original_sha256": "50d86a8dec304fc6911bda1cbaa7fd2ee0ff83f927f271ec8aaaab5312e0d485",
+   "published_sha256": "ec67bfc58ff82e4818dd282af701556cef7177a53a222ce7dabe76ac3df0520b",
+   "categories": [
+    "name of an unrelated private project"
+   ]
+  },
+  {
+   "path": "docs/MODEL-DEPLOYMENT.md",
+   "original_sha256": "792ea95eeca4e8d3f0c0f053b63e0058ca01344d6e02320e592840f4ca2d56c5",
+   "published_sha256": "4d6e750098b0d85d3be0ac39b55604284311ba61c4ba468d75bcab98f86e0d77",
+   "categories": [
+    "local user-name paths",
+    "name of an unrelated private project"
+   ]
+  },
+  {
+   "path": "docs/RL-ARCHITECTURE.md",
+   "original_sha256": "9fb2919ae1ece46aadbc04c31d0cd61bf19efdf5bb5474826856f256af36f80a",
+   "published_sha256": "2e1f91846d3b012b3afc32101d7ac4e405d42353ce4072d42674e63ab06a5a76",
+   "categories": [
+    "name of an unrelated private project"
+   ]
+  },
+  {
+   "path": "DEPLOYMENT.md",
+   "original_sha256": "f6e01ac5628541fd0670094eec72546eb4947b34ff4565aed329394c9856d119",
+   "published_sha256": "0293e5a5cf4285b71e117dc81e5c77b2647d4c7e044fab151cdc9728f4833cde",
+   "categories": [
+    "local user-name paths",
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "docs/DEV-LOG.zh-CN.md",
+   "original_sha256": "1ac1c7d03decc29d9b8223147c00b3d095ffabf15a23f0842f5c7fcceed25829",
+   "published_sha256": "0ed21dc69e1c4836fa432a4b08d89a8d5e0564889468502c1eaeff6eeb7a0f25",
+   "categories": [
+    "local user-name paths",
+    "name of an unrelated private project",
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "runtime/rl/campaign-v1/final-artifacts/scripts/add_job.py",
+   "original_sha256": "887882925d6a9f71e03c4e15998e25880516f98074216722459c2ed65f85e02a",
+   "published_sha256": "fe6efc6c3250b58e2c587b48f2c2839e1d48e752f1aa36b7d60a138b3504ca60",
+   "categories": [
+    "local user-name paths",
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "runtime/rl/campaign-v1/final-artifacts/scripts/campaign_progress.py",
+   "original_sha256": "6080d163c80c07cf059f33b70fe27e26ba428da2cda1cd8421cfa4b985e759af",
+   "published_sha256": "685a36312b29f91d1d049fc2111066291f8f859b68a54cdbdca946b086ba857a",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/campaign-v1/final-artifacts/scripts/config_campaign.py",
+   "original_sha256": "3d9eba21f6f9d66ff8ea1979c80e0ba47826fd312e1cf39753ac20bb0c9e4395",
+   "published_sha256": "51c1ef068f56a03493c8d435664ece7b498b6a8ad778e55fc1c7b6494e8f0104",
+   "categories": [
+    "local user-name paths",
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "runtime/rl/campaign-v1/final-artifacts/scripts/config_run13.py",
+   "original_sha256": "16fcd8ba0d24286496263c0403f334f3793af010aa342155c334a4674ac8c89e",
+   "published_sha256": "ad5217e51de7899dd3810648c12bdcfccb9793c293a943b7ec1cc8abef3cabd1",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/campaign-v1/final-artifacts/scripts/config_run14.py",
+   "original_sha256": "405c39465c93f167c60000f4fe7480189925b884a15fbf2f0aa7e587fe6870ff",
+   "published_sha256": "79fdf26f9898104f894b909adbe923a3e8912acef2a03735a68d112556d7f12c",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/campaign-v1/final-artifacts/scripts/config_run15.py",
+   "original_sha256": "90314a35c4310eed5b25206dcd525224ffc9baf9463dc9bdf9c05aded0896456",
+   "published_sha256": "79aac189a8af8f06835404cad1b18190407110c0a677b5e4c4f4979c375496c9",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/campaign-v1/final-artifacts/scripts/config_run16.py",
+   "original_sha256": "885426d09cc5c28b418cfaff72eafe06d3ddeabe68e97a1d38e22eb15977494b",
+   "published_sha256": "983586b9c164d25ac91fcfc4755dc234138e2a033ee522c8fa7d868feb931877",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/campaign-v1/final-artifacts/scripts/config_run17.py",
+   "original_sha256": "01ac06adc7b32fa92a17cc7d3181a258db57abbf2361f26e06f8148fb5a4a96e",
+   "published_sha256": "5ab5cf5e51d921b038f645e5c10f87cf41ea007c8a5cfedbcd544a8b69de5db9",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/campaign-v1/final-artifacts/scripts/config_run18.py",
+   "original_sha256": "6632e2a3ddc75eddfbb911e04dec05df1960121bf159654a1011ee07b12d4d5c",
+   "published_sha256": "a0bf087517f9002bf5baf29f06ad03edd3032fe39593dd6d1809acc56d177e62",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/campaign-v1/final-artifacts/scripts/config_run19.py",
+   "original_sha256": "53c30690e69757d401349d1f3734ebef0582d3e56d9f1939906ac6b47d4160a4",
+   "published_sha256": "61923baf895672ec5080d7f0dfaa83eb706646b29656c516659edb7a57773c2e",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/campaign-v1/final-artifacts/scripts/luainspect.py",
+   "original_sha256": "723b0d48a22a704b0d162f85276a62c62ab0e22e6c2a0f3accc3193182505bee",
+   "published_sha256": "0b4bcfe7e96e023eeb32b0f3ddc0b13e6b439d15f260d1b12227dbf1f3aa62a8",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/campaign-v1/final-artifacts/scripts/make_jobs.py",
+   "original_sha256": "fec7acba4af205c8b202ddbd0eeb8dcb72752747576127da56e4d1890d4545fc",
+   "published_sha256": "6f6efc3505b65a225e321f44ca815104621502d4f50b0dafd02f096e33f3a38f",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/campaign-v1/final-artifacts/scripts/patch_click.py",
+   "original_sha256": "11739e4393f47f61074c6ddbac0bef266f2d8684784b4f9ce4643ee0b84860f3",
+   "published_sha256": "0107a38cb266e7279c112fc64af2fd587f427558df52619bc6130abb38923658",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/campaign-v1/final-artifacts/scripts/patch_debias.py",
+   "original_sha256": "4b82c1fd0020e4456651e37bfbfdb184cda1affb47f3ff2a5b50b2e9db805aad",
+   "published_sha256": "9810641857b890bd265563efeea23a2b65003848173f11f7c283092882566f80",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/campaign-v1/final-artifacts/scripts/patch_pkg.py",
+   "original_sha256": "d44ddec18eacfcd704656ced6ab617b3f0c22db5ea4c190b9331cc2af70f7695",
+   "published_sha256": "04910a778c0675f4ef533475efceb0aad6c87209389d5ffca3d582a22180f680",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/campaign-v1/final-artifacts/scripts/patch_pkg2.py",
+   "original_sha256": "acd03191efdc4ecda8bdf6271aed658147c4db72c737d356b43c10b8775720f0",
+   "published_sha256": "394100128397bfb83309faa9c23321b65a00970a499758fa913fd6271163a060",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/campaign-v1/final-artifacts/scripts/patch_rate.py",
+   "original_sha256": "1224d689caa42b7a816587bd65b93abccfaa0bf5197a898a277618e586c4feae",
+   "published_sha256": "d273d315f9e42b59c623746d569e5015ac37a9baa02eb596649c822e89e8fa14",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/campaign-v1/final-artifacts/scripts/search_progress.py",
+   "original_sha256": "447f7cd0951f4ae58b56614e28faaae2c526d92b34a6dc1849ba68b29c23c012",
+   "published_sha256": "2f5054287d6a2521e66390f664de8216de7cf43f7bb00a882daca6ec5270d8f8",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/campaign-v1/final-artifacts/scripts/tests_click.py",
+   "original_sha256": "f8ea7bf4aede95d4f6ad0128c322774780b6535a305fb6a55913151b9dbc2052",
+   "published_sha256": "152b6d8e9456935b93921ae5179fbc7fc1fbbd8f6796c6f371a60ac8181b44c8",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/campaign-v1/final-artifacts/scripts/tests_pkg.py",
+   "original_sha256": "037527cd47258bfae572b885d1fbec16afbca3d9b0d99d56aa1f33ef8295feba",
+   "published_sha256": "54793af9c83deb30afd1ca3ea82a889d763ddf0534746b044d7760b844bd7ae3",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/campaign-v1/runs/native-campaign-961d1b6b26b3492db29648eafa323646/worker-stderr.log",
+   "original_sha256": "96d92eeca4cf9cd4fff0f4d2ca61c01b6c8668429f5f7c65c53c6495fbf8a129",
+   "published_sha256": "4fd9bbd67af067eecbf8c11f52f695893b7c06ad095541ce790a66623ee5655e",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "tools/recording/record_final.py",
+   "original_sha256": "8026c4898bafd1e569c877d97f690712b4e4d3d30973144870ab452e1a596186",
+   "published_sha256": "3ebb0f5f200e306e5d2a087b1aa6bb27a6e2262a08b84585c4e3d685de129930",
+   "categories": [
+    "local user-name paths"
+   ]
+  }
+ ]
+}

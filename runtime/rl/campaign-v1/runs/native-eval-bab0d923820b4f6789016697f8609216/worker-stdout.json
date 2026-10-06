@@ -1,0 +1,263 @@
+{
+  "schema": "alpharush-eval-v1",
+  "run_id": "native-eval-bab0d923820b4f6789016697f8609216",
+  "players": [
+    "plan",
+    "operator"
+  ],
+  "results": {
+    "plan": {
+      "1": {
+        "games": 3,
+        "wins": 3,
+        "lives": [
+          20,
+          20,
+          20
+        ]
+      },
+      "2": {
+        "games": 3,
+        "wins": 3,
+        "lives": [
+          20,
+          20,
+          20
+        ]
+      },
+      "3": {
+        "games": 3,
+        "wins": 3,
+        "lives": [
+          20,
+          20,
+          20
+        ]
+      },
+      "5": {
+        "games": 3,
+        "wins": 3,
+        "lives": [
+          19,
+          19,
+          17
+        ]
+      },
+      "4": {
+        "games": 3,
+        "wins": 3,
+        "lives": [
+          18,
+          16,
+          19
+        ]
+      },
+      "7": {
+        "games": 3,
+        "wins": 3,
+        "lives": [
+          19,
+          20,
+          20
+        ]
+      },
+      "6": {
+        "games": 3,
+        "wins": 3,
+        "lives": [
+          19,
+          17,
+          20
+        ]
+      },
+      "8": {
+        "games": 3,
+        "wins": 3,
+        "lives": [
+          20,
+          20,
+          20
+        ]
+      },
+      "9": {
+        "games": 10,
+        "wins": 10,
+        "lives": [
+          19,
+          20,
+          20,
+          20,
+          18,
+          15,
+          20,
+          19,
+          18,
+          20
+        ]
+      },
+      "11": {
+        "games": 10,
+        "wins": 0,
+        "lives": []
+      },
+      "10": {
+        "games": 3,
+        "wins": 3,
+        "lives": [
+          19,
+          19,
+          20
+        ]
+      },
+      "12": {
+        "games": 10,
+        "wins": 4,
+        "lives": [
+          11,
+          8,
+          18,
+          17
+        ]
+      }
+    },
+    "operator": {
+      "1": {
+        "games": 3,
+        "wins": 3,
+        "lives": [
+          20,
+          20,
+          20
+        ]
+      },
+      "2": {
+        "games": 3,
+        "wins": 3,
+        "lives": [
+          20,
+          20,
+          20
+        ]
+      },
+      "3": {
+        "games": 3,
+        "wins": 3,
+        "lives": [
+          20,
+          20,
+          20
+        ]
+      },
+      "4": {
+        "games": 3,
+        "wins": 3,
+        "lives": [
+          18,
+          18,
+          16
+        ]
+      },
+      "5": {
+        "games": 3,
+        "wins": 3,
+        "lives": [
+          19,
+          20,
+          16
+        ]
+      },
+      "7": {
+        "games": 3,
+        "wins": 3,
+        "lives": [
+          19,
+          19,
+          20
+        ]
+      },
+      "6": {
+        "games": 3,
+        "wins": 3,
+        "lives": [
+          17,
+          8,
+          20
+        ]
+      },
+      "8": {
+        "games": 3,
+        "wins": 3,
+        "lives": [
+          13,
+          20,
+          20
+        ]
+      },
+      "9": {
+        "games": 10,
+        "wins": 10,
+        "lives": [
+          19,
+          19,
+          19,
+          20,
+          18,
+          18,
+          15,
+          20,
+          19,
+          20
+        ]
+      },
+      "11": {
+        "games": 10,
+        "wins": 3,
+        "lives": [
+          4,
+          8,
+          4
+        ]
+      },
+      "10": {
+        "games": 3,
+        "wins": 3,
+        "lives": [
+          20,
+          19,
+          17
+        ]
+      },
+      "12": {
+        "games": 10,
+        "wins": 7,
+        "lives": [
+          17,
+          14,
+          18,
+          18,
+          8,
+          17,
+          14
+        ]
+      }
+    }
+  },
+  "episode_errors": [],
+  "games_played": 114,
+  "stopped_reason": null,
+  "episodes_journal": {
+    "integrity_verified": true,
+    "entries": 114,
+    "tip_sha256": "02bb0afbbfcd82b32e6448a93a4aa44f68069116fc46ae82c92d7862314597e5",
+    "engine_replay_verified": false
+  },
+  "optimizer_steps": 0,
+  "engine": {
+    "manifest_sha256": "caeb9bc9aff53d233671797950cdab5488b60475b619a0e19e4c7ce8bcfd075c",
+    "recipe_sha256": "8e06a59561d8c50eeaf5341aec8ebcab72aa1d06d135b239748d889a4db6c72c",
+    "exe_sha256": "24fa97ab51c3f850141e0d4db4d5177c1b445c7bba6f556e2e7c598a6b1825a4",
+    "host_copy_sha256": "5627fb089d21ff538fba4971eb550912dd7e03463dbc361cce1cbee969efe84f"
+  },
+  "rng_mode": "isolate_sound+stable_pairs",
+  "action_scope": "v2"
+}

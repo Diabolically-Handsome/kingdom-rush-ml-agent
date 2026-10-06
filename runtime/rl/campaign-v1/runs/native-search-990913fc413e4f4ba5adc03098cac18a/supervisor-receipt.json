@@ -1,0 +1,19 @@
+{
+  "episodes_journal": {
+    "engine_replay_verified": false,
+    "entries": 1138,
+    "integrity_verified": true,
+    "tip_sha256": "021723ce731ce635a3e2596e5bdb486b2280b24b83063a24494e3fb761841eb9"
+  },
+  "error": null,
+  "exit_code": 1,
+  "games_played": 1156,
+  "games_source": "worker_events_journal",
+  "gpu": false,
+  "max_games": 8000,
+  "optimizer_steps": 0,
+  "run_id": "native-search-990913fc413e4f4ba5adc03098cac18a",
+  "status": "stopped",
+  "wall_seconds": 1180.704000000027,
+  "worker_exit_confirmed": true
+}

@@ -1,0 +1,44 @@
+Traceback (most recent call last):
+  File "C:\Users\<user>\Documents\AlphaRush\tools\campaign-survey.py", line 1289, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "C:\Users\<user>\Documents\AlphaRush\tools\campaign-survey.py", line 1262, in main
+    _print(worker_main(args.config, args.run_dir, job_kind=args.job))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\<user>\Documents\AlphaRush\tools\campaign-survey.py", line 1038, in worker_main
+    return _campaign_main(config, permit, ctx, job, pools, run_dir, job_kind)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\<user>\Documents\AlphaRush\tools\campaign-survey.py", line 1153, in _campaign_main
+    summary = campaign_run.run_campaigns(spec, campaign_env_factory(ctx.run_id, rng_mode, action_scope), ctx,
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\<user>\Documents\AlphaRush\alpharush_rl\campaign_run.py", line 118, in run_campaigns
+    results = list(executor.map(one, spec["seeds"]))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\<user>\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\<user>\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\<user>\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\<user>\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Users\<user>\AppData\Local\Programs\Python\Python312\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\<user>\Documents\AlphaRush\alpharush_rl\campaign_run.py", line 113, in one
+    return run_campaign({**spec, "seed": seed}, lambda *a: env_factory(*a, port), shared_ctx, shared_out,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\<user>\Documents\AlphaRush\alpharush_rl\campaign_run.py", line 208, in run_campaign
+    out.append("campaign_attempt", {**base, "won": victory, "stars": stars,
+  File "C:\Users\<user>\Documents\AlphaRush\alpharush_rl\campaign_run.py", line 95, in call
+    return value(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\<user>\Documents\AlphaRush\alpharush_rl\journal.py", line 89, in append
+    status = self.verify()
+             ^^^^^^^^^^^^^
+  File "C:\Users\<user>\Documents\AlphaRush\alpharush_rl\journal.py", line 81, in verify
+    raise JournalError(f"hash mismatch at entry {sequence}")
+alpharush_rl.journal.JournalError: hash mismatch at entry 298

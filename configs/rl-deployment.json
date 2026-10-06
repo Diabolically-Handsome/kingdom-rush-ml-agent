@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "project": "AlphaRush",
+  "workspace": "..",
+  "state_dir": "runtime/rl",
+  "pools_path": "configs/pools.json",
+  "pins_manifest": "runtime/rl/pins.json",
+  "required_pins": ["alpharush_rl/ops.py", "configs/rl-deployment.json", "configs/pools.json", "configs/models-comparison.json"],
+  "native_evidence_path": "runtime/rl/native-evidence.json",
+  "required_native_gates": ["exact_state", "action_receipts", "deterministic_replay", "branch_replay"],
+  "model": {
+    "selected": true,
+    "comparison_plan": "configs/models-comparison.json",
+    "gpu_enabled": false,
+    "status": "verified_scoped_inference",
+    "models": {
+      "8b": {
+        "base": "mistralai/Ministral-3-8B-Instruct-2512-BF16",
+        "local_path": "/home/<user>/option_brain_20260922/base-ministral8b/weights",
+        "quantization": "4bit_nf4",
+        "gpu_name": "NVIDIA GeForce RTX 5080",
+        "gpu_uuid": "GPU-750ffce3-8683-57c4-8737-35bd45ad462f",
+        "adapter": null,
+        "status": "verified_scoped_inference"
+      },
+      "24b": {
+        "base": "mistralai/Mistral-Small-3.2-24B-Instruct-2506",
+        "local_path": "/home/<user>/strategy_brain_sft_20260922/base-mistral24/weights",
+        "quantization": "4bit_nf4",
+        "gpu_name": "NVIDIA GeForce RTX 5090",
+        "gpu_uuid": "GPU-4d9f95ae-dfba-0ba5-9aad-09372fa19208",
+        "adapter": null,
+        "status": "verified_scoped_inference"
+      }
+    }
+  },
+  "deployment_authorization": {
+    "request_owner_words": "请您按照这份架构部署一下我们的RL吧 有不懂的问我",
+    "cpu_smoke_selection_owner_words": "[redacted: the user's authorization message]",
+    "model_comparison_owner_words": "[redacted: the user's authorization message]",
+    "scope": "complete_framework_and_bounded_native_cpu_training_validation",
+    "formal_training": "later",
+    "status": "recorded_from_current_user_authorization"
+  },
+  "formal_training_enabled": false,
+  "bounded_model_inference": {
+    "authorized": true,
+    "status": "verified_scoped_inference_budget_consumed",
+    "validation_summary": "runtime/rl/comparison-launcher-validation-r1/summary.json",
+    "max_batch_requests": 6,
+    "max_wall_seconds": 600,
+    "total_wall_seconds": 1200,
+    "max_jobs": 2,
+    "busy_memory_used_mib": {"8b": 4096, "24b": 2048},
+    "busy_utilization_percent": 10,
+    "serve_enabled": false,
+    "training_enabled": false
+  },
+  "max_concurrent_jobs": 1,
+  "jobs": {
+    "cpu-smoke": {"max_wall_seconds": 45, "total_wall_seconds": 120, "data_kind": "synthetic", "requires_native_evidence": false},
+    "cpu-native-rollout": {"max_wall_seconds": 45, "total_wall_seconds": 300, "data_kind": "native", "requires_native_evidence": true},
+    "cpu-rl-smoke": {"max_wall_seconds": 45, "total_wall_seconds": 180, "data_kind": "native", "requires_native_evidence": true},
+    "gpu-infer": {"enabled": false, "data_kind": "native", "requires_native_evidence": true},
+    "gpu-train": {"enabled": false, "data_kind": "native", "requires_native_evidence": true}
+  }
+}

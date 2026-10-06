@@ -1,0 +1,18 @@
+{
+  "config_sha256": "890a5970115e6924ef9892e59c8c789695cfed9b729646c763fd31786e555ebd",
+  "error": "JournalError: hash mismatch at entry 298",
+  "games_played": 106,
+  "job_kind": "native-campaign",
+  "ledger_close_sha256": "af86e931c886d9d52836a42a3db67619db4987195e9295d7f66e04b37feb9181",
+  "ledger_open_sha256": "9b3cd3ffddc77c165cfd5cb861da1237b4572fa6f8c6ed96002bc98bed74c5d9",
+  "max_games": 605,
+  "meaning": "Process/budget receipt only; the job must verify its own result",
+  "phase_id": "campaign-v1",
+  "pins_sha256": "44b0effe82ad5bb603376c5f54578cddd34d8644efd768e48671a4e35888c48b",
+  "pools_sha256": "acbff340a9c0c5f49f47701af9753d912b391c08fb06e651f84dab0bb8e98c19",
+  "run_id": "native-campaign-961d1b6b26b3492db29648eafa323646",
+  "schema_version": 1,
+  "status": "failed",
+  "verified": false,
+  "wall_seconds": 506.5
+}

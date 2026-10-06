@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+/Lumi_Nox/
+/runtime/rl-engine/
+/runtime/rl/campaign-v1/video-raw/

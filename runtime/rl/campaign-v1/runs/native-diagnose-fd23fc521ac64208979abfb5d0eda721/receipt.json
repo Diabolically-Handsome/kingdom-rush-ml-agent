@@ -1,0 +1,18 @@
+{
+  "config_sha256": "30d7fba26c4d7f0e5099b6fd9a2f3e410e229abbf4f1758314615a55f05cd739",
+  "error": null,
+  "games_played": 24,
+  "job_kind": "native-diagnose",
+  "ledger_close_sha256": "9036e7b106bd1e0c18001805522a10387cbcde1db259d3953d74a7954ce766e2",
+  "ledger_open_sha256": "5305a14fcc33c6ca1a9f794a3094fa5b479b70e50f8bec0d3789cea4e14be14d",
+  "max_games": 30,
+  "meaning": "Process/budget receipt only; the job must verify its own result",
+  "phase_id": "campaign-v1",
+  "pins_sha256": "0ad042ce53b02c6b7230de9f7d1b6cb357c17979e37ba838586e4528544294ca",
+  "pools_sha256": "acbff340a9c0c5f49f47701af9753d912b391c08fb06e651f84dab0bb8e98c19",
+  "run_id": "native-diagnose-fd23fc521ac64208979abfb5d0eda721",
+  "schema_version": 1,
+  "status": "ok",
+  "verified": false,
+  "wall_seconds": 130.96899999998277
+}

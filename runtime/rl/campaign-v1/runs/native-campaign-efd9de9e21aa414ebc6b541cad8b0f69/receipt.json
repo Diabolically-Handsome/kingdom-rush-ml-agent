@@ -1,0 +1,18 @@
+{
+  "config_sha256": "1de1cb0d28c99a7de3b6054dcd4f699b27c9bca2446dbba310280738e9364fbc",
+  "error": null,
+  "games_played": 145,
+  "job_kind": "native-campaign",
+  "ledger_close_sha256": "2efe991f630048966dad5a8d2d9e362bfc640249b26f60baac9171b981b6b51f",
+  "ledger_open_sha256": "e2981482a848acbc406b201cf9c7424858a93ca7049b904a1a5ccc52984f014a",
+  "max_games": 965,
+  "meaning": "Process/budget receipt only; the job must verify its own result",
+  "phase_id": "campaign-v1",
+  "pins_sha256": "5e4d52f6852149c58fe763be020912fa7ba69684d4777c000f57eabd649605ca",
+  "pools_sha256": "acbff340a9c0c5f49f47701af9753d912b391c08fb06e651f84dab0bb8e98c19",
+  "run_id": "native-campaign-efd9de9e21aa414ebc6b541cad8b0f69",
+  "schema_version": 1,
+  "status": "ok",
+  "verified": false,
+  "wall_seconds": 939.6410000000033
+}

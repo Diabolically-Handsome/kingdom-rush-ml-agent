@@ -1,0 +1,104 @@
+{
+  "schema": "alpharush-eval-v1",
+  "run_id": "native-eval-42f2f83d036c46519914dba5bf627c36",
+  "players": [
+    "llm_steps"
+  ],
+  "results": {
+    "llm_steps": {
+      "1": {
+        "games": 3,
+        "wins": 3,
+        "lives": [
+          20,
+          20,
+          20
+        ]
+      },
+      "2": {
+        "games": 3,
+        "wins": 3,
+        "lives": [
+          20,
+          20,
+          19
+        ]
+      },
+      "5": {
+        "games": 3,
+        "wins": 2,
+        "lives": [
+          5,
+          3
+        ]
+      },
+      "6": {
+        "games": 3,
+        "wins": 2,
+        "lives": [
+          4,
+          2
+        ]
+      },
+      "4": {
+        "games": 3,
+        "wins": 3,
+        "lives": [
+          15,
+          12,
+          9
+        ]
+      },
+      "10": {
+        "games": 3,
+        "wins": 0,
+        "lives": []
+      },
+      "7": {
+        "games": 3,
+        "wins": 3,
+        "lives": [
+          20,
+          20,
+          19
+        ]
+      },
+      "3": {
+        "games": 3,
+        "wins": 3,
+        "lives": [
+          20,
+          20,
+          20
+        ]
+      },
+      "8": {
+        "games": 3,
+        "wins": 3,
+        "lives": [
+          7,
+          3,
+          2
+        ]
+      }
+    }
+  },
+  "episode_errors": [],
+  "games_played": 27,
+  "stopped_reason": null,
+  "episodes_journal": {
+    "integrity_verified": true,
+    "entries": 27,
+    "tip_sha256": "8574937cff87a6ef3e51e38343750f58f445d6e7f40a5cb4b987ad64c8975b9e",
+    "engine_replay_verified": false
+  },
+  "optimizer_steps": 0,
+  "engine": {
+    "manifest_sha256": "8f940255f38d84926f6187cfaaab3469b5a50fd9f09bf1ef32dd5c95bd789d77",
+    "recipe_sha256": "8e06a59561d8c50eeaf5341aec8ebcab72aa1d06d135b239748d889a4db6c72c",
+    "exe_sha256": "0239fed65ec6a2974e766ff1825828a787a220c7df784076aeab3fddc20c98d6",
+    "host_copy_sha256": "e8b21ab5af7e48b0f3e683fbad6ae7d475b5077f592fc5dbfd5f3f7140f2e685"
+  },
+  "rng_mode": "isolate_sound+stable_pairs",
+  "action_scope": "v2"
+}

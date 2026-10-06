@@ -1,0 +1,63 @@
+{
+  "schema": "alpharush-campaign-survey-v1",
+  "run_id": "native-teacher-31941993ddfc433eb16e2e77148f82e4",
+  "items": 38,
+  "episodes": 38,
+  "games_played": 45,
+  "max_games": 90,
+  "status_counts": {
+    "terminal": 37,
+    "void": 1
+  },
+  "outcomes": {
+    "won": 6,
+    "lost": 32
+  },
+  "pools": {
+    "train": 38
+  },
+  "replay_fraction": 0.25,
+  "replays_sampled": 7,
+  "replays_verified": 7,
+  "replay_failures": [],
+  "replay_engine_errors": [],
+  "episode_errors": [],
+  "historic_replays": {
+    "replayed": 0,
+    "verified": 0,
+    "mismatches": [],
+    "engine_errors": []
+  },
+  "plan_replay_diagnoses": {
+    "items": 0,
+    "repeats_equal": [],
+    "repeats_differ": []
+  },
+  "time_reserve_seconds": 150.0,
+  "stopped_reason": null,
+  "not_run": [],
+  "protocol": {
+    "name": "kr1-episode-v1",
+    "wait_ticks": 120,
+    "max_interval_ticks": 600,
+    "max_ticks": 120000,
+    "max_decisions": 1500,
+    "first_wave_deadline_ticks": null,
+    "reset_on_trivial_menu": true
+  },
+  "rng_mode": "isolate_sound+stable_pairs",
+  "action_scope": "v2",
+  "episodes_journal": {
+    "integrity_verified": true,
+    "entries": 46,
+    "tip_sha256": "02b19399ad9c81f58ef1b33af99726495843d6481f4258e3ceb8ca69633ed9f1",
+    "engine_replay_verified": false
+  },
+  "optimizer_steps": 0,
+  "engine": {
+    "manifest_sha256": "6cfcee20ae521efcc0e5ef94cd1da6b64479d606bf3673e655e3991f4fc39192",
+    "recipe_sha256": "300daa117f93531c700308cb1b754a0c72f712ac4bb94c89fad88e0fe876d51e",
+    "exe_sha256": "1aba3d05c79c3598c4e177c11fde5fd4ac5f22d55212d05f8d3681cbb2e317db",
+    "host_copy_sha256": "da3194dc44e3e18e14f6808ba3f96f7539b9d32576fd00c98143ec79f804f872"
+  }
+}
