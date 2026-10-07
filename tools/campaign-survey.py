@@ -65,7 +65,7 @@ RNG_TOKENS = ("audit", "isolate_sound", "stable_pairs")
 RNG_MODES = tuple("+".join(t for i, t in enumerate(RNG_TOKENS) if mask >> i & 1) for mask in range(8))
 # Must equal alpharush_rl.engine.ACTION_SCOPES (checked by a test). "v1" is the
 # build/send_wave scope every earlier plan was recorded under.
-ACTION_SCOPES = ("v1", "v2")
+ACTION_SCOPES = ("v1", "v2", "v3")
 DEFAULT_ACTION_SCOPE = "v1"
 SURVEY_RUN_ID = re.compile(r"native-survey-[0-9a-f]{32}")
 DIFF_LIMIT = 40
@@ -378,8 +378,10 @@ def plan_survey(config=CONFIG, job_kind=JOB_KIND):
         issues.extend(f"search: {problem}" for problem in problems)
         if plan["rng_mode"] not in RNG_MODES:
             issues.append(f"rng_mode {plan['rng_mode']!r} is not one of {list(RNG_MODES)}")
-        if plan["action_scope"] != "v2":
-            issues.append("a build-order search needs action_scope v2")
+        if plan["action_scope"] not in ("v2", "v3"):
+            issues.append("a build-order search needs action_scope v2 or v3")
+        if spec:
+            issues.extend(_elite_problems(job, root, spec["levels"], None))
         if spec and fraction is not None:
             plan["planned_games"] = search_job.planned_search_games(spec, fraction)
             plan["workers"] = spec["workers"]
@@ -390,10 +392,13 @@ def plan_survey(config=CONFIG, job_kind=JOB_KIND):
         spec, problems = campaign_run.check_campaign(job["campaign"], pools, phase)
         issues.extend(f"campaign: {problem}" for problem in problems)
         issues.extend(_operator_problems(job, root))
-        if plan["action_scope"] != "v2" or "isolate_sound" not in plan["rng_mode"].split("+"):
-            issues.append("a campaign needs action_scope v2 and a deterministic rng_mode")
+        if plan["action_scope"] not in ("v2", "v3") or "isolate_sound" not in plan["rng_mode"].split("+"):
+            issues.append("a campaign needs action_scope v2 or v3 and a deterministic rng_mode")
+        if spec and not _operator_problems(job, root):
+            issues.extend(_campaign_elite_problems(job, root, spec))
         if spec:
-            plan["planned_games"] = len(spec["seeds"]) * len(spec["levels"]) * spec["attempts_per_level"]
+            plan["planned_games"] = len(spec["seeds"]) * (len(spec["levels"]) * spec["attempts_per_level"]
+                                                          + len(spec.get("challenges", {})) * spec.get("challenge_attempts", 0))
             plan["workers"] = len(spec["seeds"])
             if _integer(plan["max_games"], 0) and plan["planned_games"] > plan["max_games"]:
                 issues.append(f"campaign needs up to {plan['planned_games']} games but max_games is {plan['max_games']}")
@@ -404,8 +409,13 @@ def plan_survey(config=CONFIG, job_kind=JOB_KIND):
             issues.extend(_operator_problems({**job, "campaign": {"policy": "operator"}}, root))
         if spec and "llm_steps" in spec["players"] and job.get("gpu") != "external-inference":
             issues.append("an llm_steps evaluation must declare gpu=\"external-inference\"")
-        if plan["action_scope"] != "v2" or "isolate_sound" not in plan["rng_mode"].split("+"):
-            issues.append("evaluation needs action_scope v2 and a deterministic rng_mode")
+        if plan["action_scope"] not in ("v2", "v3") or "isolate_sound" not in plan["rng_mode"].split("+"):
+            issues.append("evaluation needs action_scope v2 or v3 and a deterministic rng_mode")
+        if spec:
+            uses_net = bool({"operator", "llm_steps"} & set(spec["players"]))
+            if not uses_net or not _operator_problems({**job, "campaign": {"policy": "operator"}}, root):
+                issues.extend(_elite_problems(job, root, _task_levels(spec["tasks"], uses_net),
+                                              "single" if uses_net else None))
         if spec:
             plan["planned_games"] = len(spec["tasks"]) * len(spec["players"])
             plan["workers"] = spec["workers"]
@@ -416,15 +426,24 @@ def plan_survey(config=CONFIG, job_kind=JOB_KIND):
         final = [s for s in seeds if phase.seed_role(pools, s) == "final_campaign_run"]
         if job_kind == FINAL_JOB_KIND and (len(final) != len(seeds) or job.get("max_jobs") != 1):
             issues.append("native-final plays only final_campaign_run seeds, in exactly one job (max_jobs 1)")
+        if job_kind == FINAL_JOB_KIND and "start" in job["campaign"]:
+            issues.append("native-final starts from a new save (no campaign start progress)")
         if job_kind == "native-campaign" and final:
             issues.append("final_campaign_run seeds are reserved for the one native-final job")
     if job_kind == FINAL_JOB_KIND and "campaign" in job:
         spec, problems = campaign_run.check_campaign(job["campaign"], pools, phase)
         issues.extend(f"campaign: {problem}" for problem in problems)
         issues.extend(_operator_problems(job, root))
+        if plan["action_scope"] not in ("v2", "v3") or "isolate_sound" not in plan["rng_mode"].split("+"):
+            issues.append("a campaign needs action_scope v2 or v3 and a deterministic rng_mode")
+        if spec and not _operator_problems(job, root):
+            issues.extend(_campaign_elite_problems(job, root, spec))
         if spec:
-            plan["planned_games"] = len(spec["seeds"]) * len(spec["levels"]) * spec["attempts_per_level"]
+            plan["planned_games"] = len(spec["seeds"]) * (len(spec["levels"]) * spec["attempts_per_level"]
+                                                          + len(spec.get("challenges", {})) * spec.get("challenge_attempts", 0))
             plan["workers"] = len(spec["seeds"])
+            if _integer(plan["max_games"], 0) and plan["planned_games"] > plan["max_games"]:
+                issues.append(f"campaign needs up to {plan['planned_games']} games but max_games is {plan['max_games']}")
     if job_kind in ("native-campaign", FINAL_JOB_KIND) and "campaign" in job and (
             job["campaign"].get("brain") == "8b" or job["campaign"].get("policy") == "steps"):
         if job.get("gpu") != "external-inference":
@@ -434,8 +453,13 @@ def plan_survey(config=CONFIG, job_kind=JOB_KIND):
         issues.extend(f"collect: {problem}" for problem in problems)
         if spec and spec.get("dagger") is not None:
             issues.extend(_operator_problems({**job, "campaign": {"policy": "operator"}}, root))
-        if plan["action_scope"] != "v2" or "isolate_sound" not in plan["rng_mode"].split("+"):
-            issues.append("collection needs action_scope v2 and a deterministic rng_mode")
+        if plan["action_scope"] not in ("v2", "v3") or "isolate_sound" not in plan["rng_mode"].split("+"):
+            issues.append("collection needs action_scope v2 or v3 and a deterministic rng_mode")
+        if spec:
+            dagger = spec.get("dagger") is not None
+            if not dagger or not _operator_problems({**job, "campaign": {"policy": "operator"}}, root):
+                issues.extend(_elite_problems(job, root, _task_levels(spec["tasks"], dagger),
+                                              "single" if dagger else None))
         if spec:
             plan["planned_games"] = len(spec["tasks"])
             plan["workers"] = spec["workers"]
@@ -507,7 +531,7 @@ def native_env_factory(run_id):
                     + ("" if attempt is None else f"_r{attempt}"))
         return NativeEnv(seed=item["seed"], level=item["level"], port=PORT, difficulty=item["difficulty"],
                          identity=identity, rng_mode=item.get("rng_mode", ""),
-                         action_scope=item.get("action_scope", DEFAULT_ACTION_SCOPE))
+                         action_scope=level_scope(item.get("action_scope", DEFAULT_ACTION_SCOPE), item["level"]))
     return make
 
 
@@ -848,35 +872,119 @@ def _probe_port(port=PORT):
         probe.close()
 
 
+def level_scope(action_scope, level):
+    """alpharush_rl.engine.level_scope (imported lazily: engine is not imported at module level)."""
+    from alpharush_rl.engine import level_scope as scope
+    return scope(action_scope, level)
+
+
 def _job_ports(workers):
     """Isolated native ports a job uses: one per parallel worker (one for serial jobs)."""
     return list(range(PORT, PORT + (workers if isinstance(workers, int) and workers > 0 else 1)))
 
 
-def _operator_problems(job, root):
-    """A campaign played by the operator network names its weights file and their SHA256."""
-    if job.get("campaign", {}).get("policy") not in ("operator", "steps"):
-        return []
-    weights = job.get("operator_weights")
+def _weights_problems(job, root, key):
+    weights = job.get(key)
     if not isinstance(weights, dict) or set(weights) != {"path", "sha256"}:
-        return ["an operator campaign declares operator_weights {path, sha256}"]
+        return [f"an operator campaign declares {key} {{path, sha256}}"]
     try:
         path = _inside(root, weights["path"])
     except GateRefused as exc:
-        return [f"operator_weights: {exc}"]
+        return [f"{key}: {exc}"]
     if not path.exists() or sha256_file(path) != weights["sha256"]:
-        return ["operator_weights file is missing or its SHA256 differs"]
+        return [f"{key} file is missing or its SHA256 differs"]
     return []
+
+
+def _operator_problems(job, root):
+    """A campaign played by the operator network names its weights file and their SHA256 (and, optionally,
+    ``elite_operator_weights``: the network that plays the elite stages, levels 13-26)."""
+    if job.get("campaign", {}).get("policy") not in ("operator", "steps"):
+        return []
+    problems = _weights_problems(job, root, "operator_weights")
+    if "elite_operator_weights" in job:
+        problems += _weights_problems(job, root, "elite_operator_weights")
+    return problems
+
+
+def _weights_layout(job, root, key):
+    """Feature layout of a job's operator weights file ("v3" when the file has no layout key)."""
+    path = _inside(root, job[key]["path"])
+    return json.loads(path.read_text(encoding="utf-8")).get("layout", "v3")
+
+
+def _elite_problems(job, root, levels, operator):
+    """Elite stages (levels above 12) are played in action scope v3 by a layout-v4 operator; main-campaign
+    levels by the layout-v3 operator. ``operator`` is "campaign" (operator_weights for 1-12 plus
+    elite_operator_weights for 13-26), "single" (operator_weights plays every level) or None."""
+    levels = [level for level in levels if isinstance(level, int) and not isinstance(level, bool)]
+    elite = any(level > 12 for level in levels)
+    main = any(level <= 12 for level in levels)
+    issues = []
+    if elite and job.get("action_scope") != "v3":
+        issues.append("elite stages (levels 13-26) need action_scope v3")
+    if operator is None:
+        if "elite_operator_weights" in job:
+            issues.append("elite_operator_weights is only used by operator campaigns")
+        return issues
+    try:
+        if operator == "campaign":
+            if main and _weights_layout(job, root, "operator_weights") != "v3":
+                issues.append("operator_weights (levels 1-12) must be a layout-v3 network")
+            if elite:
+                if "elite_operator_weights" not in job:
+                    issues.append("an operator campaign with elite stages declares elite_operator_weights")
+                elif _weights_layout(job, root, "elite_operator_weights") != "v4":
+                    issues.append("elite_operator_weights must be a layout-v4 network")
+            elif "elite_operator_weights" in job:
+                issues.append("elite_operator_weights is set but the campaign has no elite stage")
+        else:
+            if elite and main:
+                issues.append("one operator network cannot play both main-campaign and elite tasks")
+            wanted = "v4" if elite else "v3"
+            if _weights_layout(job, root, "operator_weights") != wanted:
+                issues.append(f"operator_weights must be a layout-{wanted} network for these levels")
+            if "elite_operator_weights" in job:
+                issues.append("elite_operator_weights is only used by operator campaigns")
+    except (OSError, ValueError, KeyError, TypeError, GateRefused) as exc:
+        issues.append(f"operator weights unreadable: {exc}")
+    return issues
+
+
+def _task_levels(tasks, operator):
+    """Task levels for the scope/operator checks; a challenge task played by a network counts as elite
+    (the campaign plays challenges with the elite operator)."""
+    return [MAIN_ELITE_MARKER if operator and task.get("mode", 1) != 1 else task["level"] for task in tasks]
+
+
+def _campaign_elite_problems(job, root, spec):
+    policy = spec["policy"]
+    issues = []
+    if policy == "steps" and any(level > 12 for level in spec["levels"]):
+        issues.append("the steps policy plays only the main campaign (levels 1-12)")
+    # Challenges are played by the elite operator (layout v4), like the elite stages.
+    levels = list(spec["levels"]) + ([MAIN_ELITE_MARKER] if spec.get("challenges") and policy == "operator" else [])
+    issues.extend(_elite_problems(job, root, levels, "campaign" if policy == "operator" else None))
+    return issues
+
+
+MAIN_ELITE_MARKER = 13  # stands for "needs the elite operator" when a campaign plays challenges
+
+
+def _load_net(job, key):
+    from alpharush_rl.operator_net import OptionScorer
+    weights_path = _inside(ROOT, job[key]["path"])
+    return OptionScorer.from_json(json.loads(weights_path.read_text(encoding="utf-8")))
 
 
 def campaign_env_factory(run_id, rng_mode, action_scope):
     tag = run_id.rsplit("-", 1)[-1][:12]
 
-    def make(level, seed, profile, attempt, port):
+    def make(level, seed, profile, attempt, port, mode=1):
         from alpharush_rl.env import NativeEnv
-        identity = f"campaign_{tag}_{seed}_L{level:02d}_a{attempt}"
+        identity = f"campaign_{tag}_{seed}_L{level:02d}" + (f"_m{mode}" if mode != 1 else "") + f"_a{attempt}"
         return NativeEnv(seed=seed, level=level, port=port, difficulty=2, identity=identity, rng_mode=rng_mode,
-                         action_scope=action_scope, profile=profile)
+                         action_scope=level_scope(action_scope, level), profile=profile, mode=mode)
     return make
 
 
@@ -886,8 +994,9 @@ def collect_env_factory(run_id, rng_mode, action_scope):
     def make(task, profile, index, port):
         from alpharush_rl.env import NativeEnv
         return NativeEnv(seed=task["seed"], level=task["level"], port=port, difficulty=2,
-                         identity=f"collect_{tag}_{index:05d}", rng_mode=rng_mode, action_scope=action_scope,
-                         profile=profile)
+                         identity=f"collect_{tag}_{index:05d}", rng_mode=rng_mode,
+                         action_scope=level_scope(action_scope, task["level"]), profile=profile,
+                         mode=task.get("mode", 1))
     return make
 
 
@@ -899,7 +1008,8 @@ def search_env_factory(run_id, rng_mode, action_scope):
         from alpharush_rl.env import NativeEnv
         identity = f"search_{tag}_{task['identity_index']:06d}" + ("_replay" if task["replay"] else "")
         return NativeEnv(seed=task["seed"], level=task["level"], port=port, difficulty=2, identity=identity,
-                         rng_mode=rng_mode, action_scope=action_scope, profile=task["profile"])
+                         rng_mode=rng_mode, action_scope=level_scope(action_scope, task["level"]),
+                         profile=task["profile"])
     return make
 
 
@@ -988,15 +1098,30 @@ def _supervise_run(ctx, cp, root, check, job):
     return receipt
 
 
+def _brain_health():
+    """The 8B scoring server's health; GateRefused when it is unreachable or not ready."""
+    import urllib.request
+    try:
+        with urllib.request.urlopen(BRAIN_ENDPOINT + "/", timeout=10) as stream:
+            health = json.load(stream)
+    except OSError as exc:
+        raise GateRefused(f"the 8B scoring server is unreachable: {exc}") from exc
+    if health.get("ready") is not True:
+        raise GateRefused("the 8B scoring server is not ready")
+    return health
+
+
 def supervise(config=CONFIG, job_kind=JOB_KIND):
     """Hard deadline/STOP even during native RPC; closing the owned job kills our descendants."""
     check = check_only(config, job_kind)
     if not check["ok"]:
         raise SurveyRefused(check)
-    cp, _, root = phase.load_phase(config)
+    cp, cfg, root = phase.load_phase(config)
     # Environment failures refuse here, before the sole job is spent in the ledger.
     for port in _job_ports(check.get("survey", {}).get("workers")):
         _probe_port(port)
+    if ((cfg.get("jobs", {}).get(job_kind) or {}).get("campaign") or {}).get("brain") == "8b":
+        _brain_health()
     from alpharush_rl.windows_job import OwnedProcessJob
     job = OwnedProcessJob()
     try:
@@ -1111,12 +1236,16 @@ def _campaign_main(config, permit, ctx, job, pools, run_dir, job_kind):
         _probe_port(port)
     engine_before = engine_identity()
     ctx.record("engine_identity", **engine_before)
+    make_elite = None
     if spec["policy"] == "operator":
-        from alpharush_rl.operator_net import OperatorPolicy, OptionScorer
-        weights_path = _inside(ROOT, job["operator_weights"]["path"])
-        net = OptionScorer.from_json(json.loads(weights_path.read_text(encoding="utf-8")))
+        from alpharush_rl.operator_net import OperatorPolicy
+        net = _load_net(job, "operator_weights")
         name = "operator:" + job["operator_weights"]["sha256"][:12]
         make = lambda genome: OperatorPolicy(net, genome, name=name)
+        if "elite_operator_weights" in job:
+            elite_net = _load_net(job, "elite_operator_weights")
+            elite_name = "operator:" + job["elite_operator_weights"]["sha256"][:12]
+            make_elite = lambda genome: OperatorPolicy(elite_net, genome, name=elite_name)
     elif spec["policy"] == "steps":
         import urllib.request
         from alpharush_rl.llm_steps import LanguageStepSource, StepOperatorPolicy
@@ -1143,16 +1272,17 @@ def _campaign_main(config, permit, ctx, job, pools, run_dir, job_kind):
     if spec["brain"] == "8b":
         from alpharush_rl.model_broker import LanguageModelBroker
         from alpharush_rl.strategy_brain import LanguageBrain
-        import urllib.request
-        with urllib.request.urlopen(BRAIN_ENDPOINT + "/", timeout=10) as stream:
-            health = json.load(stream)
-        if health.get("ready") is not True:
-            raise GateRefused("the 8B scoring server is not ready")
+        from alpharush_rl.model_broker import RetryingBroker
+        health = _brain_health()
         ctx.record("strategy_brain", endpoint=BRAIN_ENDPOINT, model=health.get("model"))
-        brain = LanguageBrain(LanguageModelBroker(BRAIN_ENDPOINT, timeout=180), name="8b")
+
+        def retried(request_id, attempt, exc):
+            print(f"8B request {request_id} failed ({exc!r}); retry {attempt}", file=sys.stderr, flush=True)
+        brain = LanguageBrain(RetryingBroker(LanguageModelBroker(BRAIN_ENDPOINT, timeout=180), on_retry=retried),
+                              name="8b")
     summary = campaign_run.run_campaigns(spec, campaign_env_factory(ctx.run_id, rng_mode, action_scope), ctx,
                                          Journal(run_dir / EPISODES), protocol=episode_protocol(job),
-                                         make_policy=make, ports=ports, brain=brain)
+                                         make_policy=make, ports=ports, brain=brain, make_elite_policy=make_elite)
     return _finish(config, permit, run_dir, job_kind, summary, engine_before, job)
 
 
@@ -1202,8 +1332,9 @@ def _eval_main(config, permit, ctx, job, pools, run_dir, job_kind):
     def make(task, profile, index, player, port):
         from alpharush_rl.env import NativeEnv
         return NativeEnv(seed=task["seed"], level=task["level"], port=port, difficulty=2,
-                         identity=f"eval_{tag}_{index:05d}_{player}", rng_mode=rng_mode, action_scope=action_scope,
-                         profile=profile)
+                         identity=f"eval_{tag}_{index:05d}_{player}", rng_mode=rng_mode,
+                         action_scope=level_scope(action_scope, task["level"]), profile=profile,
+                         mode=task.get("mode", 1))
     summary = eval_job.eval_loop(spec, make, ctx, Journal(run_dir / EPISODES), pools=pools,
                                  protocol=episode_protocol(job), ports=ports, make_operator=make_operator,
                                  make_steps=make_steps)

@@ -1,0 +1,12 @@
+{"seed": 8001, "won_levels": 10, "decisions": 39}
+{"seed": 8002, "won_levels": 21, "decisions": 204}
+{"seed": 8003, "won_levels": 17, "decisions": 190}
+{"seed": 8004, "won_levels": 21, "decisions": 178}
+{"seed": 8005, "won_levels": 10, "decisions": 39}
+{
+ "decisions": 650,
+ "prompt_equal": 650,
+ "choice_equal": 650,
+ "max_p_diff": 0.0,
+ "differences": []
+}

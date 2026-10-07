@@ -1,0 +1,22 @@
+{
+  "episodes_journal": {
+    "engine_replay_verified": false,
+    "entries": 1346,
+    "integrity_verified": true,
+    "tip_sha256": "af0bbf8290cb00b2004ba46538065850a4740f7a89c6c666635884e1ea04e80f"
+  },
+  "error": null,
+  "exit_code": 0,
+  "games_played": 467,
+  "games_source": "worker_events_journal",
+  "gpu": false,
+  "max_games": 1650,
+  "not_run_count": 0,
+  "optimizer_steps": 0,
+  "run_id": "native-campaign-cbdb002d11b741b89fe9057dacf7a9b3",
+  "status": "survey_completed",
+  "stopped_reason": null,
+  "summary_sha256": "721eab1be37003197520cd23ed52a50221d330890ba5bcc310c45bc91a956aad",
+  "wall_seconds": 3075.2189999999973,
+  "worker_exit_confirmed": true
+}

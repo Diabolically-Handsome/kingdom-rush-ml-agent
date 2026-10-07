@@ -9,6 +9,11 @@ the **first publicly documented machine-learning agent to clear the full main ca
 Earlier work is credited [below](#prior-work); if you know of an earlier full-campaign clear by an ML agent,
 please open an issue and we will correct this claim.
 
+**Elite stages (2026-10-07):** in a second one-shot final over all 26 levels (main campaign, then the 14 elite
+stages) the agent cleared 79 of 130 levels; two of five seeds won 21 levels including 9 elite stages, while on two
+others the unchanged main-campaign agent lost level 11, so the main campaign was cleared on 3 of these 5 new seeds
+([details](#elite-stages-2026-10-07)).
+
 [中文说明 / Chinese README](README.zh-CN.md)
 
 ## Results
@@ -38,6 +43,49 @@ network and verified to reach exactly the same end state (SHA256) as the logged 
 [`media/kingdom-rush-ml-agent_seed6001_highlights.mp4`](media/kingdom-rush-ml-agent_seed6001_highlights.mp4);
 full campaign (25 min, about 8–19× game speed) and a 4× faster cut: [GitHub release](../../releases).
 
+## Elite stages (2026-10-07)
+
+The second phase takes on the 14 elite stages (levels 13–26), still as a campaign on Normal from a brand-new save.
+As a human player does, the agent first replays main levels won with fewer than 3 stars, then plays the Heroic and
+Iron challenges of the 3-star main levels (each win adds one star to the upgrade budget: the main campaign gives at
+most 36 stars, the game recommends 50+ for the elite stages), then the elite stages as they unlock.
+
+**One-shot final evaluation on 5 held-out seeds, all 26 levels from a new save:**
+
+| Seed | Levels cleared (of 26) | Elite stages won | Stars: campaign + challenges |
+|---|---|---|---|
+| 8001 | 10 | — (main level 11 lost on all 10 attempts, i.e. all 8 of its plans; a lost main level ends the campaign) | 28 + 0 |
+| 8002 | **21** | 14, 15, 16, 17, 18, 19, 23, 24, 25 | 51 + 10 |
+| 8003 | 17 | 14, 16, 18, 19, 23 | 46 + 10 |
+| 8004 | **21** | 14, 15, 16, 17, 18, 19, 23, 24, 25 | 54 + 10 |
+| 8005 | 10 | — (as 8001) | 27 + 0 |
+
+79 of 130 levels; no seed cleared all 26. Nine different elite stages were won in the final; 13, 20, 21, 22 and 26
+were not. Two rehearsals on evaluation seeds (system checks only, never used to select plans) averaged 18.0 and
+19.4 levels. We know of no earlier machine-learning agent results on the elite stages (same search as above).
+
+* **Reproducible:** all 336 final games re-executed by the same networks reached identical traces and end states,
+  and all 650 strategy decisions asked again of the 8B model were identical; `verify_evidence.py` checks that these
+  recorded results cover every final game and decision (re-running the comparison itself needs the game and the model).
+* **What was added:** action scope v3 (barracks rally points as the GUI allows them; enemy flags such as dormant,
+  untargetable, boss, flying, unblockable; per-lane path progress), an elite operator network trained by behaviour
+  cloning + DAgger (an earlier version, after 1 DAgger round, won as many evaluation-seed games as the plan executor
+  it imitates, 159 vs 159 of 240, with the same outcome in 208 of the 240 paired games; the network used in the final
+  adds 3 DAgger rounds for the newest plans, 1,830 games in all, and was checked in a second rehearsal), 13 search
+  runs on the training seeds with retry portfolios chosen by seed coverage, and a *soft tower cap* plan gene
+  (the fallback stops building at N towers but resumes once 1,000 gold is banked) that turned levels 13 and 15 from
+  0 wins into winnable levels.
+* **Pre-final audit:** 65 agents reviewed the first rehearsal and the draft final configuration; confirmed findings were fixed
+  before the final (retries for the strategy-model server, per-seed exception containment, a health check before the
+  one-shot job opens, de-duplicated plan portfolios).
+* **Weak points:** main level 11 (its 8 plans win 5–8 of 10 training seeds each; it often needs retries, and on two
+  final seeds it lost all 10 attempts: all 8 plans, then the first plan again, which a deterministic game loses again)
+  and elite stages 20–22, which the agent loses early to mechanics its action set does not
+  yet handle. A drafted plan for them: [`docs/elite/l20-22-practice-plan-2026-10-07.md`](docs/elite/l20-22-practice-plan-2026-10-07.md)
+  (Chinese). Full log: [`docs/DEV-LOG.zh-CN.md`](docs/DEV-LOG.zh-CN.md); evidence: [`runtime/rl/elite-v1/`](runtime/rl/elite-v1/).
+
+Seed pools of this phase: train 1001–1010, evaluation 7001–7020, final 8001–8005 (6001–6005 retired).
+
 ## Verify it yourself (no game needed)
 
 ```bash
@@ -46,7 +94,8 @@ python verify_evidence.py
 
 This checks every hash-chained journal, that the one-shot final job was frozen on exactly the published code and
 configuration, recomputes the 5/5 result from the attempt records, and confirms the final seeds appear in no
-other run. Expected output ends with `ALL CHECKS PASSED`.
+other run; it does the same for the elite-stage final (and checks its re-execution and strategy-replay records).
+Expected output ends with `ALL CHECKS PASSED`.
 
 ## What the agent is
 
@@ -124,7 +173,9 @@ The full development log (Chinese) is in [`docs/DEV-LOG.zh-CN.md`](docs/DEV-LOG.
 * It is not an end-to-end reinforcement-learning policy: plans come from evolutionary search, the operator is
   trained by imitation, and the 8B model is used zero-shot.
 * Observations come from the game's internal state (through the RPC host), not from pixels.
-* Only the 12-level main campaign on Normal; the 14 elite stages and Heroic/Iron challenges are not attempted.
+* Elite stages: 13, 20, 21, 22 and 26 were not won in the final; main level 11 is the weakest link of the
+  campaign. Heroic/Iron challenges are played only as a source of upgrade stars (not all of them are won).
+* Normal difficulty only; the six heroes available without purchases.
 
 ## Reproducing
 
@@ -144,8 +195,11 @@ No game files are included in this repository. The strategy brain needs the 8B m
 
 The authorization messages quoted from the project owner's chat, local user-name paths and the name of an
 unrelated private project were removed from some text files before publishing. Every such file is listed in
-[`runtime/rl/campaign-v1/REDACTIONS.json`](runtime/rl/campaign-v1/REDACTIONS.json) with its original SHA256 (the
-hash the frozen job used) and its published SHA256. Hash-chained journals were not modified.
+[`runtime/rl/campaign-v1/REDACTIONS.json`](runtime/rl/campaign-v1/REDACTIONS.json) and
+[`runtime/rl/elite-v1/REDACTIONS.json`](runtime/rl/elite-v1/REDACTIONS.json) with its published SHA256 and, for
+files pinned by a frozen job, its original SHA256 (the hash that job used). Hash-chained journals were not modified. The code tree has moved on
+since the main-campaign result; the files that result's job pinned are kept in
+[`runtime/rl/campaign-v1/pinned-snapshot/`](runtime/rl/campaign-v1/pinned-snapshot/).
 
 ## License and notices
 

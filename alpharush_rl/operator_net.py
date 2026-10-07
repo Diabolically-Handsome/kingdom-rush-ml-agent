@@ -16,12 +16,22 @@ from .menus import validate_menu
 from .search import BRANCHES, KINDS, BuildOrderPolicy, check_genome, tower_kind_level
 
 ACTIONS = ("wait", "build_tower", "upgrade_tower", "upgrade_power", "sell_tower", "use_power", "send_wave",
-           "point_tower", "click_entity")
-# Rows recorded before click_entity existed lack its one-hot column (the last action column).
-LEGACY_ACTIONS = len(ACTIONS) - 1
-MAX_LEVEL = 12
-OPS = ("b", "u", "k")
-OP_ACTION = {"b": "build_tower", "u": "upgrade_tower", "k": "upgrade_power"}
+           "point_tower", "click_entity", "set_rally")
+# Rows recorded before click_entity existed lack its one-hot column (index 8 of the "v3" layout).
+LEGACY_ACTIONS = 8
+RALLY_OPTIONS = ("entry", "center", "exit", "boss")
+# Feature layouts. "v3": the main-campaign layout (levels 1-12, actions without set_rally, plan ops b/u/k);
+# the campaign-v1 operators were trained on it and keep computing exactly the same numbers. "v4": the
+# elite-stage layout (levels 1-26, rally actions and steps, boss / dormant / flying enemy features).
+# Instruction features stay the trailing columns of both vectors in every layout.
+LAYOUTS = {
+    "v3": {"levels": 12, "actions": ACTIONS[:9], "ops": ("b", "u", "k"), "elite": False},
+    "v4": {"levels": 26, "actions": ACTIONS, "ops": ("b", "u", "k", "r"), "elite": True},
+}
+LAYOUT = "v4"  # new data and new networks
+MAX_LEVEL = LAYOUTS[LAYOUT]["levels"]
+OPS = LAYOUTS[LAYOUT]["ops"]
+OP_ACTION = {"b": "build_tower", "u": "upgrade_tower", "k": "upgrade_power", "r": "set_rally"}
 
 
 def _n(value, default=0.0):
@@ -49,7 +59,34 @@ def _towers_by_mesh(state):
             if isinstance(t, dict) and t.get("holder_id") is not None}
 
 
-def global_features(state: dict, instruction: dict | None) -> list[float]:
+def _awake_bosses(state):
+    return [e for e in state.get("enemies", []) if isinstance(e, dict) and e.get("boss") and not e.get("dormant")
+            and _n(e.get("hp")) > 0]
+
+
+def _distance(ax, ay, bx, by, cap=500.0):
+    """Distance between two points, capped (``cap`` when either point is unknown)."""
+    values = [_n(v, math.nan) for v in (ax, ay, bx, by)]
+    if any(math.isnan(v) for v in values):
+        return cap
+    return min(cap, math.hypot(values[0] - values[2], values[1] - values[3]))
+
+
+def elite_global_features(state: dict) -> list[float]:
+    """Layout v4: [awake boss, its health fraction and progress, dormant boss waiting, untargetable /
+    flying / unblockable enemies]."""
+    enemies = [e for e in state.get("enemies", []) if isinstance(e, dict)]
+    bosses = _awake_bosses(state)
+    boss = max(bosses, key=lambda e: (_n(e.get("hp_max")), -_n(e.get("id")))) if bosses else {}
+    return [1.0 if bosses else 0.0, _n(boss.get("hp")) / max(1.0, _n(boss.get("hp_max"), 1.0)),
+            min(1.0, max(0.0, _n(boss.get("path_progress")))),
+            1.0 if any(e.get("dormant") for e in enemies) else 0.0,
+            sum(1 for e in enemies if e.get("untargetable") and not e.get("dormant")) / 20,
+            sum(1 for e in enemies if e.get("flying")) / 20, sum(1 for e in enemies if e.get("unblockable")) / 20]
+
+
+def global_features(state: dict, instruction: dict | None, layout: str = LAYOUT) -> list[float]:
+    spec = LAYOUTS[layout]
     level = state.get("level_idx")
     wave_total = max(1.0, _n(state.get("wave_total"), 1.0))
     enemies = [e for e in state.get("enemies", []) if isinstance(e, dict)]
@@ -70,21 +107,28 @@ def global_features(state: dict, instruction: dict | None) -> list[float]:
     heroes = [h for h in state.get("heroes", []) if isinstance(h, dict)]
     hero_alive = 1.0 if any(not h.get("dead") for h in heroes) else 0.0
     hero_hp = (sum(_n(h.get("hp")) / max(1.0, _n(h.get("hp_max"), 1.0)) for h in heroes) / len(heroes)) if heroes else 0.0
-    out = _one_hot((level - 1) if isinstance(level, int) and 1 <= level <= MAX_LEVEL else None, MAX_LEVEL)
+    levels = spec["levels"]
+    out = _one_hot((level - 1) if isinstance(level, int) and 1 <= level <= levels else None, levels)
     out += [_n(state.get("gold")) / 1000, _n(state.get("lives")) / 20, _n(state.get("wave")) / wave_total,
             wave_total / 20, 1.0 if state.get("wave") == 0 else 0.0,
             len(enemies) / 40, (sum(progress) / len(progress)) if progress else 0.0, max(progress, default=0.0)]
     out += bins + towers + [building]
     out += [len([h for h in state.get("holders", []) if isinstance(h, dict) and not h.get("blocked")]) / 20,
             _power_ready(state, 1), _power_ready(state, 2), hero_alive, hero_hp]
-    out += instruction_features(state, instruction)
+    if spec["elite"]:
+        out += elite_global_features(state)
+    out += instruction_features(state, instruction, layout)
     return out
 
 
-def instruction_features(state: dict, instruction: dict | None) -> list[float]:
-    """The strategy level's current order: [has step, op, kind, holder x/y/score, tower level, cast, early]."""
+def instruction_features(state: dict, instruction: dict | None, layout: str = LAYOUT) -> list[float]:
+    """The strategy level's current order: [has step, op, kind, holder x/y/score, tower level, cast, early]
+    (layout v4: plus the plan's boss-blocking order), then 1.0 = instruction present."""
+    spec = LAYOUTS[layout]
+    ops = spec["ops"]
+    width = 1 + len(ops) + 4 + 4 + 2 + (11 if spec["elite"] else 0) + 1
     if not instruction:
-        return [0.0] * 15
+        return [0.0] * width
     step = instruction.get("step")
     feats = [1.0 if step else 0.0]
     if step:
@@ -96,17 +140,30 @@ def instruction_features(state: dict, instruction: dict | None) -> list[float]:
         if step[0] == "b":
             kind = step[2]
         where = holder or tower or {}
-        feats += _one_hot(OPS.index(step[0]), 3) + _one_hot(KINDS.index(kind) if kind in KINDS else None, 4)
+        feats += _one_hot(ops.index(step[0]) if step[0] in ops else None, len(ops))
+        feats += _one_hot(KINDS.index(kind) if kind in KINDS else None, 4)
         feats += [_n(where.get("x")) / 1000, _n(where.get("y")) / 1000, _n(where.get("path_score")) / 5,
                   _n(tl) / 4]
     else:
-        feats += [0.0] * 11
+        feats += [0.0] * (len(ops) + 8)
     feats += [_n(instruction.get("cast"), 50) / 100, _n(instruction.get("early"), 1)]
+    if spec["elite"]:
+        # The plan's boss-blocking order and the genes of the fallback rules that make most elite decisions:
+        # build ratio per kind, build-first factor, preferred level-4 branch per kind.
+        ratio = str(instruction.get("ratio") or "3111")
+        branches = instruction.get("branches") or {}
+        feats += [_n(instruction.get("block"))]
+        feats += [int(d) / 9 if d.isdigit() else 0.0 for d in ratio[:4].ljust(4, "0")]
+        feats += [math.log2(max(1.0, _n(instruction.get("f"), 50)) / 50) / 3, _n(instruction.get("cap")) / 12]
+        feats += [float(BRANCHES[kind].index(branches[kind])) if branches.get(kind) in BRANCHES[kind] else 0.0
+                  for kind in KINDS]
     feats += [1.0]  # instruction present
     return feats
 
 
-def option_features(state: dict, item: dict, instruction: dict | None) -> list[float]:
+def option_features(state: dict, item: dict, instruction: dict | None, layout: str = LAYOUT) -> list[float]:
+    spec = LAYOUTS[layout]
+    actions = spec["actions"]
     action = item["action"]
     name = action.get("action")
     holders = {h.get("id"): h for h in state.get("holders", []) if isinstance(h, dict)}
@@ -114,6 +171,7 @@ def option_features(state: dict, item: dict, instruction: dict | None) -> list[f
     kind, level, branch, where = None, 0.0, 0.0, {}
     power, anchor_progress, power_level = None, 0.0, 0.0
     mesh = None
+    anchor = {}
     if name == "build_tower":
         kind, level = action.get("tower_type"), 1.0
         where = holders.get(action.get("holder_id"), {})
@@ -147,39 +205,62 @@ def option_features(state: dict, item: dict, instruction: dict | None) -> list[f
             "anchor_id")), {})
         anchor_progress = _n(anchor.get("path_progress"))
         where = {"x": action.get("x"), "y": action.get("y")}
-    out = _one_hot(ACTIONS.index(name) if name in ACTIONS else None, len(ACTIONS))
+    elif name == "set_rally":
+        tower = towers.get(action.get("tower_id"), {})
+        mesh = str(tower.get("holder_id")) if tower.get("holder_id") is not None else None
+        kind, current = tower_kind_level(tower.get("template"))
+        level = _n(current)
+        where = {"x": action.get("x"), "y": action.get("y")}
+    out = _one_hot(actions.index(name) if name in actions else None, len(actions))
     out += _one_hot(KINDS.index(kind) if kind in KINDS else None, 4)
     out += [level / 4, branch, _n(where.get("x")) / 1000, _n(where.get("y")) / 1000,
             _n(where.get("path_score")) / 5, _n(item.get("cost")) / 500, power_level]
     out += _one_hot((power - 1) if power in (1, 2) else None, 2) + [anchor_progress]
+    if spec["elite"]:
+        # Rally: which point, how far the soldiers' current rally point is from it and how far an awake
+        # boss is; spells and aims: whether the anchor is a boss.
+        rally = name == "set_rally"
+        tower = towers.get(action.get("tower_id"), {}) if rally else {}
+        bosses = _awake_bosses(state)
+        near_boss = min((_distance(action.get("x"), action.get("y"), b.get("x"), b.get("y")) for b in bosses),
+                        default=500.0) if rally else 500.0
+        out += _one_hot(RALLY_OPTIONS.index(action.get("option")) if rally and action.get("option") in RALLY_OPTIONS
+                        else None, len(RALLY_OPTIONS))
+        out += [(_distance(tower.get("rally_x"), tower.get("rally_y"), action.get("x"), action.get("y")) / 100)
+                if rally else 0.0, near_boss / 100, 1.0 if anchor.get("boss") else 0.0]
     step = (instruction or {}).get("step")
     if step:
-        same_op = 1.0 if OP_ACTION[step[0]] == name else 0.0
+        same_op = 1.0 if OP_ACTION.get(step[0]) == name else 0.0
         same_mesh = 1.0 if mesh is not None and mesh == step[1] else 0.0
-        same_kind = 1.0 if step[0] == "b" and kind == step[2] else 0.0
+        same_kind = 1.0 if (step[0] == "b" and kind == step[2]) or (
+            step[0] == "r" and name == "set_rally" and action.get("option") == step[2]) else 0.0
         out += [same_op, same_mesh, same_kind, same_op * same_mesh]
     else:
         out += [0.0] * 4
     return out
 
 
-def decision_arrays(state: dict, menu: list[dict], instruction: dict | None):
+def decision_arrays(state: dict, menu: list[dict], instruction: dict | None, layout: str = LAYOUT):
     """(global vector, option matrix) of one decision, in menu order."""
-    g = np.asarray(global_features(state, instruction), dtype=np.float32)
-    o = np.asarray([option_features(state, item, instruction) for item in menu], dtype=np.float32)
+    g = np.asarray(global_features(state, instruction, layout), dtype=np.float32)
+    o = np.asarray([option_features(state, item, instruction, layout) for item in menu], dtype=np.float32)
     return g, o
 
 
-G_DIM = len(global_features({}, None))
-O_DIM = len(option_features({}, {"action": {"action": "wait"}}, None))
+DIMS = {name: (len(global_features({}, None, name)), len(option_features({}, {"action": {"action": "wait"}}, None, name)))
+        for name in LAYOUTS}
+G_DIM, O_DIM = DIMS[LAYOUT]
 
 
 class OptionScorer:
     """MLP over [global, option] -> score; softmax over a decision's options."""
 
-    def __init__(self, hidden=(128, 64), seed=0):
+    def __init__(self, hidden=(128, 64), seed=0, layout=LAYOUT):
+        if layout not in LAYOUTS:
+            raise ValueError(f"layout must be one of {sorted(LAYOUTS)}")
+        self.layout = layout
         rng = np.random.default_rng(seed)
-        sizes = [G_DIM + O_DIM, *hidden, 1]
+        sizes = [sum(DIMS[layout]), *hidden, 1]
         self.params = []
         for a, b in zip(sizes[:-1], sizes[1:]):
             self.params.append(rng.normal(0, math.sqrt(2.0 / a), size=(a, b)).astype(np.float32))
@@ -236,19 +317,27 @@ class OptionScorer:
         return total / wsum, grads
 
     def to_json(self):
-        return {"hidden": list(self.hidden), "g_dim": G_DIM, "o_dim": O_DIM,
+        g_dim, o_dim = DIMS[self.layout]
+        data = {"hidden": list(self.hidden), "g_dim": g_dim, "o_dim": o_dim,
                 "params": [p.tolist() for p in self.params]}
+        if self.layout != "v3":
+            data["layout"] = self.layout  # weights without a layout key are the main-campaign layout v3
+        return data
 
     @classmethod
     def from_json(cls, data):
-        legacy = data["g_dim"] == G_DIM and data["o_dim"] == O_DIM - 1
-        if data["g_dim"] != G_DIM or (data["o_dim"] != O_DIM and not legacy):
+        layout = data.get("layout", "v3")
+        if layout not in LAYOUTS:
+            raise ValueError(f"unknown operator feature layout {layout!r}")
+        g_dim, o_dim = DIMS[layout]
+        legacy = layout == "v3" and data["g_dim"] == g_dim and data["o_dim"] == o_dim - 1
+        if data["g_dim"] != g_dim or (data["o_dim"] != o_dim and not legacy):
             raise ValueError("operator feature dimensions changed since these weights were trained")
-        net = cls(tuple(data["hidden"]))
+        net = cls(tuple(data["hidden"]), layout=layout)
         net.params = [np.asarray(p, dtype=np.float32) for p in data["params"]]
         if legacy:
             # Weights trained before click_entity: a zero input weight for its one-hot column.
-            net.params[0] = np.insert(net.params[0], G_DIM + LEGACY_ACTIONS, 0.0, axis=0)
+            net.params[0] = np.insert(net.params[0], g_dim + LEGACY_ACTIONS, 0.0, axis=0)
         return net
 
 
@@ -305,9 +394,14 @@ class PlanTracker:
             if verdict == "skip" or (verdict == "wait" and _n(state.get("gold")) >= 800):
                 reader.cursor += 1
                 continue
-            return {"step": steps[reader.cursor], "cast": self.genome["cast"], "early": self.genome["early"],
+            return {**self._genes(), "step": steps[reader.cursor],
                     "expect": item["action"] if verdict == "take" else None}
-        return {"step": None, "cast": self.genome["cast"], "early": self.genome["early"], "expect": None}
+        return {**self._genes(), "step": None, "expect": None}
+
+    def _genes(self):
+        g = self.genome
+        return {"cast": g["cast"], "early": g["early"], "block": g.get("block", 0), "ratio": g.get("ratio", "3111"),
+                "f": g.get("f", 50), "cap": g.get("cap", 0), "branches": dict(g["branches"])}
 
     def observe(self, instruction, action):
         if instruction.get("expect") is not None and action == instruction["expect"]:
@@ -325,7 +419,7 @@ class OperatorPolicy:
     def choose(self, state, menu, context):
         validate_menu(menu)
         instruction = self.tracker.instruction(state, menu) if self.tracker else None
-        g, o = decision_arrays(state, menu, instruction)
+        g, o = decision_arrays(state, menu, instruction, self.net.layout)
         scores = self.net.scores(g, o)
         index = int(np.argmax(scores))
         if self.tracker:
@@ -354,9 +448,10 @@ class Recorder:
     """Wraps a plan executor and keeps every decision's arrays and the demonstrator's choice
     (plus a compact text-ready summary of each decision in ``macro``)."""
 
-    def __init__(self, policy, with_instruction=True):
+    def __init__(self, policy, with_instruction=True, layout=LAYOUT):
         self.policy = policy
         self.name = policy.name
+        self.layout = layout
         self.tracker = PlanTracker(policy.genome) if with_instruction else None
         self.rows = []
         self.macro = []
@@ -367,7 +462,7 @@ class Recorder:
         index = next(i for i, item in enumerate(menu) if item["label"] == choice["label"])
         if self.tracker:
             self.tracker.observe(instruction, menu[index]["action"])
-        g, o = decision_arrays(state, menu, instruction)
+        g, o = decision_arrays(state, menu, instruction, self.layout)
         self.rows.append((g, o, index))
         self.macro.append(macro_summary(state, menu, index, instruction, (choice.get("meta") or {}).get("rule")))
         return choice
@@ -392,7 +487,7 @@ class DaggerRecorder:
         self.expert.cursor = self.tracker.reader.cursor
         expert = self.expert.choose(state, menu, context)
         label = next(i for i, item in enumerate(menu) if item["label"] == expert["label"])
-        g, o = decision_arrays(state, menu, instruction)
+        g, o = decision_arrays(state, menu, instruction, self.net.layout)
         scores = self.net.scores(g, o)
         mine = int(np.argmax(scores))
         self.agreements += mine == label
@@ -411,19 +506,34 @@ class DaggerRecorder:
                          "instruction": instruction.get("step")}}
 
 
-def save_rows(path, rows, meta):
+def save_rows(path, rows, meta, layout=LAYOUT):
     """One episode's decisions as a compressed npz (ragged options flattened with offsets)."""
     offsets = np.cumsum([0] + [len(o) for _, o, _ in rows]).astype(np.int64)
-    np.savez_compressed(path, g=np.stack([g for g, _, _ in rows]).astype(np.float32) if rows else np.zeros((0, G_DIM)),
-                        o=np.concatenate([o for _, o, _ in rows]).astype(np.float32) if rows else np.zeros((0, O_DIM)),
+    g_dim, o_dim = DIMS[layout]
+    np.savez_compressed(path, g=np.stack([g for g, _, _ in rows]).astype(np.float32) if rows else np.zeros((0, g_dim)),
+                        o=np.concatenate([o for _, o, _ in rows]).astype(np.float32) if rows else np.zeros((0, o_dim)),
                         offsets=offsets, target=np.asarray([t for _, _, t in rows], dtype=np.int64),
                         meta=np.asarray(json.dumps(meta)))
 
 
+def rows_layout(g_dim, o_dim):
+    """The feature layout of recorded arrays (v3 rows from before click_entity have one column less)."""
+    for name, dims in DIMS.items():
+        if (g_dim, o_dim) == dims:
+            return name
+    if (g_dim, o_dim) == (DIMS["v3"][0], DIMS["v3"][1] - 1):
+        return "v3"
+    raise ValueError(f"no operator feature layout has dimensions {(g_dim, o_dim)}")
+
+
 def load_rows(path):
+    """(rows, meta) of one episode; ``meta["layout"]`` is the feature layout the rows were recorded in."""
     data = np.load(path, allow_pickle=False)
     g, o, offsets, target = data["g"], data["o"], data["offsets"], data["target"]
-    if o.shape[1] == O_DIM - 1:
+    layout = rows_layout(g.shape[1], o.shape[1])
+    if layout == "v3" and o.shape[1] == DIMS["v3"][1] - 1:
         o = np.insert(o, LEGACY_ACTIONS, 0.0, axis=1)  # recorded before click_entity existed
     rows = [(g[i], o[offsets[i]:offsets[i + 1]], int(target[i])) for i in range(len(target))]
-    return rows, json.loads(str(data["meta"]))
+    meta = json.loads(str(data["meta"]))
+    meta["layout"] = layout
+    return rows, meta

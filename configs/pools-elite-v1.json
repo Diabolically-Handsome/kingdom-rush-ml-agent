@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "pool_id": "KR1-elite-v1",
+  "supersedes": "KR1-campaign-v1",
+  "difficulty": 2,
+  "mode": "campaign",
+  "levels": {"main_campaign": [1,2,3,4,5,6,7,8,9,10,11,12],
+             "elite_stages": [13,14,15,16,17,18,19,20,21,22,23,24,25,26],
+             "source": "kr1/game_settings.lua main_campaign_levels=12, last_level=26 and level_ranges, read offline with the game LuaJIT on 2026-10-06"},
+  "pools": {
+    "train": {"seeds": [1001,1002,1003,1004,1005,1006,1007,1008,1009,1010]},
+    "evaluation": {"seeds": [7001,7002,7003,7004,7005,7006,7007,7008,7009,7010,7011,7012,7013,7014,7015,7016,7017,7018,7019,7020], "never_in_gradients": true},
+    "final_campaign_run": {"seeds": [8001,8002,8003,8004,8005], "access": "one_frozen_evaluation"},
+    "retired": {"seeds": [2001,2002,2003,2004,3001,3002,3003,3004,4001,4002,4003,4004,
+                          5001,5002,5003,5004,5005,5006,5007,5008,5009,5010,5011,5012,5013,5014,5015,5016,5017,5018,5019,5020,
+                          6001,6002,6003,6004,6005],
+                "note": "KR1-deployment-v1 seeds; campaign-v1 evaluation seeds (used in its rehearsals) and final seeds (spent by its one-shot final); never used in elite-v1"}
+  },
+  "unlisted_seeds": "never_use"
+}

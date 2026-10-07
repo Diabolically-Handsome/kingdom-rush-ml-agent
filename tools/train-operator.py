@@ -18,20 +18,19 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from alpharush_rl.operator_net import (ACTIONS, G_DIM, O_DIM, OptionScorer, instruction_features,  # noqa: E402
+from alpharush_rl.operator_net import (ACTIONS, DIMS, OptionScorer, instruction_features,  # noqa: E402
                                        load_rows, train)
 
 RUNS = ROOT / "runtime/rl/campaign-v1/runs"
 MODELS = ROOT / "runtime/rl/campaign-v1/models"
 WAIT = ACTIONS.index("wait")
-INSTRUCTION_G = len(instruction_features({}, None))  # trailing global dims that carry the instruction
 INSTRUCTION_O = 4  # trailing option dims: matches with the instruction
 
 
-def load(run_ids, only_won):
+def load(run_ids, only_won, runs=RUNS):
     episodes = []
     for run_id in run_ids:
-        data = RUNS / run_id / "data"
+        data = runs / run_id / "data"
         for path in sorted(data.glob("*.npz")):
             rows, meta = load_rows(path)
             # Expert-labelled network play (DAgger) teaches from lost games too.
@@ -70,9 +69,21 @@ def main(argv=None):
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--solo", action="store_true",
                         help="zero the instruction features: a policy that plays without the strategy level")
+    parser.add_argument("--phase-state", default="runtime/rl/campaign-v1",
+                        help="phase state directory holding the collect runs; the weights go to its models/")
     args = parser.parse_args(argv)
     started = time.time()
-    episodes = load(args.runs, only_won=not args.all_episodes)
+    state = (ROOT / args.phase_state).resolve()
+    if not state.is_relative_to(ROOT / "runtime/rl"):
+        raise SystemExit("--phase-state must be a phase directory under runtime/rl")
+    models = state / "models"
+    episodes = load(args.runs, only_won=not args.all_episodes, runs=state / "runs")
+    layouts = {meta["layout"] for _, _, meta in episodes}
+    if len(layouts) != 1:
+        raise SystemExit(f"the demonstrations mix feature layouts {sorted(layouts)}")
+    layout = layouts.pop()
+    g_dim, o_dim = DIMS[layout]
+    instruction_g = len(instruction_features({}, None, layout))  # trailing global dims that carry the instruction
     train_set, holdout = [], []
     for path, rows, meta in episodes:
         target = holdout if meta["seed"] in args.holdout_seeds else train_set
@@ -80,25 +91,25 @@ def main(argv=None):
             weight = 1.0 if chosen_action(o, choice) == WAIT else args.action_weight
             if args.solo:
                 g, o = g.copy(), o.copy()
-                g[-INSTRUCTION_G:] = 0
+                g[-instruction_g:] = 0
                 o[:, -INSTRUCTION_O:] = 0
             target.append((g, o, choice, weight))
     if not train_set:
         raise SystemExit("no training decisions")
     hidden = tuple(int(x) for x in args.hidden.split(","))
-    net = OptionScorer(hidden=hidden, seed=args.seed)
+    net = OptionScorer(hidden=hidden, seed=args.seed, layout=layout)
     history = train(net, train_set, epochs=args.epochs, batch=args.batch, lr=args.lr, seed=args.seed,
                     log=lambda e, loss: print(f"epoch {e + 1}: loss {loss:.4f}", flush=True))
     weights = net.to_json()
     weights["solo"] = args.solo  # a solo network plays without strategy-level instructions
     text = json.dumps(weights, separators=(",", ":"))
     digest = hashlib.sha256(text.encode("utf-8")).hexdigest()
-    MODELS.mkdir(parents=True, exist_ok=True)
+    models.mkdir(parents=True, exist_ok=True)
     kind = "solo" if args.solo else "operator"
-    path = MODELS / f"{kind}-{digest[:12]}.json"
+    path = models / f"{kind}-{digest[:12]}.json"
     path.write_text(text, encoding="utf-8")
     receipt = {"schema": "alpharush-operator-train-v1", "weights": path.relative_to(ROOT).as_posix(),
-               "weights_sha256": digest, "g_dim": G_DIM, "o_dim": O_DIM, "hidden": list(hidden),
+               "weights_sha256": digest, "layout": layout, "g_dim": g_dim, "o_dim": o_dim, "hidden": list(hidden),
                "runs": args.runs, "holdout_seeds": args.holdout_seeds, "epochs": args.epochs, "batch": args.batch,
                "lr": args.lr, "action_weight": args.action_weight, "only_won": not args.all_episodes, "solo": args.solo,
                "episodes": len(episodes), "data_sha256": {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
@@ -106,7 +117,7 @@ def main(argv=None):
                "loss_history": history, "train": metrics(net, train_set), "holdout": metrics(net, holdout),
                "optimizer_steps": args.epochs * ((len(train_set) + args.batch - 1) // args.batch),
                "gpu": False, "wall_seconds": time.time() - started}
-    (MODELS / f"{kind}-{digest[:12]}.receipt.json").write_text(json.dumps(receipt, indent=2) + "\n",
+    (models / f"{kind}-{digest[:12]}.receipt.json").write_text(json.dumps(receipt, indent=2) + "\n",
                                                                     encoding="utf-8")
     print(json.dumps({k: receipt[k] for k in ("weights", "weights_sha256", "episodes", "train", "holdout",
                                               "optimizer_steps", "wall_seconds")}, indent=2))

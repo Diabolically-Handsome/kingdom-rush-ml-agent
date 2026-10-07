@@ -6,7 +6,10 @@ import math
 from .journal import canonical_json, sha256_data
 
 SUPPORTED_ACTIONS = frozenset(("wait", "build_tower", "upgrade_tower", "send_wave",
-                               "upgrade_power", "sell_tower", "use_power", "point_tower", "click_entity"))
+                               "upgrade_power", "sell_tower", "use_power", "point_tower", "click_entity",
+                               "set_rally"))
+RALLY_TEXT = {"entry": "the most upstream", "center": "the most central", "exit": "the most downstream",
+              "boss": "the boss's"}
 # Global spells by native button number (game_gui.power_1/power_2).
 POWER_TEXT = {1: "Cast rain of fire", 2: "Call reinforcements"}
 
@@ -130,6 +133,15 @@ def build_menu(state: dict, wait_ticks: int = 30) -> list[dict]:
             what = native.get("template") if isinstance(native.get("template"), str) else "entity"
             why = {"downed_boss": " to finish the downed boss", "tower_trap": " to free the trapped tower"}
             text = f"Click {what} {entity} at ({x},{y})" + why.get(native.get("kind"), "")
+        elif action_name == "set_rally":
+            tower = towers.get(native.get("tower_id"))
+            option, x, y = (native.get(key) for key in ("option", "x", "y"))
+            if tower is None or option not in RALLY_TEXT or not (_integer(x) and _integer(y)):
+                continue
+            action, cost = {"action": action_name, "tower_id": native["tower_id"], "option": option,
+                            "x": x, "y": y}, 0.0
+            text = (f"Rally tower {native['tower_id']} ({tower.get('template')}) soldiers to {RALLY_TEXT[option]}"
+                    f" path point in range ({x},{y})")
         elif action_name == "send_wave":
             if state.get("wave_ready") is not True:
                 continue

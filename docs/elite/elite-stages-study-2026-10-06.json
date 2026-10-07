@@ -1,0 +1,786 @@
+{
+ "early": {
+  "levels": [
+   {
+    "level": 13,
+    "name": "Sarelgaz's Lair",
+    "start_gold": "800 (lives 20). Heroic 1400 gold/6 waves/1 life, iron 1400 gold/1 wave/1 life, no boss in either",
+    "waves_campaign": "20",
+    "bosses": [
+     "eb_sarelgaz: 18000 HP, armor 0, magic armor 0, max_speed 12, lives_cost 20, vis.bans 27262976 (immune to thorn, teleport and polymorph). It uses the generic scripts.enemy_mixed.update with no custom script. Melee is damage_type 4096 = DAMAGE_EAT, 300-500 dmg, cd 1 s, so it eats blocking soldiers (inferred from the flag name). No dying, tap_decal or required_clicks. Spawns in w20 on path_index 3 [kr1/game_templates.lua via entity_db sandbox; kr1/data/waves/level13_waves_campaign.lua w20 wave 3]"
+    ],
+    "notable_enemies": [
+     "enemy_sarelgaz_small (new): 1250 HP, armor 0.7, magic armor 0.7, gold 80, 68 in total from w16",
+     "enemy_spider_big x105 (egg layer, enemy_spider_big.update) and enemy_spider_small x78",
+     "enemy_troll x128 plus troll_axe_thrower x26 and troll_chieftain x8 (rage)",
+     "gargoyle x28 (flying, flags 2176 includes F_FLYING)",
+     "dark_knight x39, slayer x6, yeti x16, rocketeer x16, necromancer x18, whitewolf x18"
+    ],
+    "special_mechanics": [
+     {
+      "name": "Mid-map cave spawns",
+      "description": "Paths 2 and 3 start at short wave flags inside the map at (516,544) and (569,549), next to the cave decal. The boss enters on path 3, so front-loaded defenses at the map edge are bypassed.",
+      "needs_player_click": false,
+      "evidence": "kr1/data/levels/level13_data.lua entities_list[6],[7] (editor_wave_flag len=16) and [2] stage13_cave1; level13_paths.lua has 4 active paths; waves w20 path_index 3 = eb_sarelgaz"
+     },
+     {
+      "name": "decal_fredo easter egg",
+      "description": "Clickable decal (ui.can_click). On ui.clicked it plays a release animation and grants the FREE_FREDO achievement. No gameplay effect.",
+      "needs_player_click": true,
+      "evidence": "level13_data.lua entities_list[4]; template decal_fredo ui.can_click=true; kr1/game_scripts.lua main/314 L8443-8463 (ui clicked ... release ... got FREE_FREDO)",
+      "covered_by_existing_click_entity": "No: no dying+tap_decal and no modifier. Not needed for victory."
+     }
+    ],
+    "special_towers_or_holders": [
+     "14 x tower_holder_snow, all editor.game_mode=0; no special tower or holder"
+    ],
+    "risk_for_agent": "medium",
+    "notes": "No new script mechanic, but this is the largest HP pool so far: an 18000 HP boss that eats blockers, plus heavy armor/magic-armor mixes (sarelgaz_small 0.7/0.7, dark knights). The difficulty is DPS and composition, not the action space. Iron mode locks mage and engineer (level_mode_overrides[3])."
+   },
+   {
+    "level": 14,
+    "name": "Ruins Of Acaroth",
+    "start_gold": "600 (lives 20). Heroic 2000/6 waves, iron 1600/1 wave",
+    "waves_campaign": "20",
+    "bosses": [
+     "eb_gulthak: 12000 HP, armor 0, speed 12, lives_cost 20. update = scripts.enemy_shaman.update: every 8 s it heals up to 20 wounded enemies (hp<hp_max) within 320 px with mod_gulthak_heal (+200 HP). Melee 200-600 physical. No click mechanic. Spawns in w20 on path_index 3 together with 30 orc_armored, 7 forest_troll, 14 ogre, 130 wolves and 10 orc_rider [templates: eb_gulthak.timed_attacks, mod_gulthak_heal.hps; kr1/game_scripts.lua main/138 L3852-3918 (find_enemies_in_range ... max_count ... create_entity mod)]"
+    ],
+    "notable_enemies": [
+     "enemy_orc_armored (new): 400 HP, armor 0.8, 228 in total",
+     "enemy_orc_rider (new): 400 HP, magic armor 0.8, speed 42, lives 2; on death spawns enemy_orc_armored (death_spawns)",
+     "enemy_goblin_zapper (new): 140 HP, ranged bomb 60-165 px; on death aura_goblin_zapper_death does 50-150 dmg in r60 to non-enemies; 69 in total",
+     "enemy_forest_troll (new): 4000 HP, area melee, regen aura (4 HP/0.133 s after 2 s unhit), lives 5, 32 in total",
+     "shaman x45 (healer), ogre x23, gargoyle x66 (flying), wolves 368"
+    ],
+    "special_mechanics": [
+     {
+      "name": "Boss and shaman group healing",
+      "description": "Gul'Thak and the shamans heal wounded enemies in a radius. Focus damage or burst is needed. Nothing to click.",
+      "needs_player_click": false,
+      "evidence": "eb_gulthak.main_script.update=scripts.enemy_shaman.update; game_scripts main/138 L3852-3918"
+     },
+     {
+      "name": "Decor only",
+      "description": "decal_orc_burner x4 and decal_orc_flag x4 are pure render entities with no script or ui.",
+      "needs_player_click": false,
+      "evidence": "level14_data.lua entities_list[6]-[13]; templates have only render/editor"
+     }
+    ],
+    "special_towers_or_holders": [
+     "16 x tower_holder_grass; no special holder"
+    ],
+    "risk_for_agent": "medium",
+    "notes": "Needs mixed physical and magic damage: armored orcs have 0.8 armor, riders 0.8 magic armor, and riders turn into armored orcs on death. Zapper death explosions hurt barracks soldiers. Lowest-risk boss of the set because it does not interact with towers or need clicks. Iron mode locks barrack and archer."
+   },
+   {
+    "level": 15,
+    "name": "Rotten Forest",
+    "start_gold": "800 (lives 20). Heroic 1000/6 waves, iron 800/1 wave",
+    "waves_campaign": "20",
+    "bosses": [
+     "eb_greenmuck: 10000 HP, speed 9, lives_cost 20 [scripts.eb_greenmuck.update = kr1/game_scripts.lua main/189 L5413-5502]. Every 6 s, if at least one soldier is targetable (filter main/189/26: soldier, not dead), it fires 7 bomb_greenmuck at randomly ordered soldiers (80-160 explosion dmg, r47, damage_bans F_ENEMY). Area melee 150-250 in r60. On death it sets interrupt=true on s15_rotten_spawner, which stops the tree spawns. No tap or click. Spawns in w20 on path_index 1 with 40 rotten_tree, 46 demon and 3 demon_mage"
+    ],
+    "notable_enemies": [
+     "enemy_rotten_tree (new): 1000 HP, armor 0.8; 84 from waves plus extras from the spawner",
+     "enemy_swamp_thing (new): 3000 HP, regen, ranged bomb 110-165 px, area melee, lives 5; 29 from waves",
+     "enemy_zombie (new): 250 HP, armor 0.4; 93",
+     "enemy_spider_rotten (new): 1000 HP, magic armor 0.6; lays enemy_spider_rotten_egg, each spawning 3 enemy_spider_rotten_tiny (enemies_spawner)",
+     "portal demons: demon x139, demon_wolf x51, demon_mage x9",
+     "flyers: gargoyle x86, demon_imp x30",
+     "necromancer x18"
+    ],
+    "special_mechanics": [
+     {
+      "name": "Swamp graveyard: dead soldiers rise as enemies",
+      "description": "swamp_controller runs graveyard_controller.update. Any dead friendly non-hero unit (vis_has F_FRIEND, vis_bans F_HERO; excludes wildcat, magnus illusion and reinforcements that expired by timeout), 0.5 s after death, is respawned as enemy_zombie (hp_max<=400) or enemy_swamp_thing (more) at a random swamp spawn_pos (4 points near (410-450, 86-126)) onto path 4, with 0 gold. Applies in all modes.",
+      "needs_player_click": false,
+      "evidence": "level15_data.lua entities_list[17] (graveyard.pi=4, spawn_pos); template swamp_controller.graveyard (spawns_by_health, keep_gold=false); game_scripts main/310 L8355-8412 and filter main/310/6 L8361-8372"
+     },
+     {
+      "name": "Rotten tree spawner (campaign only)",
+      "description": "s15_rotten_spawner (editor.game_mode=1) spawns enemy_rotten_tree with a 'raise' animation and 0 gold at random valid nodes along the paths, i.e. mid-path rather than at the entry. Rate per wave from spawn_timers {cooldown, count}: w1-10 none, w11-13 1 per 15 s, w14 none, w15-16 2 per 15 s, w17-19 3 per 15 s, w20 6 per 15 s. Stops when Greenmuck dies.",
+      "needs_player_click": false,
+      "evidence": "level15_data.lua entities_list[16]; template s15_rotten_spawner.spawn_timers/spawn_margin; game_scripts main/320 L8553-8602 (get_random_position, get_valid_nodes, math.random, raise, gold=0, interrupt)"
+     },
+     {
+      "name": "Demon portal",
+      "description": "decal_demon_portal_big at (785,644) with out_nodes {[2]=3}. Demons, demon wolves, demon mages and imps use enemy_base_portal.insert: on path 2 they appear at node 3 with a raise animation, and during the raise vis.bans=F_ALL and ignore_damage=true, so they are briefly untargetable. The portal tween only opens and closes.",
+      "needs_player_click": false,
+      "evidence": "level15_data.lua entities_list[3]; templates enemy_demon*.main_script.insert=scripts.enemy_base_portal.insert; game_scripts main/316 L8470-8503 and main/318 L8508-8550"
+     },
+     {
+      "name": "Swamp bubbles",
+      "description": "decal_swamp_bubble x8 use delayed_play, which only reacts to clicks if the entity has a ui component. These have none, so they are cosmetic.",
+      "needs_player_click": false,
+      "evidence": "level15_data.lua entities_list[4]-[11]; template has no ui; all/scripts.lua main/39 L109-217"
+     }
+    ],
+    "special_towers_or_holders": [
+     "17 x tower_holder_wasteland; no special holder"
+    ],
+    "risk_for_agent": "high",
+    "notes": "Three mechanics break front-loaded plans: trees rise mid-path, every barracks soldier that dies becomes a zombie or swamp thing on path 4, and Greenmuck bombards soldiers. Barracks-heavy build orders feed the enemy. None needs a click. Iron mode locks archer and engineer."
+   },
+   {
+    "level": 16,
+    "name": "Hushwood",
+    "start_gold": "500 (lowest of 13-19; lives 20). Heroic 1250/6 waves, iron 1300/1 wave",
+    "waves_campaign": "15",
+    "bosses": [],
+    "notable_enemies": [
+     "enemy_raider (new): 1000 HP, armor 0.95, ranged ball 55-165 px; 47",
+     "enemy_pillager (new): 2800 HP, magic armor 0.9, area melee, lives 5; 11",
+     "bandit x279, brigand x259, marauder x43",
+     "wolves 231, gargoyle x58 (flying)"
+    ],
+    "special_mechanics": [
+     {
+      "name": "Invalid path ranges (cover)",
+      "description": "Path 1 nodes 120-162 and path 3 nodes 96-127 are added as invalid ranges. The utils target finders skip enemies on nodes that fail P:is_node_valid, so towers cannot hit enemies on those stretches (inferred from the filters). Power placement through valid_node_nearby also respects them.",
+      "needs_player_click": false,
+      "evidence": "level16_data.lua invalid_path_ranges; all/level_utils.lua main/39 L295-305 (add_invalid_range); all/utils.lua main/85/3 L692-704, main/87/3 L719-731, main/89 L740-792 (is_node_valid in find_* filters)"
+     }
+    ],
+    "special_towers_or_holders": [
+     "14 x tower_holder_grass; no special holder"
+    ],
+    "risk_for_agent": "medium",
+    "notes": "No boss and no scripted entities, so this is an economy and composition test: 500 gold and about 900 bandit-family units. It needs magic damage against raiders (0.95 armor) and physical damage against pillagers (0.9 magic armor). Iron mode locks archer and mage."
+   },
+   {
+    "level": 17,
+    "name": "Bandit's Lair",
+    "start_gold": "800 (lives 20). Heroic 1500/6 waves, iron 1800/1 wave",
+    "waves_campaign": "15",
+    "bosses": [
+     "eb_kingpin: 8000 HP, speed 12, lives_cost 20; vis.bans 27262977 includes F_BLOCK (=1), so soldiers cannot block him [scripts.eb_kingpin.update = game_scripts main/192 L5518-5592, predicate main/192/3, filter main/192/34]. Every stop_cooldown (5 s) he stops for stop_time (5 s) and picks randomly between eat (mod_kingpin_heal_self +500 HP, only if wounded) and heal (mod_kingpin_heal_others +50 HP to every wounded enemy within 100 px). Permanent kingpin_damage_aura: 100 physical dmg per 0.067 s cycle to non-enemies within 65 px (computed: about 1500 raw DPS; all/scripts.lua aura_apply_damage main/153). Area melee 100 dmg. No click. Spawns in w15 on the dedicated path 5 with 8 marauders"
+    ],
+    "notable_enemies": [
+     "raider x50, pillager x14, marauder x94",
+     "bandit x177, brigand x183",
+     "spider_big x75 (eggs) and spider_small x57",
+     "wolves 250, gargoyle x133 (flying)"
+    ],
+    "special_mechanics": [
+     {
+      "name": "Barricades (campaign only)",
+      "description": "Three decal_s17_barricade entities (editor.game_mode=1) wait for eb_kingpin and play a 'destroy' animation once his nav_path.ni reaches destroy_node 95, 104 or 111. They are visual only and have no blocking component.",
+      "needs_player_click": false,
+      "evidence": "level17_data.lua entities_list[8]-[10]; template decal_s17_barricade (boss_name, render only); game_scripts main/322 L8606-8623"
+     },
+     {
+      "name": "Two exits, five paths",
+      "description": "There are defend points exit 1 at (46,414) and exit 2 at (46,190). Path 5 is used only by the boss wave.",
+      "needs_player_click": false,
+      "evidence": "level17_data.lua entities_list[6],[7],[11]-[15]; level17_paths.lua active 1-5; waves w15 entry with path_index=5"
+     }
+    ],
+    "special_towers_or_holders": [
+     "15 x tower_holder_grass; no special holder"
+    ],
+    "risk_for_agent": "medium",
+    "notes": "The boss is a pure DPS race. He cannot be blocked, heals himself and nearby enemies, and shreds soldiers near him. The two exits break the single-exit path_progress metric (see cross-level findings). Iron mode locks mage and engineer."
+   },
+   {
+    "level": 18,
+    "name": "Glacial Heights",
+    "start_gold": "600 (lives 20). Heroic 1500/6 waves, iron 1800/1 wave",
+    "waves_campaign": "16",
+    "bosses": [],
+    "notable_enemies": [
+     "enemy_troll_skater (new): 350 HP, regen. On ice cells it sets vis.bans |= skate.vis_bans_extra = F_BLOCK (unblockable) and gets mod_troll_skater (type fast, speed x2.42). 119 in total",
+     "enemy_troll_brute (new): 2800 HP, armor 0.6, area melee, regen, lives 3; 13",
+     "troll x95, troll_chieftain x24 (rage), axe_thrower x19",
+     "whitewolf x25, wolves 110, gargoyle x44 (flying)"
+    ],
+    "special_mechanics": [
+     {
+      "name": "Tunnels (path 1 to path 5, path 2 to path 6)",
+      "description": "level18_paths.lua has connections {[1]=5,[2]=6}. Each 'tunnel' entity picks enemies near the end of pick_pi (entrance_nodes=15), removes their modifiers and auras, unblocks them, sets ui.can_click=false, pauses their main_script and flags them in_limbo. After dist/(speed_factor 2 x max_speed) seconds it places them at node 1 of place_pi (5 or 6). While in limbo they are untargetable and invisible but remain enemy entities.",
+      "needs_player_click": false,
+      "evidence": "level18_data.lua entities_list[25],[26] (tunnel pick_pi/place_pi) and [7] decal_tunnel_light; template tunnel.tunnel; all/scripts.lua main/159 L4029-4103 and main/161 L4109-4133"
+     },
+     {
+      "name": "Ice terrain",
+      "description": "317 grid cells are LAND|ICE (value 2049), which activates the troll skaters' unblockable fast skating.",
+      "needs_player_click": false,
+      "evidence": "kr1/data/levels/level18_grid.lua cell counts (2049 x317); game_scripts main/157 L4434-4482 and main/157/6 (TERRAIN_ICE)"
+     },
+     {
+      "name": "decal_scrat easter egg",
+      "description": "Clickable decal. On ui.clicked it plays touch_fx and grants the DEFEAT_ACORN achievement. No gameplay effect.",
+      "needs_player_click": true,
+      "evidence": "level18_data.lua entities_list[6]; template decal_scrat ui.can_click=true; game_scripts main/324 L8630-8656 (got DEFEAT_ACORN)",
+      "covered_by_existing_click_entity": "No: no tap_decal and no modifier. Not needed for victory."
+     }
+    ],
+    "special_towers_or_holders": [
+     "12 x tower_holder_snow (fewest holders of 13-19); no special holder"
+    ],
+    "risk_for_agent": "medium",
+    "notes": "No boss, but skaters cannot be held by barracks on ice, and the tunnels teleport path 1/2 enemies onto later path segments, which defeats position-based anchoring. Iron mode locks archer and mage."
+   },
+   {
+    "level": 19,
+    "name": "Ha'Kraj Plateau",
+    "start_gold": "1000 (lives 20). Heroic 1900/6 waves, iron 2200/1 wave",
+    "waves_campaign": "16",
+    "bosses": [
+     "eb_ulgukhai: 10000 HP, speed 9, lives_cost 20 [scripts.eb_ulgukhai.update = game_scripts main/195 L5608-5653]. While he walks unblocked he is shielded: health.ignore_damage=true, blood none, and vis.bans |= shielded_extra_vis_bans 1048580 (F_POISON|F_MOD), so towers and spells do nothing to him. Only while a soldier blocks him is the shield cleared; he then fights with area melee 150-350 dmg, r57.6, every 3 s. aura_ulgukhai_regen gives 4 HP per 0.133 s (about 30 HP/s, ignore_mods) after 2 s unhit. No tap or click. Spawns in w16 on path_index 2, subpath 2"
+    ],
+    "notable_enemies": [
+     "enemy_troll_skater x163 (unblockable and fast on 309 ice cells)",
+     "enemy_troll_brute x14 (2800 HP, armor 0.6, regen)",
+     "troll x113, axe_thrower x47, chieftain x7",
+     "wolf_small x179, wolf x107, whitewolf x52, gargoyle x70 (flying)"
+    ],
+    "special_mechanics": [
+     {
+      "name": "Boss shield that only blocking removes",
+      "description": "Damage only lands on Ulgukhai while soldiers (barracks, reinforcements, hero) hold him on path 2. If every blocker dies he re-shields and walks on, and a leak costs all 20 lives.",
+      "needs_player_click": false,
+      "evidence": "game_scripts main/195 L5608-5653 (ignore_damage set/clear around y_enemy_walk_until_blocked / y_wait_for_blocker); template eb_ulgukhai.shielded_extra_vis_bans"
+     },
+     {
+      "name": "Three exits",
+      "description": "Defend points: exit 3 at (512,93), exit 2 at (46,221), exit 1 at (51,448). There are 3 paths.",
+      "needs_player_click": false,
+      "evidence": "level19_data.lua entities_list[2]-[4]; level19_paths.lua active 1-3"
+     },
+     {
+      "name": "Frozen mushrooms",
+      "description": "5 decal_frozen_mushroom with click_play.required_clicks=1. Clicking one plays an animation and sets an achievement flag (DEFEAT_MUSHROOM bits 1/2/4/8/16), then hides it. No gameplay effect.",
+      "needs_player_click": true,
+      "evidence": "level19_data.lua entities_list[5]-[9]; template decal_frozen_mushroom.click_play; all/scripts.lua main/41 L221-259",
+      "covered_by_existing_click_entity": "No: required_clicks is nested under click_play and there is no modifier, so host.lua:350-361 does not match. Not needed for victory."
+     },
+     {
+      "name": "Ice terrain",
+      "description": "309 LAND|ICE cells. Skaters are unblockable and x2.42 speed on them.",
+      "needs_player_click": false,
+      "evidence": "level19_grid.lua (2049 x309); game_scripts main/157"
+     }
+    ],
+    "special_towers_or_holders": [
+     "15 x tower_holder_snow; no special holder; decal_troll_burner and decal_troll_flag are decor"
+    ],
+    "risk_for_agent": "high",
+    "notes": "The highest structural risk: a plan without soldiers that can hold path 2 at w16 cannot damage the boss at all. With no rally action, the only levers are which holder gets a barracks (its fixed default_rally_pos) and reinforcements at an anchor. The three exits also make path_progress wrong. Iron mode locks barrack and mage."
+   }
+  ],
+  "cross_level_findings": [
+   "No click needed for 13-19: none of the five bosses (eb_sarelgaz, eb_gulthak, eb_greenmuck, eb_kingpin, eb_ulgukhai) has dying, tap_decal or a tower-freezing required_clicks modifier, and no tower trap exists on these levels (template dumps; game_scripts main/189, 192, 195). The only clickable entities are achievement easter eggs: decal_fredo L13, decal_scrat L18, decal_frozen_mushroom x5 L19. click_need (alpharush_rl/assets/host.lua:350-361) does not offer them, which is correct. The existing click_entity rule needs no change for 13-19.",
+   "No special towers or holders on 13-19: every holder is a standard tower_holder_snow/grass/wasteland with editor.game_mode=0, so BASIC_TOWERS/STANDARD_TOWERS (host.lua:207-213) cover all build options. There is no sunray-like point tower.",
+   "Blocking is now the decisive and unexpressible lever. Ulgukhai (L19) can only be damaged while blocked. Kingpin (L17, vis.bans F_BLOCK) and troll skaters on ice (L18/L19, skate.vis_bans_extra=F_BLOCK) cannot be blocked at all. The action space (V2_ACTIONS, host.lua:215-216) has no barracks rally-point or hero-move action, so soldier placement is fixed to each holder's tower.default_rally_pos. Proposal: a set_rally action, or at least a boss-targeted reinforcement anchor.",
+   "Power anchors can miss the boss: power_anchors (host.lua:290-314) offers only the 3 front-most enemies by path_progress, 60 px apart. Reinforcements onto Ulgukhai, or rain of fire onto Kingpin or Greenmuck, are only possible when the boss happens to be in that top 3. Proposal: always include live F_BOSS enemies as anchors.",
+   "path_progress assumes one exit: get_level_exit picks a single cluster of path ends (Lumi_Nox/games/kingdom_rush/bridge.lua:247-268; same code in runtime alpha_native_bridge.lua:247/436). L17 has 2 defend points and L19 has 3, so progress is wrong for enemies heading to the other exits. Mid-path spawns also make progress jump: L13 cave paths 2/3, L15 random tree spawns and the portal out_node, L18 tunnels placing enemies on paths 5/6.",
+   "The enemy observation omits the new states. collect_enemies (bridge.lua:409-440) exports hp, armor, speed and path fields but not health.ignore_damage (Ulgukhai's shield), vis.bans (unblockable or flying) or in_limbo. Tunnel-limbo enemies on L18 stay listed, since they are still e.enemy and not dead, at stale positions (inferred). The operator cannot see these states.",
+   "Soldier deaths are punished. L15's graveyard turns every dead non-hero friendly unit into a zombie or swamp thing on path 4 (game_scripts main/310). Greenmuck bombs soldiers, the Kingpin aura does about 1500 raw DPS in r65, Sarelgaz eats blockers, and zapper and demon deaths explode. Main-campaign barracks-heavy priors from the 8B brain may transfer badly to L15/L17.",
+   "Enemies untargetable for stretches: L16 invalid_path_ranges (utils find_* skip invalid nodes), L15 portal raise (vis.bans=F_ALL, ignore_damage), L18 tunnel limbo, L19 shielded boss.",
+   "Every elite boss has lives_cost 20, equal to the full 20 lives, so any boss leak is an instant loss. Heroic (6 waves) and iron (1 wave) modes have 1 life, no boss, and lock two tower types via level_mode_overrides[3]. Campaign mode alone is enough to clear the levels.",
+   "Armor and magic-armor splits are sharper than in levels 1-12: orc_armored 0.8 armor vs orc_rider 0.8 MR (L14), raider 0.95 armor vs pillager 0.9 MR (L16), sarelgaz_small 0.7/0.7 (L13), rotten_tree 0.8 armor (L15). Starting gold ranges from 500 (L16) to 1000 (L19). The per-level GA search should handle composition; the main risk is the boss and blocking mechanics above."
+  ]
+ },
+ "late": {
+  "levels": [
+   {
+    "level": 20,
+    "name": "Pit Of Fire",
+    "start_gold": "1200 (campaign; heroic 1900, iron 2700)",
+    "waves_campaign": "15 (heroic 6, iron 1)",
+    "bosses": [
+     "enemy_demon_cerberus mini-boss, campaign only (flags BOSS|MINIBOSS = 2144): 6000 hp, armor 0.8, speed 39, lives_cost 5, gold 350, area melee 70-90 r57.6; on death aura_demon_cerberus_death does 666 physical damage in r120 to soldiers. level20.lua main/15 L22-56 creates it at level start at (817,297) on path 2, node 35, with sleeping=true. While it sleeps its script (GS main/155 L4408-4430) sets immune_to=DAMAGE_ALL, vis.bans=F_ALL, can_select=false and hides its health bar. When wave_group_number == wave_group_total (wave 15) it emits a wave notification, wakes up and runs enemy_mixed. No click involved."
+    ],
+    "notable_enemies": [
+     "enemy_demon (250 hp, magic armor 0.6): every demon type has a death aura; aura_demon_death does 50-100 physical in r60 to soldiers",
+     "enemy_demon_wolf: fast (speed 45), dodges",
+     "enemy_demon_imp: flying (vis flags 2176), passive, 350 hp",
+     "enemy_demon_legion: 666 hp, armor 0.8. Clones itself every 15 s (generation 2) (GS main/149 L4152-4223)",
+     "enemy_demon_mage: 1000 hp, lives 5. Every 6 s puts mod_demon_shield on up to 4 demons within 180; the shield ignores the first 4 hits, and only instakill, disintegrate or eat damage bypasses it (GS main/278 L7836-7858)",
+     "enemy_demon_flareon: ranged flare, range 150",
+     "enemy_demon_gulaemon: 2500 hp. Every 15 s takes flight with mod_gulaemon_fly (counts as flying, speed x3.67 for 2 s), which unblocks it from soldiers (GS main/151 L4229-4325)"
+    ],
+    "special_mechanics": [
+     {
+      "name": "Burning floor hazard",
+      "description": "11 aura_burning_floor patches (r75) apply mod_burning_floor_burn to soldiers: 20 poison damage every 0.367 s, can kill. A burning_floor_controller entry is {delay, on-time} per wave: after the delay all floors turn on for the on-time, then turn off. Campaign entries: waves 4 and 5 {3,40}, 8 {3,20}, 9 {3,30}, 10 {3,40}, 13 {3,20}, 15 {20,40}. Default rally points of holders 6, 8, 9 and 14 are 13-28 px from a patch.",
+      "needs_player_click": false,
+      "evidence": "level20_data.lua E1-E12 (cooldowns table); GS main/326 L8663-8711 (unpack, y_wait, aura.active=true/false), main/328 L8716-8748; GT aura_burning_floor / mod_burning_floor_burn (dps 20 every 0.3667 s, kill=true). Rally distances computed from E31-E44.",
+      "covered_by_existing_click_entity": "n/a (no click). The action space has no rally or hero-move action to dodge it."
+     },
+     {
+      "name": "Dormant Cerberus counted as a live enemy",
+      "description": "bridge collect_enemies counts every entity with an enemy component that is not dead. So the sleeping Cerberus keeps enemy_count >= 1 for the whole level, and send_wave (early call) is never offered after wave 0. It also enters s.enemies and can become a use_power anchor while it is immune (inferred).",
+      "needs_player_click": false,
+      "evidence": "Lumi_Nox/games/kingdom_rush/bridge.lua:409-416,738 (loaded as alpha_native_bridge, alpharush_rl/engine.py:73,177); alpharush_rl/assets/host.lua:475 and power_anchors host.lua:290-315",
+      "covered_by_existing_click_entity": "n/a"
+     },
+     {
+      "name": "Demon portal decals",
+      "description": "decal_demon_portal_big opens and closes with the waves. It is cosmetic: its script creates no entities.",
+      "needs_player_click": false,
+      "evidence": "level20_data.lua E15; GS main/318 L8508-8550 (constants have no create_entity)",
+      "covered_by_existing_click_entity": "n/a"
+     }
+    ],
+    "special_towers_or_holders": [
+     "14 tower_holder_wasteland (type 'holder', handled normally). No special towers."
+    ],
+    "risk_for_agent": "medium",
+    "notes": "Iron mode locks tower_build_mage. Heroic and iron waves each include one demon_cerberus as an ordinary wave enemy. Template hp values are before scaling by all/difficulty.lua patch_templates (main/8 L13-108)."
+   },
+   {
+    "level": 21,
+    "name": "Pandaemonium",
+    "start_gold": "900 (heroic 2200, iron 3500)",
+    "waves_campaign": "16 (heroic 6, iron 1)",
+    "bosses": [
+     "eb_moloch, campaign only. hp_max by difficulty {8889, 11111, 13333} (Normal is index 2; all/difficulty.lua main/8/1 resolves table values), armor 0, speed 21, lives_cost 20. level21.lua main/15 L22-48 creates him at level start, seated at pos_sitting (526,614). Script GS main/198 L5669-5790 (sitting phase): health bar hidden, ignore_damage=true, vis.bans=-1, so he is untargetable. When wave_group_number >= wave_active (16) the level script sets phase_signal='battle'; he stands up, takes damage, uses active_vis_bans and walks the path. Melee: area 80-120 explosion damage, r40. Every 7 s, if at least 2 soldiers are within r100, his horn attack does DAMAGE_INSTAKILL (1024) to them. On death: store.force_next_wave=true and kill_all_enemies, then phase 'death-complete'. No tap_decal and no dying-click state."
+    ],
+    "notable_enemies": [
+     "Same demon roster as level 20, plus 2 enemy_demon_cerberus as normal wave enemies in wave 10",
+     "Wave 12 is 160 enemy_demon",
+     "Wave 16 (with Moloch) has 48 demon_legion (cloners), 14 flareon, 10 wolves"
+    ],
+    "special_mechanics": [
+     {
+      "name": "Burning floor every wave",
+      "description": "8 aura_burning_floor patches. Campaign entry for every wave 1-18 is {3,5}: the floor burns for 5 s, starting 3 s after each wave begins. Default rally points of holders 1, 2, 13, 14 and 15 are 24-33 px from a patch.",
+      "needs_player_click": false,
+      "evidence": "level21_data.lua E1-E9; GS main/326, main/328",
+      "covered_by_existing_click_entity": "n/a"
+     },
+     {
+      "name": "Seated boss counted as a live enemy",
+      "description": "Moloch exists, not dead and with an enemy component, from wave 0 onward. So enemy_count >= 1 for the whole level, and the host never offers send_wave after wave 0. He can also be picked as a power anchor while ignore_damage is true (inferred).",
+      "needs_player_click": false,
+      "evidence": "bridge.lua:409-416,738; host.lua:475; level21.lua main/15",
+      "covered_by_existing_click_entity": "n/a"
+     },
+     {
+      "name": "Portals and cosmetic decals",
+      "description": "decal_inferno_ground_portal and decal_inferno_portal x2 use the cosmetic portal script. decal_s21_hellboy, decal_s21_veznan (campaign) and decal_s21_veznan_free (heroic/iron) have no script.",
+      "needs_player_click": false,
+      "evidence": "level21_data.lua E35-E37, E52-E55; GT (no main_script for the decal_s21_* templates)",
+      "covered_by_existing_click_entity": "n/a"
+     }
+    ],
+    "special_towers_or_holders": [
+     "15 tower_holder_wasteland. No special towers."
+    ],
+    "risk_for_agent": "high",
+    "notes": "4 entry paths and 1 exit at (528,76). A Moloch leak costs 20 lives (lives_cost), which is likely an instant loss (inferred). The final wave is the boss plus mass cloning legions. Iron mode locks tower_build_engineer."
+   },
+   {
+    "level": 22,
+    "name": "Fungal Forest",
+    "start_gold": "1000 (heroic 1700, iron 3500)",
+    "waves_campaign": "15 (heroic 6, iron 1)",
+    "bosses": [
+     "eb_myconid, campaign wave 15 only, spawned at the start of the wave on path 3. 4500 hp, armor 0, speed 18, lives_cost 20, melee 150-350 physical. GS main/201 L5806-5909: every 5 s (only while at least min_nodes=25 nodes remain, inferred from main/201/3) it releases spores. The spores apply mod_myconid_poison (4 poison every 0.067 s for 5 s) to soldiers within r110, and a myconid_spawner summons enemy_rotten_lesser with summon_counts 2,3,3,4,4,4,3,2, then 2 per cast after that. On death it waits 1.33 s and spawns 12 more (on_death_spawn_count). level22.lua main/15 L22-50 waits for the boss to die and for those spawns before finishing. No click."
+    ],
+    "notable_enemies": [
+     "enemy_rotten_lesser: 500 hp. Death aura applies pestilence poison in r60 to soldiers",
+     "enemy_rotten_tree: 1000 hp, armor 0.8",
+     "enemy_spider_rotten: 1000 hp, magic armor 0.6. Lays up to 6 eggs that hatch spider_rotten_tiny",
+     "enemy_swamp_thing: 3000 hp, lives 5. Ranged bomb 40-100 r67.5 at range 110-165. Regenerates 1 hp every 0.067 s (15 hp/s) after 2 s without being hit",
+     "enemy_zombie: 250 hp, armor 0.4"
+    ],
+    "special_mechanics": [
+     {
+      "name": "Swamp graveyard: dead soldiers become enemies",
+      "description": "swamp_controller runs graveyard_controller. Any dead friendly non-hero soldier anywhere on the map, dead for more than 0.5 s, is turned into an enemy with no position check: enemy_zombie if its hp_max <= 400, otherwise enemy_swamp_thing (for example the sorcerer's soldier_elemental, 500 hp). The new enemy appears at one of 9 swamp spawn positions and gives 0 gold (keep_gold=false). Excluded: wildcat, Magnus illusion, and reinforcements that timed out. Barracks-heavy plans and the Myconid's spores feed the enemy.",
+      "needs_player_click": false,
+      "evidence": "level22_data.lua E8 (graveyard.spawn_pos); GT swamp_controller.graveyard.spawns_by_health={{enemy_zombie,400},{enemy_swamp_thing,9e99}}; GS main/310 L8355-8412 and filter main/310/6 L8361-8372 (checks: dead, has F_FRIEND, not F_HERO, death time, reinforcement timeout, excluded templates; no position test)",
+      "covered_by_existing_click_entity": "n/a"
+     }
+    ],
+    "special_towers_or_holders": [
+     "tower_elf: a pre-built mercenary barracks at holder 18 in campaign and heroic. Its menu 'elf' is tw_buy_soldier soldier_elf (100 gold, up to 4) plus tw_rally. The host never offers it (STANDARD_TOWERS/POWER_SPECIALS whitelist, host.lua:207-213,416), so this free resource goes unused.",
+     "tower_elf_holder (type holder_elf, iron only, holders 16-18): its menu tw_upgrade builds tower_elf. The host skips it because only kind=='holder' is handled (host.lua:403).",
+     "17 tower_holder_wasteland in campaign"
+    ],
+    "risk_for_agent": "medium",
+    "notes": "5 paths. Iron mode locks archer and engineer. The Myconid appears only in campaign."
+   },
+   {
+    "level": 23,
+    "name": "Rotwick",
+    "start_gold": "750 (heroic 1450, iron 500)",
+    "waves_campaign": "15 (heroic 6, iron 1)",
+    "bosses": [
+     "None. The level has no eb_* entity, no level23.lua script in the archive, and no eb_* in any waves file."
+    ],
+    "notable_enemies": [
+     "enemy_giant_rat: speed 41.9, poison bite",
+     "enemy_wererat: 450 hp, armor 0.3, speed 49.9, poison (15 every 0.233 s for 2 s)",
+     "enemy_wolf: speed 60, dodges",
+     "enemy_skeleton_blackburn: 120 hp, cheap swarm",
+     "enemy_skeleton_big: 400 hp",
+     "enemy_halloween_zombie / enemy_zombie_blackburn: 300 hp",
+     "enemy_skeleton_warrior: spawner only"
+    ],
+    "special_mechanics": [
+     {
+      "name": "Mega spawner ambushes",
+      "description": "mega_spawner loads level23_spawner. It spawns enemies at 35 mid-map points (graves and houses) that walk onto paths 1, 2, 3 and 5. Campaign adds 417 enemies on waves 4-15 (146 zombie_blackburn, 135 skeleton_blackburn, 127 giant_rat, 9 skeleton_warrior), on top of the 939 in the waves file. Heroic adds 421; iron has none. These spawns are not in the waves file, so the next_wave preview never shows them (inferred).",
+      "needs_player_click": false,
+      "evidence": "level23_data.lua E29; level23_spawner.lua (entry fields del,delv,gr,spi,qty,force,seq,imin,imax,tpl per the log format in all/scripts.lua main/247 L5806-6016)",
+      "covered_by_existing_click_entity": "n/a"
+     },
+     {
+      "name": "Easter-egg decals",
+      "description": "decal_s23_splinter x4 and decal_s23_splinter_pizza use click_play with required_clicks=1 (achievement 'SPLINTER'). Cosmetic. Their click_play component is not a modifier, so click_entity correctly ignores them.",
+      "needs_player_click": false,
+      "evidence": "level23_data.lua E19-E23; GT decal_s23_splinter*; GS main/330 L8754-8767",
+      "covered_by_existing_click_entity": "not offered (correct)"
+     }
+    ],
+    "special_towers_or_holders": [
+     "14 tower_holder_blackburn (type 'holder')"
+    ],
+    "risk_for_agent": "medium",
+    "notes": "Lowest starting gold in the set (750) against large swarms plus ambushes. Iron mode locks barrack and engineer."
+   },
+   {
+    "level": 24,
+    "name": "Ancient Necropolis",
+    "start_gold": "900 (heroic 1100, iron 2700)",
+    "waves_campaign": "15 (heroic 6, iron 1)",
+    "bosses": [
+     "None (no eb_* and no level script)."
+    ],
+    "notable_enemies": [
+     "enemy_fallen_knight: 1000 hp, magic armor 0.9, speed 13.3. On death spawns enemy_spectral_knight_spawn",
+     "enemy_spectral_knight: 400 hp, armor 1, immune_to=26 (physical + explosion + electrical), so only magic or true damage hurts it. Its aura gives fallen knights mod_spectral_knight (damage_factor_increase 1.2)",
+     "enemy_necromancer: 700 hp, lives 3, ranged bolt. Every 8 s summons up to 5 skeletons (5% chance skeleton_big), group cap 35",
+     "enemy_abomination: 2500 hp, armor 0.3, lives 3. Death aura does 250 true damage in r100",
+     "Skeleton and zombie swarms"
+    ],
+    "special_mechanics": [
+     {
+      "name": "Mega spawner ambushes",
+      "description": "Campaign adds 435 enemies from 39 grave points on paths 1-4 (235 halloween_zombie, 136 skeleton_blackburn, 64 giant_rat), the same in heroic. They are not in the waves file.",
+      "needs_player_click": false,
+      "evidence": "level24_data.lua E76; level24_spawner.lua",
+      "covered_by_existing_click_entity": "n/a"
+     },
+     {
+      "name": "Two exits",
+      "description": "6 entry paths and 2 defend points (exit 1 at (984,509), exit 2 at (983,185)).",
+      "needs_player_click": false,
+      "evidence": "level24_data.lua E67-E68, E70-E75",
+      "covered_by_existing_click_entity": "n/a"
+     },
+     {
+      "name": "Easter egg",
+      "description": "decal_s24_nevermore: a click_play crow (achievement). Cosmetic.",
+      "needs_player_click": false,
+      "evidence": "GS main/334 L8791-8808",
+      "covered_by_existing_click_entity": "not offered (correct)"
+     }
+    ],
+    "special_towers_or_holders": [
+     "15 tower_holder_blackburn"
+    ],
+    "risk_for_agent": "high",
+    "notes": "Damage-type gating: archer, artillery and tesla (electrical) cannot hurt spectral knights, while fallen knights have 0.9 magic armor. Plans need both damage types. Iron mode locks archer and mage."
+   },
+   {
+    "level": 25,
+    "name": "Nightfang Swale",
+    "start_gold": "1100 (heroic 1500, iron 1500)",
+    "waves_campaign": "15 (heroic 6, iron 1)",
+    "bosses": [
+     "None (no eb_* and no level script)."
+    ],
+    "notable_enemies": [
+     "enemy_werewolf: 700 hp, magic armor 0.3. werewolf_regen_aura regenerates 2 hp every 0.25 s after 2 s without being hit",
+     "enemy_lycan: 400 hp. When predicted hp would fall below 25%, applies mod_lycanthropy to itself and turns into enemy_lycan_werewolf with +700 hp (all/scripts.lua enemy_lycan.on_damage main/272 L6483-6511)",
+     "enemy_lycan_werewolf: 1100 hp, magic armor 0.6, speed 60, regen 4 hp every 0.25 s",
+     "enemy_witch: flying, 600 hp, magic armor 0.9, speed 44.9, range 319, lives 2. bolt_witch applies mod_witch_frog: DAMAGE_EAT, which turns soldiers into frogs; heroes take 40-60 magic instead",
+     "enemy_abomination, giant_rat, wererat, skeleton_big"
+    ],
+    "special_mechanics": [
+     {
+      "name": "Path 7 fully invalid (witch path)",
+      "description": "Level data registers invalid_path_ranges {path 7, from node 1}. add_invalid_range defaults to = end node and flags = NF_ALL. I loaded level25 paths in path_db and applied the range: 0 of 361 path-7 nodes stay valid. The utils enemy finders (find_foremost_enemy and the other find_* functions) require P:is_node_valid(pi,ni). All 32 campaign witches spawn on path 7. Read literally, the code makes them untargetable by towers for their whole flight, costing 64 lives, which conflicts with the level being winnable. Verify in a live run before planning (inferred consequence).",
+      "needs_player_click": false,
+      "evidence": "level25_data.lua TOP invalid_path_ranges; all/path_db.lua add_invalid_range main/70 L357-363, is_node_valid main/74 L378-401; all/utils.lua finder filters main/85/3 L692-704, main/91 L794-857; waves campaign W3, W5, W8, W9, W13, W15 path_index 7 = all witches",
+      "covered_by_existing_click_entity": "n/a"
+     },
+     {
+      "name": "Easter egg",
+      "description": "decal_s25_nessie: a click_play achievement. Cosmetic.",
+      "needs_player_click": false,
+      "evidence": "GS main/336 L8812-8867",
+      "covered_by_existing_click_entity": "not offered (correct)"
+     }
+    ],
+    "special_towers_or_holders": [
+     "14 tower_holder_blackburn"
+    ],
+    "risk_for_agent": "high",
+    "notes": "Moon fields (zombie speed x2, werewolf moon regen, soldier lycanthropy infection) need level.moon_controller, which no KR1 level or template defines, so they are inert (all/scripts.lua mod_lycanthropy.update main/269 L6425-6477; archive-wide scan). Witches out-range most towers and frog barracks soldiers. Iron mode locks archer and barrack."
+   },
+   {
+    "level": 26,
+    "name": "Castle Blackburn",
+    "start_gold": "1250 (heroic 1100, iron 1620)",
+    "waves_campaign": "15 (heroic 6, iron 1). Wave 1 group interval is 10000.",
+    "bosses": [
+     "eb_blackburn, campaign wave 15 only, on path 2 at the start of the wave. 9000 hp, armor 0.75, speed 16.6, lives_cost 20. Melee: area 100-200 explosion damage, r63.8. Smash (GS main/204 L5926-6037): first after cooldown 10 s, then cooldown is set to after_cooldown=5 s. Every tower with can_be_mod within 283.7 px gets mod_blackburn_tower: tower_block_inc for duration 4 s, then tower_block_dec (GS main/206 L6040-6075, filter main/204/48). Soldiers within r106 take 1-5 true damage plus mod_blackburn_stun (4 s, heroes 2 s). blackburn_aura (GS main/208 L6078-6150): every 0.5 s raises 1-3 soldiers that died within r106 as enemy_skeleton_big with 0 gold, cap 15. On death: ui.can_click=false, mega_spawner.interrupt=true, force_next_wave, kill_all_enemies. Nothing waits for a click: mod_blackburn_tower has no required_clicks and no ui_click_proxy_add, unlike mod_jt_tower and mod_veznan_tower (GS main/174, main/182)."
+    ],
+    "notable_enemies": [
+     "Mix of all Halloween types: witch (44), lycan / lycan_werewolf, werewolf, fallen_knight (43), spectral_knight, abomination, wererat, giant_rat, wolves",
+     "enemy_sheep_fly: iron mode only (53), clicks_to_destroy=8"
+    ],
+    "special_mechanics": [
+     {
+      "name": "Blackburn tower freeze",
+      "description": "Mass tower disable that expires on its own (4 s, re-applied about every 5 s plus animation time) inside r283.7. Blocked towers get no upgrade or sell offers while blocked (host.lua:416).",
+      "needs_player_click": false,
+      "evidence": "GT mod_blackburn_tower.modifier.duration=4, no required_clicks; GS main/204, main/206",
+      "covered_by_existing_click_entity": "n/a: no click needed, and the rule correctly does not fire because required_clicks is absent"
+     },
+     {
+      "name": "Mega spawner ambushes",
+      "description": "Campaign adds 492 enemies on waves 1-14 from 29 points on paths 1, 2 and 5 (164 skeleton_blackburn, 136 halloween_zombie, 96 skeleton_big, 96 giant_rat). Heroic entries all have quantity 0. Blackburn's death interrupts the spawner.",
+      "needs_player_click": false,
+      "evidence": "level26_data.lua E67; level26_spawner.lua; GS main/204 instr 33-42",
+      "covered_by_existing_click_entity": "n/a"
+     },
+     {
+      "name": "Three exits / 7 paths",
+      "description": "3 defend points at x=40 (y 193, 360, 522) and 7 entry paths.",
+      "needs_player_click": false,
+      "evidence": "level26_data.lua E52-E54, E60-E66",
+      "covered_by_existing_click_entity": "n/a"
+     },
+     {
+      "name": "Flying sheep (iron only)",
+      "description": "enemy_sheep.update dies after 8 player clicks (ui.clicked counts against clicks_to_destroy). The sheep is also killable by damage (389 hp, flying). It has no tap_decal and no modifier, so click_entity would not offer it.",
+      "needs_player_click": false,
+      "evidence": "GT enemy_sheep_fly.clicks_to_destroy=8; GS main/136 L3815-3847; level26_waves_iron.lua (sheep_fly=53)",
+      "covered_by_existing_click_entity": "no (optional; would need a new 'clicks_to_destroy' rule)"
+     },
+     {
+      "name": "Cosmetic decals",
+      "description": "decal_s26_cage, decal_s26_hangmen x4 and decal_bat_flying_1-6 use delayed_play, which plays an animation when clicked. No gameplay effect.",
+      "needs_player_click": false,
+      "evidence": "level26_data.lua E55-E59; GT",
+      "covered_by_existing_click_entity": "not offered (correct)"
+     }
+    ],
+    "special_towers_or_holders": [
+     "15 tower_holder_blackburn per mode",
+     "Iron only: a pre-built tower_sorcerer (powers.polymorph level 1) at holder 1. It is a standard tower, so the host would offer its upgrades."
+    ],
+    "risk_for_agent": "high",
+    "notes": "Hardest of the set: boss tower freezes, dead soldiers turned into skeletons, witches, physical-immune spectral knights and about 490 extra spawner enemies. Iron mode locks archer and engineer."
+   }
+  ],
+  "cross_level_findings": [
+   "Clicks: none of levels 20-26 needs a player click to progress. Moloch, Myconid, Blackburn and Cerberus all die from damage alone: no dying state, no tap_decal, no required_clicks. I scanned all 586 evaluated templates for required_clicks, tap_decal, click_fx and clicks_to_destroy. The only progress-relevant click mechanics in KR1 are eb_jt (tap_decal) plus mod_jt_tower and mod_veznan_tower (required_clicks=3), which the existing click_entity rule already covers (host.lua:350-361). Everything else is cosmetic or optional: easter-egg click_play decals in levels 23-25 (required_clicks on a non-modifier, so correctly not offered), goat and sheep decals, and enemy_sheep_fly/ground (clicks_to_destroy=8, level 26 iron only, also killable by damage). No new click rule is needed to clear the 20-26 campaigns.",
+   "Action-space gap 1, dormant bosses: the bridge counts every entity with an enemy component that is not dead (bridge.lua:409-416,738). So the sleeping Cerberus (level 20 campaign) and the seated, damage-immune Moloch (level 21 campaign) keep enemy_count >= 1 from wave 0. The host therefore never offers send_wave after wave 0 (host.lua:475; same condition at host.lua:195,516), and power_anchors (host.lua:290-315) can aim spells at immune targets (inferred). Suggested fix: drop enemies with health.ignore_damage, immune_to == DAMAGE_ALL, vis.bans == F_ALL/-1, or a 'sleeping' or 'sitting' phase from enemy_count and the anchors.",
+   "Action-space gap 2, no rally or hero positioning (V2_ACTIONS, host.lua:215-216). Several mechanics punish soldiers standing in the wrong place or dying: burning floors in levels 20/21 sit 13-33 px from the default rally points of holders 6, 8, 9, 14 (level 20) and 1, 2, 13, 14, 15 (level 21). In level 22 every dead non-hero soldier becomes a zombie or swamp thing worth 0 gold. In level 26 Blackburn raises soldiers that die near him as skeleton_big. Moloch instakills groups of 2+ soldiers. Witches turn soldiers into frogs. Plans that rely on barracks should be re-scored on these levels.",
+   "Action-space gap 3, special towers: the host only offers STANDARD_TOWERS and POWER_SPECIALS (host.lua:207-213,416) and only 'holder' kind holders (host.lua:403). The level 22 pre-built elf mercenary barracks (tw_buy_soldier soldier_elf, 100 gold, max 4) and the iron-mode tower_elf_holder are therefore unusable. Not required to win, but a free resource is left unused.",
+   "Hidden enemies: mega_spawner adds about 417, 435 and 492 campaign enemies on levels 23, 24 and 26 from mid-path grave or house points. They do not appear in the waves files and so not in the next_wave preview (preview content is inferred). A GA build order scored on wave composition will under-estimate pressure and ambushes behind the front towers.",
+   "Damage-type gating: spectral knights (levels 24 and 26) have immune_to=26 (physical + explosion + electrical) and armor 1, so they need mage, sorcerer, arcane or true damage. Fallen knights and witches have 0.9 magic armor. Demon-mage shields ignore 4 hits each (levels 20 and 21), which favours fast-hitting towers. Regenerators: swamp thing, werewolf, lycan_werewolf. Several enemies spawn more enemies: legion clones, necromancers, Myconid summons, spider eggs, lycan transformation.",
+   "Must-verify anomaly: on level 25, path 7 is fully registered as an invalid range (all 361 nodes invalid in path_db with the level's range applied), and the utils targeting filters require is_node_valid. All 32 campaign witches use path 7. Read literally, the code makes them untargetable (32 x 2 lives), which conflicts with a winnable level. Run a short live headless probe on level 25 (watch whether witches get shot) before planning.",
+   "Boss lives_cost is 20 for Moloch, Myconid and Blackburn, so one leak is likely fatal (inferred from a default of 20 lives). Moloch only becomes active in wave 16 (wave_active=16); Myconid and Blackburn spawn at the start of wave 15. Blackburn's tower freeze expires on its own (4 s, about every 5 s, r283.7) and needs no click, but frozen towers are blocked, so the host offers no upgrades on them during that time.",
+   "Moon mechanics (zombie speed x2, werewolf moon regen, soldier lycanthropy) are gated on level.moon_controller, which no KR1 level or template defines, so they are inert. Lycan to lycan_werewolf transformation at 25% hp is NOT moon-gated and does happen.",
+   "Bonus modes: heroic has 6 waves and iron 1, with different cash. Moloch, Myconid and Blackburn appear only in campaign. Level 26 iron adds the clickable sheep and a pre-built sorcerer tower. Iron mode locks two tower families on most levels (level_mode_overrides[3].locked_towers).",
+   "Method and reproducibility: values come from evaluating the bytecode in memory with the game's lua51.dll, read-only from Kingdom Rush.exe.bak, through a scratch harness at <local scratch directory> (with lvl.lua, waves2.lua, spawner2.lua, tpl.lua, enemy.lua). The harness runs entity_db:load() for templates and runs the level, wave and spawner members directly. 'GS main/N' refers to prototypes in game_scripts_protos.txt (kr1/game_scripts.lua); 'GT' means a template evaluated from kr1/game_templates.lua, whose prototype dump is one monolithic main L0-8771. Template hp values are before all/difficulty.lua patch_templates scaling. No project, game or archive file was modified."
+  ]
+ },
+ "progression": {
+  "unlock_rules": "Elite stages unlock only through CAMPAIGN-mode wins. No star count is required. The rule is utils.unlock_next_levels_in_ranges(unlock_data, levels, GS) with GS.level_ranges = {{1,12},{13},{14},{15,22,list=true},{16,17},{18,19},{20,21},{23,26}} and main_campaign_levels = 12. The map screen runs it on every init and saves when anything changes.\n\n(1) Once levels[12][GAME_MODE_CAMPAIGN] exists (level 12 won in campaign mode, any difficulty), the first level of every elite range is created as an empty entry (levels[n] = {}) in one step: 13 Sarelgaz's Lair, 14 Ruins of Acaroth, 15 Rotten Forest, 16 Hushwood, 18 Glacial Heights, 20 Pit of Fire and 23 Rotwick.\n\n(2) Inside a range, a campaign win on the previous level opens the next one:\n- 16 -> 17 Bandit's Lair\n- 18 -> 19 Ha'Kraj Plateau\n- 20 -> 21 Pandaemonium\n- 15 -> 22 Fungal Forest (a 'list' range, so 15 and 22 are paired)\n- 23 -> 24 Ancient Necropolis -> 25 Nightfang Swale -> 26 Castle Blackburn\n- 13 and 14 stand alone.\n\nI confirmed this by running the game's own function in a sandbox (scratchpad simunlock.py). After 12 is won it unlocks 13, 14, 15, 16, 18, 20, 23. After 16 it unlocks 17; after 15, 22; after 23, 24; after 18, 20 and 24, it unlocks 19, 21 and 25; after 25, 26. A heroic-only win on 12 unlocks nothing.\n\nHeroic and Iron wins never unlock levels. On a first campaign win the map victory handler also adds find_next_level_in_ranges(idx), e.g. 12->13, 15->22, 16->17, 17->18, 22->16, 25->26, 26->26. All of these are already open or the same as the rule above, so the effective unlock graph is the one listed.\n\nIf a pending victory (slot.last_victory) is for a level index with no levels[idx] entry, the map ignores it ('victory level %s was not shown in map before').\n\nEndless (level 81) is separate: its flag is gated by is_premium.",
+  "stars_and_rewards": "Elite stages do award stars, up to 5 each, exactly like main levels:\n- Campaign: 1-3 stars, stored in levels[i].stars. 3 stars if lives_left >= 18, 2 if >= 6, else 1. Campaign starts with 20 lives.\n- Heroic win: +1 star (key levels[i][2] present).\n- Iron win: +1 star (key levels[i][3] present).\n\nmax_stars = 130 = 26 levels x 5. count_stars skips level indexes >= 80, so endless does not count. The main campaign gives at most 60 stars (36 from campaign); the elites add up to 70 (42 from campaign). Re-winning with more lives raises the stored stars.\n\nAll stars count toward the star-upgrade budget: UpgradesView.max_stars = screen_map.total_stars = utils.count_stars(user_data) = campaign stars + heroic wins + iron wins. Buying everything costs 65 stars, so 3 campaign stars on all 26 levels (78) covers it without any heroic or iron win.\n\nThe in-game TIP_ELITE tip is advisory, not a gate. It shows once, in campaign mode, when level_idx >= 13 and count_stars < 50: 'ELITE STAGE! This is a stage of extreme difficulty. Over 50 stars are recommended to face this stage.'\n\nGems are shop currency only: gems_per_wave = floor(gems_per_level[i] * gems_factor_per_mode[mode] / waves_count). gems_per_level is 500 for levels 13-26; the mode factors are campaign 0.8, heroic 0.48, iron 0.48.",
+  "hero_rules": "Heroes are allowed in all three modes on every elite stage. levelNN_data.lua has locked_hero = false for 13-26, including the iron override. map_data level_data[13..26].upgrades.heroe = true, so the challenge rules page shows 'HEROES'.\n\nNo hero is ever required. The only forced-hero code is the separate 'level_challenge.restrictions' feature.\n\nHero room gate (screen_map HeroRoomViewKR1 and show_hero): a hero is unlocked when #slot.levels >= hero_data.available_level.\n- gerald 4, alleria 6, malik 8, bolin 8, magnus 9, ignus 11\n- denas, elora, ingvar, hacksaw, oni, thor and 10yr: 12\nAfter the main campaign all 13 heroes pass this gate. I found no purchase or DLC check on this path, and features.lua configures only the steam achievements, http and news services, with no DLC or IAP list. campaign.py:22-25 still treats only 6 heroes as free, which is unverified.\n\nHeroes do NOT keep levels across stages. In KR1 game_settings.hero_xp_ephemeral = true, so:\n- systems.lua does not write hero xp at level end;\n- game_gui does not write it on quit or restart;\n- storage restore skips hero levels.\n\ninsert_hero sets hero.level from heroes.status[h].xp using hero_xp_thresholds {300,900,2000,4000,8000,12000,16000,20000,26000}, which gives levels 1-10. In a normal save xp stays 0, so the hero starts every stage at level 1 and levels up only during the stage. The project's hero_xp > 0 option would start a hero above level 1, which the real game never does.",
+  "modes_and_difficulty": "Each elite stage has three modes:\n- Campaign (GAME_MODE_CAMPAIGN = 1): 20 lives, 15-20 waves.\n- Heroic (2): 1 life, 6 waves, no tower locks.\n- Iron (3): 1 life, 1 wave, and specific towers locked per level.\nThe Heroic and Iron tabs stay locked until that stage has 3 campaign stars (en.lua: 'Complete this stage with 3 stars to unlock this mode.'). Endless (4) exists only for level 81 (endless_levels_count = 1).\n\nTowers locked in Iron:\n- 13: mage, artillery\n- 14: barracks, archers\n- 15: archers, artillery\n- 16: archers, mages\n- 17: mages, artillery\n- 18: archers, mages\n- 19: barracks, mages\n- 20: mages\n- 21: artillery\n- 22: archers, artillery\n- 23: barracks, artillery\n- 24: archers, mages\n- 25: archers, barracks\n- 26: archers, artillery\n\nWaves and 'cash' per mode (campaign / heroic / iron):\n- 13: 20w/800, 6w/1400, 1w/1400\n- 14: 20/600, 6/2000, 1/1600\n- 15: 20/800, 6/1000, 1/800\n- 16: 15/500, 6/1250, 1/1300\n- 17: 15/800, 6/1500, 1/1800\n- 18: 16/600, 6/1500, 1/1800\n- 19: 16/1000, 6/1900, 1/2200\n- 20: 15/1200, 6/1900, 1/2700\n- 21: 16/900, 6/2200, 1/3500\n- 22: 15/1000, 6/1700, 1/3500\n- 23: 15/750, 6/1450, 1/500\n- 24: 15/900, 6/1100, 1/2700\n- 25: 15/1100, 6/1500, 1/1500\n- 26: 15/1250, 6/1100, 1/1620\n\nDifficulties are 1 Casual, 2 Normal, 3 Veteran. KR1 has max_difficulty = 3, so Impossible (4) is never offered: the level-select button cycles with zmod(d+1, 3). Difficulty is one global slot setting (user_data.difficulty), not chosen per stage. Enemy HP factor is 0.8 / 1.0 / 1.2 and soldier HP factor 1.2 / 1 / 1. Each level record keeps the best difficulty beaten per mode: levels[i][mode] = max(level_difficulty, old). Stars do not depend on difficulty.",
+  "upgrade_rules": "There are 6 trees (archers, barracks, mages, engineers, rain, reinforcements), each with 5 levels. Prices per level:\n- archers, barracks, mages: 1, 1, 2, 2, 3\n- engineers: 1, 1, 2, 3, 3\n- rain: 2, 2, 3, 3, 3\n- reinforcements: 2, 3, 3, 3, 4\nBuying everything costs 65 stars. This matches STAR_PRICES in campaign.py:15-16. The budget is all stars earned, including elite, heroic and iron stars.\n\nPer-stage cap: systems.lua applies the slot's upgrade levels, then calls upgrades.patch_templates(store.level.max_upgrade_level). That value comes from levelNN_data.lua after level_utils.load_data merges level_mode_overrides[level_mode].\n\nFor every elite level 13-26 the cap is 5 in all modes, so there is no cap. There are also no campaign or heroic tower locks on elites. By contrast, levels 1-9 use campaign overrides to lock advanced towers, and their heroic/iron overrides cap upgrades at 2-4 and lock the hero. map_data level_data[i].upgrades.{level, heroe} is only the challenge-page text ('lvl 5 max', 'HEROES') for these overrides.",
+  "save_slot_format": "Game format: slot_%d.lua contains a Lua table.\n- Required keys: levels, upgrades, heroes. If any is missing, load_slot deletes the slot.\n- Defaults are filled in for missing optional keys (gems = 0).\n- The template also has achievements, bag, gems and seen, plus heroes.status[13 heroes] = {skills = {}, xp = 0}.\n- save_slot adds version_string.\n- heroes.selected is set by the hero room; user_data.difficulty is the global difficulty.\n- last_victory = {level_idx, level_mode, level_difficulty, stars} is written by systems.lua on a win and consumed by the next map init.\n\nEach levels[i] entry works like this:\n- Its presence, even as {}, means the level is unlocked.\n- [1], [2], [3] hold the best difficulty won in campaign, heroic and iron.\n- stars holds the campaign stars (1-3).\nElite levels use the same table, keyed 13-26; there is no separate structure. Slot progress = sum over i = 1..26 of (stars + heroic + iron), clamped to [0, 130].\n\nComparison with the project:\n- campaign.py slot_lua (117-131) writes {[1] = 2 (Normal), stars = s} for each won level. That is the game's format.\n- It also writes levels[max+1] = {} as the next unlock (125-128). That is right for levels 1-12 but wrong for the elite ranges. After 12 the game opens 13, 14, 15, 16, 18, 20 and 23 together; the map adds missing range heads itself on init, but the project would only add 13. After a win on 26 it would create levels[27], which does not exist.\n- check_profile (72-92) accepts only campaign stars 1-3 per index. It cannot hold heroic or iron wins ([2]/[3]) and has no upper bound on the index. Its budget check counts campaign stars only, while the game also counts heroic and iron.\n- heroes.status[h].xp = hero_xp (123) is a state the real game never writes, because hero xp is ephemeral.\n- No user_data.difficulty is written. Inferred: the map defaults to DIFFICULTY_NORMAL.",
+  "evidence": [
+   "kr1/game_settings.lua main L0-182 (evaluated in sandbox, scratchpad/evaldata2.py): main_campaign_levels=12, last_level=26, max_stars=130, max_difficulty=3, level_ranges={{1,12},{13},{14},{15,22,list=true},{16,17},{18,19},{20,21},{23,26}}, hero_xp_ephemeral=true, hero_xp_thresholds={300..26000} (9 entries), gems_per_level[13..26]=500, gems_factor_per_mode={0.8,0.48,0.48}, difficulty_enemy_hp_max_factor={0.8,1,1.2}",
+   "all/utils.lua main/135 L1268-1323 + closure main/135/3 L1273-1281 (unlock_next_levels_in_ranges: bytecode pcs 5-31 add the first level of every range i>=2 once levels[12][CAMPAIGN] is set; pcs 32-91 unlock in-range successors after a campaign win, list ranges by order); executed with the game's own LuaJIT in scratchpad/simunlock.py giving the unlock sequence 13,14,15,16,18,20,23 | 17 | 22 | 24 | 19,21,25 | 26",
+   "all/utils.lua main/129 L1200-1212 count_stars: sums v.stars + (v[HEROIC] and 1) + (v[IRON] and 1) for index < 80; sandbox gives 130 for 26 fully completed levels; main/133 L1235-1266 find_next_level_in_ranges",
+   "all-desktop/screen_map.lua main/56 L168-697 bytecode pcs 146-290: processes last_victory (ignored if levels[idx] missing); first campaign win sets lv.stars and opens find_next_level_in_ranges; lv[mode]=max(level_difficulty, lv[mode] or 0); then calls unlock_next_levels_in_ranges and total_stars=count_stars",
+   "all-desktop/screen_map.lua main/109 L2069-2166 pcs 66-70: Heroic/Iron tab locked while stars < 3; _assets/kr1-desktop/strings/en.lua LEVEL_MODE_LOCKED_DESCRIPTION 'Complete this stage with 3 stars to unlock this mode.'",
+   "all-desktop/screen_map.lua main/139 L2844-2851: UpgradesView max_stars = screen_map.total_stars (budget = all earned stars)",
+   "all-desktop/screen_map.lua main/112 L2178-2188: difficulty = zmod(d+1, (#levels > main_campaign_levels) and max_difficulty or 3), so 3 levels in KR1",
+   "all-desktop/screen_map.lua main/214 L4017-4116 and main/216 L4118-4178: hero unlocked iff #user_data.levels >= hero_data.available_level; no DLC/premium constants; kr1-desktop/data/map_data.lua hero_data available_level gerald 4, alleria 6, malik 8, bolin 8, magnus 9, ignus 11, others 12",
+   "all-desktop/screen_map.lua main/108 L2033-2067: challenge page text from map_data level_data[i].upgrades.level ('UPGRADE LEVEL n') and .heroe ('HEROES'/'NO HEROES'); map_data level_data[13..26] = {heroe=true, level=5}",
+   "kr1/data/levels/level13..26_data.lua (evaluated): max_upgrade_level=5, locked_hero=false, level_mode_overrides only [3] (iron) with locked_towers listed in modes_and_difficulty; level02/06/09_data overrides contrast (heroic/iron cap 2/3/4, locked_hero=true)",
+   "all/level_utils.lua main/33 L177-196: load_data applies level_mode_overrides[level_mode]; main/49 L395-476 insert_hero: honors level.locked_hero, sets hero xp/level from slot heroes.status via hero_xp_thresholds",
+   "all/systems.lua main/40 L55-143 pcs 250-282: lives campaign 20, heroic 1, iron 1; pcs 165-175: patch_templates(level.max_upgrade_level)",
+   "all/systems.lua main/42 L145-328: pcs 276-295 victory stars 3/2/1 by lives >=18/>=6 (non-campaign modes stars=1); pcs 121-148 TIP_ELITE when campaign, level_idx>=13, count_stars<50; pcs 412-420 last_victory record; kr1-desktop/data/game_gui_data.lua TIP_ELITE text 'Over 50 stars are recommended to face this stage.'",
+   "all/systems.lua main/42/1 L147-163 and all-desktop/game_gui.lua main/164 L1399-1410, main/166 L1412-1423: hero xp written to slot only if not hero_xp_ephemeral",
+   "all/systems.lua main/45 L422-554 pcs 22-38: gems_per_wave = floor(gems_per_level[idx]*gems_factor_per_mode[mode]/waves_count)",
+   "all/storage.lua main/51 L187-240 + main-chunk table constant K26={levels,upgrades,heroes} (required keys), K24={gems=0} (defaults); main/67 L313-358 slot progress = sum over levels 1..26 of stars+heroic+iron, clamped to max_stars; main/75 L423-496 restore_levels builds {[1]=d,[2]=d,[3]=d,stars=s} and skips hero xp when ephemeral",
+   "kr1/data/slot_template.lua (evaluated): achievements, bag, gems, heroes.status[13]={skills,xp=0}, levels={}, seen, upgrades{6 trees}=0",
+   "kr1/upgrades.lua (evaluated): 30 entries, 6 classes x levels 1-5, prices sum 65; all/constants.lua: DIFFICULTY_EASY..IMPOSSIBLE=1..4, GAME_MODE_CAMPAIGN/HEROIC/IRON/ENDLESS=1..4",
+   "kr1/data/waves/level13..26_waves_{campaign,heroic,iron}.lua (evaluated): group counts and cash listed in modes_and_difficulty",
+   "_assets/kr1-desktop/strings/en.lua: LEVEL_13..26_TITLE names, LEVEL_NN_IRON_UNLOCK (e.g. 13 'no artillery no mage'), LEVEL_NN_MODES_UPGRADES 'lvl 5 max'",
+   "C:/Users/<user>/Documents/AlphaRush/alpharush_rl/campaign.py:13-16 STAR_PRICES, 22-25 FREE_HEROES (6 heroes), 27 CAMPAIGN_MODE=1/NORMAL=2, 31-35 stars_for_lives, 72-92 check_profile, 117-131 slot_lua (levels {[1]=2,stars}; levels[max+1]={})",
+   "Reproduction scripts (read-only, scratchpad): <local scratch directory>, simunlock.py, tconst.py, disasm.py}"
+  ],
+  "open_questions": [
+   "Hero purchase gating: the KR1 hero room code (screen_map main/214, main/216) checks only #levels >= available_level, and features.lua lists no DLC or IAP service, so all 13 heroes look selectable after level 12. campaign.py:22-25 treats only 6 as free. Not checked at runtime whether this Steam build hides or blocks denas, elora, ingvar, hacksaw, oni, thor or 10yr somewhere else.",
+   "Not verified: whether a direct '-level 13..26' launch needs levels[idx] in the slot. The map ignores a victory for a level index that has no levels[idx] entry; I did not read the director or loading path for the -level case.",
+   "Untested: whether a non-existent levels[27] = {} entry (what slot_lua would write after a win on 26) breaks the map screen. map_points has no entry 27.",
+   "Not traced: how the host sets level_difficulty for direct launches when the slot has no user_data.difficulty. The map default to DIFFICULTY_NORMAL is inferred from screen_map main/111.",
+   "Not inspected: per-mode scripted events in the custom level scripts kr1/data/levels/level20.lua, level21.lua and level22.lua (Pit of Fire, Pandaemonium, Fungal Forest), or the elite boss mechanics (eb_sarelgaz, eb_gulthak, eb_greenmuck, eb_kingpin, eb_ulgukhai, eb_moloch, eb_myconid, eb_blackburn with mod_blackburn_tower), which may need click_entity-style handling.",
+   "Not inspected: how the 'cash' field of the wave files maps to starting gold (initial_gold) and whether difficulty changes it.",
+   "game_settings.default_hero did not appear when the table was evaluated (likely nil in KR1). Not checked what happens in insert_hero when no hero is selected."
+  ]
+ },
+ "audit": {
+  "assumptions": [
+   {
+    "file": "alpharush_rl/campaign_run.py",
+    "line": 33,
+    "assumption": "check_campaign only accepts levels == [1..N] (comment: 'a campaign starts from a new save'). An elite campaign therefore has to replay levels 1-12 first. tests/test_campaign_run.py:143 pins this by asserting that levels [2,3] are rejected.",
+    "change_needed": "Allow a campaign to start from a supplied starting progress, i.e. a won {level: stars} map plus owned upgrades. That progress should be verified against a prior campaign journal, or rebuilt with campaign_profile. Then levels can be 13..26 directly. Alternatively keep the rule and run levels [1..26], which needs the budget change below.",
+    "effort": "small"
+   },
+   {
+    "file": "alpharush_rl/campaign_run.py",
+    "line": 218,
+    "assumption": "The first level whose attempts run out ends the whole campaign (stopped_reason 'level_failed'), and levels are strictly sequential. In the game, winning level 12 in campaign mode unlocks 13, 14, 15, 16, 18, 20 and 23 together. The rest unlock in chains: 16->17, 18->19, 20->21, 15->22, 23->24->25->26. So elite levels form 7 independent chains (all/utils.lua main/135 L1268-1323 unlock_next_levels_in_ranges, disassembled; kr1/game_settings.lua level_ranges={{1,12},{13},{14},{15,22,list=true},{16,17},{18,19},{20,21},{23,26}}, main_campaign_levels=12, last_level=26).",
+    "change_needed": "For levels above main_campaign_levels, a failed level should only block its own chain successors and the run should continue with the other unlocked levels. Numeric order 13..26 already satisfies every prerequisite.",
+    "effort": "small"
+   },
+   {
+    "file": "tools/campaign-survey.py",
+    "line": 396,
+    "assumption": "planned_games = seeds x levels x attempts_per_level (also line 426) must fit max_games. native-final allows max_games 485 (configs/phases/campaign-v1.json:36000) and native-campaign allows 965 (line 28308). A 1..26 run with 5 seeds x 8 attempts plans 1040 games. attempts_per_level is capped at 1..10 (campaign_run.py:36).",
+    "change_needed": "Size max_games and wall budgets for 14 extra levels in the new phase config, or use fewer attempts per level.",
+    "effort": "trivial"
+   },
+   {
+    "file": "alpharush_rl/campaign.py",
+    "line": 127,
+    "assumption": "slot_lua unlocks only max(won)+1. After a level-12 win, the real save would hold 13, 14, 15, 16, 18, 20 and 23 (utils main/135). A direct '-level N' launch ignores unlocks (all/director.lua main/30), so this affects only how faithful the save is, not gameplay (inferred).",
+    "change_needed": "Write unlocked entries from game_settings.level_ranges, mirroring unlock_next_levels_in_ranges.",
+    "effort": "trivial"
+   },
+   {
+    "file": "alpharush_rl/campaign.py",
+    "line": 226,
+    "assumption": "level_profile assumes every level 1..L-1 was won, in numeric order, at a uniform star rate. For L >= 13 this includes all 12 main levels plus the earlier elite levels. That is consistent with the unlock graph, and there is no upper bound (search_job.py:245, collect_job.py:84 and eval_job.py:78 all use it).",
+    "change_needed": "None for numeric-order elite play. Only needed if chains are played out of order (see the retry item).",
+    "effort": "trivial"
+   },
+   {
+    "file": "alpharush_rl/campaign.py",
+    "line": 24,
+    "assumption": "FREE_HEROES lists 6 free heroes, all available from level 11, so heroes_available(13..26) returns all six. kr1-desktop/data/map_data.lua hero_data also lists denas, elora, ingvar, hacksaw, oni, thor and 10yr at available_level 12, but they are treated as purchase-only (campaign.py:22-23). strategy_brain.py:38-43 HERO_TEXT covers only the six free heroes.",
+    "change_needed": "No change for free heroes. If premium heroes are owned, add them to FREE_HEROES and HERO_TEXT (ownership not verified).",
+    "effort": "trivial"
+   },
+   {
+    "file": "alpharush_rl/campaign.py",
+    "line": 15,
+    "assumption": "STAR_PRICES total 65 stars, and only campaign-mode stars are modelled: CAMPAIGN_MODE=1 (line 27) and slot_lua line 124 writes only {[1]=NORMAL, stars}. 36 stars after level 12 plus 3 per elite level reaches the cap around level 22. Purchase loops stop at level 5 (campaign.py:64,189; strategy_brain.py:92,104), and LanguageBrain.buy skips the question once all packages are equal (strategy_brain.py:202-203). Heroic/iron stars are not modelled (game max_stars=130 = 26 x 5) and engine.py:312 always passes -mode 1.",
+    "change_needed": "None for campaign-mode elite. Heroic/iron would need mode in Worker/profile/slot and the iron tower locks from level_mode_overrides[3].",
+    "effort": "trivial"
+   },
+   {
+    "file": "alpharush_rl/operator_net.py",
+    "line": 22,
+    "assumption": "MAX_LEVEL=12 sets the size of the level one-hot (line 73). Levels 13-26 get an all-zero level vector, so the operator plays them silently level-agnostic. Its weights were trained only on level 1-12 demonstrations. Raising MAX_LEVEL changes G_DIM (line 173), and from_json refuses the existing weights (lines 243-247).",
+    "change_needed": "Either keep 12 deliberately or set it to 26 with a weight-row-insert shim like the click_entity legacy path (lines 249-251). Either way, collect elite demonstrations or DAgger data (native-collect) and retrain or evaluate before trusting the operator on 13-26.",
+    "effort": "medium"
+   },
+   {
+    "file": "configs/pools-campaign-v1.json",
+    "line": 7,
+    "assumption": "'levels': {'main_campaign': [1..12]} is documentation only. No code reads it: phase.pool_problems (phase.py:147-179) checks only seeds. The final_campaign_run seeds 6001-6005 ('access': 'one_frozen_evaluation', line 12) were spent by native-final-1456be77.",
+    "change_needed": "Create a new pools file for an elite phase, with fresh final/evaluation seeds disjoint from all used ones.",
+    "effort": "trivial"
+   },
+   {
+    "file": "configs/phases/campaign-v1.json",
+    "line": 17,
+    "assumption": "The phase is scoped 'main_campaign_all_levels'. runtime/rl/campaign-v1/ledger.jsonl shows native-final 1/1, native-survey, verify, teacher and diagnose at 1/1, native-search 22/24, campaign 3/6, collect 3/6 and eval 4/6 jobs used. So preflight refuses another native-final (phase.py:303-304). The job approval text is a time-limited authorisation until 2026-10-06 19:00. Any edit to this pinned file needs an explicit re-freeze (phase.py:126-144, 335-336).",
+    "change_needed": "Create a new phase config (for example elite-v1) with jobs for levels 13-26: search, collect, eval, campaign, final. It needs a new user approval in chat.",
+    "effort": "small"
+   },
+   {
+    "file": "Lumi_Nox/games/kingdom_rush/bridge.lua",
+    "line": 247,
+    "assumption": "get_level_exit picks ONE convergence exit, and enemy_path_progress (line 273) is straight-line distance to it. Levels 1-12 each have one decal_defend_point. Level 17 has 2, level 19 has 3, level 24 has 2 and level 26 has 3 (levelNN_data.lua entities_list, all modes). On those maps, progress for enemies heading to another exit is wrong (inferred). It feeds spell anchor order (host.lua:298-301), the plan cast trigger (search.py:214) and operator features (operator_net.py:56).",
+    "change_needed": "Measure progress to the exit at the end of each enemy's own path (pi/spi), or along its node index. bridge.lua is an engine input (engine.py:73-74), so this needs a re-prepare and a determinism re-verify.",
+    "effort": "medium"
+   },
+   {
+    "file": "Lumi_Nox/games/kingdom_rush/bridge.lua",
+    "line": 416,
+    "assumption": "collect_enemies counts every live e.enemy, including untouchable ones. On level 20, kr1/data/levels/level20.lua main/15 (campaign mode only) creates enemy_demon_cerberus with sleeping=true and wakes it only when wave_group_number == wave_group_total. Its script, game_scripts main/155, sets immune_to DAMAGE_ALL, ui.can_select and a hidden health bar. On level 21, level21.lua main/15 spawns eb_moloch sitting (main/198: sitting, ignore_damage, health_bar hidden). The host offers send_wave after wave 0 only when enemy_count==0 (host.lua:475, 516), so early wave calls are blocked on level 20 (inferred). Spell anchors (host.lua:290-315) may also target these enemies.",
+    "change_needed": "Export sleeping, ignore_damage, immune_to and ui.can_select per enemy. Exclude untargetable enemies from the anchor lists and from the enemy_count gate (or gate on has_alive_enemies semantics).",
+    "effort": "small"
+   },
+   {
+    "file": "alpharush_rl/search.py",
+    "line": 200,
+    "assumption": "A boss is any enemy whose template starts with 'eb_'. Elite bosses mostly match: eb_sarelgaz (13), eb_gulthak (14), eb_greenmuck (15), eb_kingpin (17), eb_ulgukhai (19), eb_moloch (21), eb_myconid (22), eb_blackburn (26). Level 20's end boss is enemy_demon_cerberus, so the plan's boss-focus rule never fires there (inferred).",
+    "change_needed": "Detect bosses from the wave or level boss marker or an hp_max threshold, and ignore sleeping or sitting phases.",
+    "effort": "trivial"
+   },
+   {
+    "file": "alpharush_rl/strategy_brain.py",
+    "line": 45,
+    "assumption": "The 8B SYSTEM prompt describes playing 'through the main campaign'. choose_plan (lines 236-239) gives only the level number, with no level name or boss information. The LoRA saw only main-campaign prompts.",
+    "change_needed": "Generalise the wording and optionally add the level title and boss name (strings in _assets/kr1-desktop/strings/en.lua LEVEL_NN_TITLE).",
+    "effort": "trivial"
+   },
+   {
+    "file": "configs/phases/campaign-v1.json",
+    "line": 1338,
+    "assumption": "The episode cap is max_ticks 240000 / max_decisions 3000 (same at 19855, 28319, 36011). The worst main level in native-final was level 12 at 118624 ticks and 897 decisions. Elite levels 13-15 have 20 waves, the others 15-16 (survey final_summary.wave_total).",
+    "change_needed": "Probably sufficient (inferred). Check stall_reason on the first elite searches before raising it.",
+    "effort": "trivial"
+   },
+   {
+    "file": "alpharush_rl/engine.py",
+    "line": 312,
+    "assumption": "Worker.start launches '-level N -mode 1 -diff D' after writing slot_1 from the profile.",
+    "change_needed": "None. The path works for 13-26 (see engine_launch_for_levels_13_26).",
+    "effort": "trivial"
+   },
+   {
+    "file": "alpharush_rl/search_job.py",
+    "line": 65,
+    "assumption": "check_search accepts levels 1..99 and builds per-level profiles via level_profile (line 246) and heroes via heroes_available (line 295). check_collect (collect_job.py:47-60) and check_eval (eval_job.py:37-52) put no bound on level.",
+    "change_needed": "None. Search, collect and eval jobs can target 13-26 as they are.",
+    "effort": "trivial"
+   },
+   {
+    "file": "alpharush_rl/assets/host.lua",
+    "line": 597,
+    "assumption": "meta reads game_settings.main_campaign_levels (=12) read-only, and engine.py:372 normalises it. Nothing gates on it.",
+    "change_needed": "None.",
+    "effort": "trivial"
+   },
+   {
+    "file": "tests/test_campaign_profile.py",
+    "line": 91,
+    "assumption": "Tests pin current behaviour: hero availability (lines 91-94), rejection of non-1..N campaigns (test_campaign_run.py:143), and holder_elf never being buildable (test_host_actions_v2.py:176, 256). test_campaign_survey.py:396-399 pins elite levels 13-26 as the last 14 survey items.",
+    "change_needed": "Update these alongside any change above.",
+    "effort": "trivial"
+   }
+  ],
+  "engine_launch_for_levels_13_26": "Plausible, and already exercised.\n\n**Launch path.** engine.py:312-313 passes -level N -mode 1 -diff D. all/director.lua main/30 (L50-202, bytecode pc 239-298) does load_slot(1), else create_slot(1), then set_active_slot(1). If params.level is set, it sets next_item_name='game' and next_item_args={level_idx=tonumber(level), level_mode=tonumber(mode) or GAME_MODE_CAMPAIGN, level_difficulty=tonumber(diff) or DIFFICULTY_NORMAL}. There is no unlock check. Unlocking exists only on the map screen (all/utils.lua main/135, called from all-desktop/screen_map.lua main/56), which this path bypasses.\n\n**Runs already done (read from the run journals).**\n- native-survey-849cb860 (v1, new save, pressure_greedy) loaded every level 13-26 with level_meta.level_idx=N, level_mode=1, level_difficulty=2 and no errors.\n- native-teacher-31941993 (v2, teacher_v2) did the same.\n- Every elite game in both runs lost in waves 1-4; they had no hero and no upgrades.\n- Two runs were void: survey level 16 and teacher level 13. Both were build receipts that coincided with lives reaching 0; env.py:223-227 now handles that case.\n- native-verify-34bcae6e cold replays matched on levels 16, 21 and 24 under isolate_sound+stable_pairs.\n\n**Campaign-mode rules for 13-26.**\n- No locked towers, max_upgrade_level=5, locked_hero=false. level_mode_overrides only define key 3 (iron), in levelNN_data.lua.\n- Wave totals: 20 for levels 13-15; 15-16 for levels 16-26.\n- Special entities on these levels, by data file:\n  - Level 20: level20.lua creates the sleeping Cerberus.\n  - Level 21: level21.lua spawns Moloch.\n  - Level 22: level22.lua waits for eb_myconid's death and its spawns. A pre-built tower_elf sits on holder 18 (game_mode 1).\n  - Levels 23, 24 and 26: mega_spawner.\n  - Levels 20 and 21: burning floors.\n  - Level 18: tunnels.\n  - Level 15: swamp spawner.\n\n**Profiles.** check_profile, slot_lua and write_profile have no level cap, so a level-13+ profile (12 main wins plus upgrades plus hero) is written the same way. Only the unlocked-level entries differ from a real save, and this does not affect gameplay (inferred).",
+  "action_space_gaps": [
+   "Barracks rally points. tower_menus_data gives tw_rally to barrack 1-3, paladin, barbarian, sorcerer (its elemental) and elf. host V2_ACTIONS (host.lua:215-216) has no rally action, and catalog_v2 keeps only tw_upgrade, upgrade_power and tw_sell items (host.lua:417-436). menus.py:8-9 and env.py:11-13 lack it too. The bridge already has set_rally_point (bridge.lua:991-1097, dispatch at 1285), but handle_v2 refuses anything outside V2_ACTIONS (host.lua:635). GUI semantics (all-desktop/game_gui.lua main/361, GUI_MODE_RALLY_TOWER): point inside the rally_range ellipse, valid_node_nearby NF_RALLY, cell_is_only rally_terrains, then rally_pos plus rally_new. Likely needed on the multi-exit levels (17, 19, 24, 26) and to keep soldiers out of aura_burning_floor on levels 20 and 21 (game_scripts main/328 damages soldiers in radius).",
+   "Hero movement. There is no hero action; the hero stays where it spawns (inferred). bridge.lua:954-989 action_move_hero writes nav_rally.pos/new without the GUI checks. game_gui.lua main/361 GUI_MODE_RALLY_HERO checks requires_node_nearby, valid_terrains_dest, min_distance and waypoints, so exposing the bridge version would need those checks added.",
+   "Elf tower purchases on level 22. In campaign mode the level has a pre-built tower_elf on holder 18 (level22_data.lua, editor.game_mode=1). Its menu is tw_buy_soldier(soldier_elf) plus tw_rally (tower_menus_data 'elf'). The GUI handles it in game_gui main/374 (tw_buy_soldier -> unit_bought). host.lua offers nothing for kind 'elf': it is neither in STANDARD_TOWERS (host.lua:211-213, 416) nor in POWER_SPECIALS={sunray} (host.lua:210, 438). Not required to win, but it is unused gold-to-units.",
+   "Spells at points not anchored to an enemy. use_power is offered only at up to 3 live-enemy anchors (host.lua:290-315, 464-473), so reinforcements cannot be pre-placed at a chokepoint or exit before enemies arrive. Anchors can also land on untargetable enemies (the sleeping Cerberus on level 20, the sitting Moloch on level 21). power_point_valid (host.lua:320-340) already checks validity, so path-node anchors could be added.",
+   "Special or locked holders do not block campaign-mode elite play. catalog_v2 builds only on kind 'holder' (host.lua:403-415). The only special holders are tower_elf_holder (holder_elf -> tw_upgrade(tower_elf)), which on level 22 exists only in iron mode (game_mode=3) and also appears on level 5. No KR1 level data file (level01-26, level81) contains blocked holders (holder_blocked_* / tw_unblock). The sasquash holder is on level 8 only.",
+   "No click gap for the elite bosses. click_need (host.lua:350-361) covers tap_decal bosses and required_clicks tower traps (eb_jt main/170, mod_jt_tower main/174, mod_veznan_tower main/182). The elite boss scripts have none of tap_decal, clicked or required_clicks among their constants: game_scripts main/189 greenmuck, 192 kingpin, 195 ulgukhai, 198 moloch, 201 myconid, 204 blackburn. mod_blackburn_tower (main/206) is a timed block (tower_block_inc ... duration ... tower_block_dec). The clickable decorations are achievement easter eggs only: decal_fredo on level 13 (main/314), decal_scrat on level 18 (main/324), decal_s23_splinter on level 23 (main/330), nevermore on level 24 (main/334), nessie on level 25 (main/336).",
+   "Not applicable to KR1: selling decorations (no such menu kind in kr1/data/tower_menus_data.lua), tw_buy_attack (in game_gui main/374 but used by no KR1 menu), hero ultimate / power_3 (KR1 powers_ui is 1..2, host.lua:375-383; the GUI_MODE_POWER_3 strings appear generic, inferred)."
+  ],
+  "summary": "Short answer: the current architecture can plausibly be taken to the 14 elite levels in campaign/Normal mode, with targeted changes rather than a redesign.\n\n**What already works.**\n- The direct '-level N -mode 1' launch has no unlock check (all/director.lua main/30).\n- Earlier survey and teacher runs already loaded all of levels 13-26.\n- Cold replays were deterministic on levels 16, 21 and 24.\n- Campaign-mode elite rules are the standard ones: no tower locks and all 5 upgrade levels.\n- The search, collect and eval validators, the profile and slot writer, the hero list and the star logic have no level caps.\n- No elite boss needs a click: no tap_decal or required_clicks in their scripts, and Blackburn's tower block is timed.\n\n**Hard limits in the code.**\n- campaign_run.check_campaign only accepts levels 1..N, and the runner stops at the first failed level. In the game, elite levels unlock as 7 independent chains after level 12 (utils main/135 plus level_ranges).\n- operator_net MAX_LEVEL=12 one-hot: levels 13-26 get a zero vector, and changing it invalidates the trained weights.\n- Governance: the campaign-v1 phase's native-final and survey/verify/teacher jobs are used up, the final seeds 6001-6005 are spent, and the approval text runs only until 2026-10-06 19:00. A new phase/pools config is needed, with a new approval from the user in chat.\n\n**Elite-specific risks.**\n- The bridge measures path progress against a single exit, but levels 17, 19, 24 and 26 have 2-3 exits.\n- Untargetable enemies (the sleeping Cerberus on level 20, the sitting Moloch on level 21) count as live enemies. This blocks early wave calls and can attract spell anchors.\n- Boss detection by the 'eb_' prefix misses the level 20 Cerberus.\n\n**Action gaps.** In priority order: barracks rally points (the bridge has it, the host does not expose it), hero movement, spells aimed at path points rather than enemies, and buying elves on level 22. Special or blocked holders and click mechanics are not needed for campaign-mode elite play.\n\n**Fidelity only.** slot_lua unlocks only max+1.\n\nRead-only otherwise. I created only scratchpad helpers: elite_dump.py and gs_main_disasm.txt in <local scratch directory>"
+ }
+}

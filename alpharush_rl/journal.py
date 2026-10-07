@@ -47,7 +47,15 @@ class Journal:
     def __init__(self, path: str | Path):
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
+        self._status = self._stamp = None
         self.verify()
+
+    def _file_stamp(self):
+        try:
+            stat = self.path.stat()
+        except FileNotFoundError:
+            return None
+        return stat.st_size, stat.st_mtime_ns
 
     def entries(self) -> list[dict]:
         if not self.path.exists():
@@ -82,11 +90,15 @@ class Journal:
             previous = digest
         if expected_tip is not None and previous != expected_tip:
             raise JournalError("journal tip differs from pinned tip (possible truncation)")
-        return {"integrity_verified": True, "entries": len(rows), "tip_sha256": previous,
-                "engine_replay_verified": False}
+        status = {"integrity_verified": True, "entries": len(rows), "tip_sha256": previous,
+                  "engine_replay_verified": False}
+        self._status, self._stamp = dict(status), self._file_stamp()
+        return status
 
     def append(self, kind: str, payload: dict) -> dict:
-        status = self.verify()
+        # The chain was verified in full when this writer last saw the file; re-verify only if the file
+        # changed since (size or modification time), so an append costs O(1) instead of a full pass.
+        status = self._status if self._status is not None and self._stamp == self._file_stamp() else self.verify()
         # Hash exactly what is stored: JSON turns integer keys into strings, which sort differently
         # once there are ten or more of them ({1: .., 10: ..} vs {"1": .., "10": ..}).
         payload = json.loads(canonical_json(payload))
@@ -97,6 +109,8 @@ class Journal:
         with self.path.open("ab") as stream:
             stream.write(encoded + b"\n")
             stream.flush()
+        self._status = {**status, "entries": status["entries"] + 1, "tip_sha256": row["sha256"]}
+        self._stamp = self._file_stamp()
         return row
 
 

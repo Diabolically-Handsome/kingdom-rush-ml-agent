@@ -72,7 +72,7 @@ class ImitationTests(unittest.TestCase):
             path = Path(tmp) / "episode.npz"
             save_rows(path, rows, {"level": 1})
             loaded, meta = load_rows(path)
-        self.assertEqual({"level": 1}, meta)
+        self.assertEqual({"level": 1, "layout": "v4"}, meta)
         self.assertEqual(len(rows), len(loaded))
         self.assertTrue(all(np.array_equal(a[1], b[1]) and a[2] == b[2] for a, b in zip(rows, loaded)))
         decisions = [(g, o, t, 1.0) for g, o, t in loaded]
@@ -91,9 +91,11 @@ class ImitationTests(unittest.TestCase):
     def test_rows_and_weights_from_before_click_entity_still_load(self):
         import tempfile
         from pathlib import Path
-        from alpharush_rl.operator_net import LEGACY_ACTIONS, load_rows
-        net = OptionScorer(hidden=(16, 8), seed=2)
+        from alpharush_rl.operator_net import DIMS, LEGACY_ACTIONS, load_rows
+        G_DIM, O_DIM = DIMS["v3"]  # click_entity was added to the main-campaign layout
+        net = OptionScorer(hidden=(16, 8), seed=2, layout="v3")
         old = net.to_json()
+        self.assertNotIn("layout", old)
         old["o_dim"] = O_DIM - 1
         old["params"][0] = np.delete(np.asarray(old["params"][0]), G_DIM + LEGACY_ACTIONS, axis=0).tolist()
         again = OptionScorer.from_json(old)

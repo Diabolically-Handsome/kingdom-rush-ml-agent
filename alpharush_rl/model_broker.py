@@ -133,6 +133,32 @@ class LanguageModelBroker:
         return validate_distribution(response, request)
 
 
+class RetryingBroker:
+    """Retries transport failures of a deterministic scoring server: the same request to the same model, so a
+    retry can only reproduce the answer (never a rule fallback). Invalid answers still raise at once."""
+    DELAYS = (5, 15, 30, 60, 120, 240)
+
+    def __init__(self, broker, delays=DELAYS, on_retry=None, sleep=None):
+        import time
+        self.broker, self.delays, self.on_retry = broker, tuple(delays), on_retry
+        self.sleep = time.sleep if sleep is None else sleep
+
+    def distribution(self, request: dict) -> dict:
+        import http.client
+        import urllib.error
+        transient = (urllib.error.URLError, http.client.HTTPException, ConnectionError, TimeoutError)
+        for attempt, delay in enumerate((*self.delays, None)):
+            try:
+                return self.broker.distribution(request)
+            except transient as exc:
+                if delay is None:
+                    raise
+                if self.on_retry is not None:
+                    self.on_retry(request.get("id"), attempt + 1, exc)
+                self.sleep(delay)
+        raise AssertionError("unreachable")
+
+
 class LanguageModelPolicy:
     """Use the same native menu and prompt as the environment's existing policy.
 

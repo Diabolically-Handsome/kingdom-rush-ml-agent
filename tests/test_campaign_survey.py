@@ -801,7 +801,7 @@ class PlanReplayDiagnosisTests(TempWorkspace):
     def test_plan_replay_uses_the_source_episode_action_scope(self):
         self.write_survey(index=5)  # written before action scopes: played under v1
         self.write_survey(seed=1002, index=6, action_scope="v2")
-        self.write_survey(seed=1003, index=7, action_scope="v3")
+        self.write_survey(seed=1003, index=7, action_scope="v9")
         for job_scope in ("v1", "v2"):
             with self.subTest(job_scope=job_scope):
                 items, issues = SURVEY.check_run_list([self.diag(episode=5), self.diag(episode=6)], self.pools,
@@ -809,7 +809,7 @@ class PlanReplayDiagnosisTests(TempWorkspace):
                 self.assertEqual(issues, [])
                 self.assertEqual([i["action_scope"] for i in items], ["v1", "v2"])
         _, issues = SURVEY.check_run_list([self.diag(episode=7)], self.pools, self.root)
-        self.assertIn("episode action_scope 'v3'", " | ".join(issues))
+        self.assertIn("episode action_scope 'v9'", " | ".join(issues))
 
         class Recording(DiagFactory):
             def __init__(self):
@@ -930,10 +930,10 @@ class JobActionScopeTests(TempWorkspace):
         self.assertEqual(([], "v1"), (issues, items[0]["action_scope"]))
 
     def test_unknown_action_scope_refuses_before_any_game(self):
-        for scope in ("v3", "", None, "V2", 2):
+        for scope in ("v9", "", None, "V2", 2):
             with self.subTest(scope=scope):
                 _, issues = SURVEY.check_run_list([item(1001)], self.pools, None, "", scope)
-                self.assertEqual([f"action_scope {scope!r} is not one of ['v1', 'v2']"], issues)
+                self.assertEqual([f"action_scope {scope!r} is not one of ['v1', 'v2', 'v3']"], issues)
                 ctx, factory = self.context(), ScopeFactory()
                 with self.assertRaisesRegex(GateRefused, "action_scope"):
                     self.run_loop([item(1001)], ctx, factory, action_scope=scope)

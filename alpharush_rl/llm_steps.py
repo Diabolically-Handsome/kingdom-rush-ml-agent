@@ -126,7 +126,7 @@ class StepOperatorPolicy:
     def choose(self, state, menu, context):
         validate_menu(menu)
         instruction = self.source.instruction(state, menu)
-        g, o = decision_arrays(state, menu, instruction)
+        g, o = decision_arrays(state, menu, instruction, self.net.layout)
         scores = self.net.scores(g, o)
         index = int(np.argmax(scores))
         self.source.observe(instruction, menu[index]["action"])

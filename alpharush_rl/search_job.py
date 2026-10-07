@@ -20,7 +20,7 @@ from dataclasses import asdict
 from pathlib import Path
 
 from . import phase
-from .campaign import heroes_available, level_profile
+from .campaign import heroes_available, task_profile
 from .episode import EpisodeProtocol, replay_unsupported, replay_verify, run_episode
 from .ops import GateRefused
 from .search import (BuildOrderPolicy, LevelSearch, check_genome, fitness, genome_id, level_holders,
@@ -33,9 +33,19 @@ SEARCH_KEYS = {"levels", "search_seed", "population", "evaluations_per_level", "
 # re-played first; each is also queued with every listed allocation); search_seeds [train seeds]
 # scores a plan by its mean fitness over these seeds instead of search_seed alone; levels_only limits the
 # search phase to some levels while validation still covers every level.
-OPTIONAL_KEYS = {"warm_start", "search_seeds"}
+# level_weights {level: w > 0}: the scheduler feeds the open level with the fewest evaluations per weight;
+# stop_wins N: a level is done once N population plans won every search seed (and min_evaluations ran);
+# stall_evaluations N: a level is done after N evaluations without a new best. warm_start.reevaluate may
+# also be a list of levels whose imports are re-played (the others are adopted as measured).
+# heroes {level: [hero, ...]}: new plans for that level only use these (free, unlocked) heroes.
+# mode 2/3: search the Heroic/Iron challenges of the listed main levels (no hero: challenges lock it).
+# seed_plans {level: [plans]}: played first in this job (re-measured; in a challenge search without their hero).
+OPTIONAL_KEYS = {"warm_start", "search_seeds", "level_weights", "stop_wins", "stall_evaluations", "heroes", "mode",
+                 "seed_plans"}
 RUN_ID = re.compile(r"native-search-[0-9a-f]{32}")
 MAX_WORKERS = 48
+# Validation stops submitting games this many seconds before the job's wall deadline (in-flight games end).
+VALIDATION_MARGIN = 300
 WIN = 10000
 
 
@@ -53,7 +63,9 @@ def check_search(spec, pools):
     from .campaign import PACKAGES
     if warm is not None and (not isinstance(warm, dict)
                              or not {"runs", "top"} <= set(warm) <= {"runs", "top", "reevaluate", "packages"}
-                             or warm.get("reevaluate", False) not in (True, False)
+                             or not (warm.get("reevaluate", False) in (True, False)
+                                     or (isinstance(warm.get("reevaluate"), list)
+                                         and all(_int(level, 1, 99) for level in warm["reevaluate"])))
                              or not isinstance(warm.get("packages", []), list)
                              or not set(warm.get("packages", [])) <= set(PACKAGES)
                              or not isinstance(warm["runs"], list) or not warm["runs"]
@@ -70,9 +82,40 @@ def check_search(spec, pools):
                            ("workers", 1, MAX_WORKERS), ("validate_top", 0, 20)):
         if not _int(spec[key], low, high):
             issues.append(f"{key} must be an integer in {low}..{high}")
-    rate = spec["profile_stars_per_level"]
-    if isinstance(rate, bool) or not isinstance(rate, (int, float)) or not 1 <= rate <= 3:
-        issues.append("profile_stars_per_level must be a number from 1 to 3 (an average star rate)")
+    weights = spec.get("level_weights", {})
+    if not isinstance(weights, dict) or not all(
+            isinstance(k, str) and k.isdigit() and int(k) in (levels if isinstance(levels, list) else [])
+            and not isinstance(w, bool) and isinstance(w, (int, float)) and 0 < w <= 100 for k, w in weights.items()):
+        issues.append("level_weights must map searched level numbers (as strings) to weights in (0, 100]")
+    from .campaign import heroes_available
+    heroes = spec.get("heroes", {})
+    if not isinstance(heroes, dict) or not all(
+            isinstance(k, str) and k.isdigit() and int(k) in (levels if isinstance(levels, list) else [])
+            and isinstance(v, list) and v and set(v) <= set(heroes_available(int(k))) for k, v in heroes.items()):
+        issues.append("heroes must map searched level numbers (as strings) to nonempty lists of available heroes")
+    mode = spec.get("mode", 1)
+    if isinstance(mode, bool) or mode not in (1, 2, 3) or (
+            mode != 1 and not (isinstance(levels, list) and all(_int(level, 1, 12) for level in levels))):
+        issues.append("mode must be 1, or 2/3 (Heroic/Iron challenges) of main levels 1-12")
+    seeds_plans = spec.get("seed_plans", {})
+    if not isinstance(seeds_plans, dict) or not all(
+            isinstance(k, str) and k.isdigit() and int(k) in (levels if isinstance(levels, list) else [])
+            and isinstance(v, list) for k, v in seeds_plans.items()):
+        issues.append("seed_plans must map searched level numbers (as strings) to lists of plans")
+    else:
+        for key, plans in seeds_plans.items():
+            for plan in plans:
+                try:
+                    check_genome(plan)
+                except ValueError as exc:
+                    issues.append(f"seed_plans {key}: {exc}")
+    for key in ("stop_wins", "stall_evaluations"):
+        if key in spec and not _int(spec[key], 1, 100000):
+            issues.append(f"{key} must be a positive integer")
+    from .campaign import star_rate_ok
+    if not star_rate_ok(spec["profile_stars_per_level"]):
+        issues.append("profile_stars_per_level must be a number from 1 to 3 (an average star rate) "
+                      "or [main rate, elite rate]")
     search_seeds = spec.get("search_seeds", [spec["search_seed"]])
     if not isinstance(search_seeds, list) or not search_seeds or spec["search_seed"] not in search_seeds \
             or len(set(map(str, search_seeds))) != len(search_seeds):
@@ -140,8 +183,11 @@ def play_task(task, port, factory, protocol, ctx, difficulty=2):
         if task["purpose"] == "probe":
             state = env.reset()
             reader = getattr(env, "meta", None)
-            return {"holders": level_holders(state), "specials": level_specials(state),
-                    "meta": reader() if callable(reader) else {}}
+            probe = {"holders": level_holders(state), "specials": level_specials(state),
+                     "meta": reader() if callable(reader) else {}}
+            if "set_rally" in (getattr(env, "scope", None) or ()):
+                probe["rally"] = True  # action scope v3: plans may rally barracks
+            return probe
         if task["purpose"] == "replay":
             return replay_verify(lambda: env, task["result"])
         watch = ToughestEnemyWatch(BuildOrderPolicy(task["genome"]))
@@ -157,10 +203,17 @@ def play_task(task, port, factory, protocol, ctx, difficulty=2):
 
 def native_env(task, port, *, rng_mode, action_scope, tag):
     """The native env of one search task (module-level so worker processes can build it)."""
+    from .engine import level_scope
     from .env import NativeEnv
     identity = f"search_{tag}_{task['identity_index']:06d}" + ("_replay" if task["replay"] else "")
     return NativeEnv(seed=task["seed"], level=task["level"], port=port, difficulty=2, identity=identity,
-                     rng_mode=rng_mode, action_scope=action_scope, profile=task["profile"])
+                     rng_mode=rng_mode, action_scope=level_scope(action_scope, task["level"]), profile=task["profile"],
+                     mode=task.get("mode", 1))
+
+
+def _reevaluated(warm, level):
+    flag = warm.get("reevaluate", False)
+    return flag is True or (isinstance(flag, list) and level in flag)
 
 
 def warm_entries(spec, runs_dir, protocol):
@@ -180,6 +233,8 @@ def warm_entries(spec, runs_dir, protocol):
         if start is None:
             raise GateRefused(f"warm_start run {run_id} has no search_start record")
         earlier = start["spec"]
+        if earlier.get("mode", 1) != spec.get("mode", 1) and not warm.get("reevaluate"):
+            raise GateRefused(f"warm_start run {run_id} searched another game mode (re-play its plans instead)")
         # Adopted scores must come from identical conditions; re-played plans only need to be plans.
         if not warm.get("reevaluate"):
             if (earlier["search_seed"], earlier["profile_stars_per_level"]) != (spec["search_seed"],
@@ -193,10 +248,14 @@ def warm_entries(spec, runs_dir, protocol):
             if not line:
                 continue
             row = json.loads(line)
-            if row.get("kind") != "search_eval":
+            if row.get("kind") not in ("search_eval", "search_validate"):
                 continue
             payload = row["payload"]
-            if payload["level"] not in spec["levels"] or payload["seed"] not in search_seeds:
+            if payload["level"] not in spec["levels"]:
+                continue
+            # Adopted scores need this run's search seeds; a plan re-played here may come from any measured game.
+            if not _reevaluated(warm, payload["level"]) and (row["kind"] != "search_eval"
+                                                             or payload["seed"] not in search_seeds):
                 continue
             key = genome_id(payload["genome"])
             entry = found.setdefault(payload["level"], {}).setdefault(
@@ -207,9 +266,18 @@ def warm_entries(spec, runs_dir, protocol):
     ranked = {}
     for level, entries in found.items():
         for entry in entries.values():
-            # Mean over the search seeds, a missing seed counting 0: plans proven on every seed rank first.
-            entry["fitness"] = sum(entry["seeds"].get(seed, 0.0) for seed in search_seeds) / len(search_seeds)
-        ranked[level] = sorted(entries.values(), key=lambda e: (-e["fitness"], genome_id(e["genome"])))[:warm["top"]]
+            if _reevaluated(warm, level):
+                # Re-played plans rank by their record: smoothed win rate over the games played (winners only, so a
+                # short zero-win record cannot outrank a long one), then mean fitness.
+                record = list(entry["seeds"].values())
+                entry["fitness"] = sum(record) / len(record)
+                wins = sum(f >= WIN for f in record)
+                entry["rate"] = (wins + 1) / (len(record) + 4) if wins else 0.0
+            else:
+                # Mean over the search seeds, a missing seed counting 0: plans proven on every seed rank first.
+                entry["fitness"] = sum(entry["seeds"].get(seed, 0.0) for seed in search_seeds) / len(search_seeds)
+        ranked[level] = sorted(entries.values(), key=lambda e: (-e.get("rate", 0.0), -e["fitness"],
+                                                                genome_id(e["genome"])))[:warm["top"]]
     return ranked
 
 
@@ -242,14 +310,16 @@ def search_loop(spec, env_factory, ctx, out, *, pools, protocol, replay_fraction
     validation = {}
     replays = []
 
+    mode = spec.get("mode", 1)
+
     def profile_for(level, hero, package="balanced"):
-        return level_profile(level, stars, hero=hero, package=package)
+        return task_profile(level, stars, hero=hero, package=package, mode=mode)
 
     def make_task(purpose, level, seed, genome=None, result=None):
         counter[0] += 1
         hero = genome["hero"] if genome else None
         package = genome.get("pkg", "balanced") if genome else "balanced"
-        return {"purpose": purpose, "level": level, "seed": seed, "genome": genome, "result": result,
+        return {"purpose": purpose, "level": level, "seed": seed, "genome": genome, "result": result, "mode": mode,
                 "profile": profile_for(level, hero, package), "identity_index": counter[0],
                 "replay": purpose == "replay", "episode_id": f"{ctx.run_id}-{counter[0]:06d}"}
 
@@ -291,11 +361,15 @@ def search_loop(spec, env_factory, ctx, out, *, pools, protocol, replay_fraction
             return
         if task["purpose"] == "probe":
             out.append("search_probe", {**base, "holders": value["holders"], "specials": value.get("specials", []),
-                                        "meta": value["meta"]})
-            search = LevelSearch(task["level"], value["holders"], heroes_available(task["level"]),
-                                 spec["rng_seed"], population=spec["population"], specials=value.get("specials", []))
+                                        "meta": value["meta"], **({"rally": True} if value.get("rally") else {})})
+            allowed = ([] if mode != 1 else spec.get("heroes", {}).get(str(task["level"]))
+                       or heroes_available(task["level"]))
+            search = LevelSearch(task["level"], value["holders"], allowed,
+                                 spec["rng_seed"], population=spec["population"], specials=value.get("specials", []),
+                                 rally=bool(value.get("rally")))
+            reevaluate = spec["warm_start"].get("reevaluate") if spec.get("warm_start") else False
             for entry in warm.get(task["level"], []):
-                if spec["warm_start"].get("reevaluate"):
+                if reevaluate is True or (isinstance(reevaluate, list) and task["level"] in reevaluate):
                     search.queue(entry["genome"])
                 else:
                     search.adopt(entry["genome"], entry["fitness"])
@@ -310,6 +384,11 @@ def search_loop(spec, env_factory, ctx, out, *, pools, protocol, replay_fraction
                         out.append("search_variant", {"run_id": ctx.run_id, "level": task["level"],
                                                       "genome_id": genome_id(variant), "genome": variant,
                                                       "parent_id": genome_id(entry["genome"])})
+            for plan in spec.get("seed_plans", {}).get(str(task["level"]), []):
+                genome = check_genome({**plan, "hero": None} if mode != 1 else plan)
+                search.queue(genome)
+                out.append("search_seed_plan", {"run_id": ctx.run_id, "level": task["level"],
+                                                "genome_id": genome_id(genome), "genome": genome})
             searches[task["level"]] = search
             return
         if task["purpose"] == "replay":
@@ -345,6 +424,11 @@ def search_loop(spec, env_factory, ctx, out, *, pools, protocol, replay_fraction
         search = searches[level]
         best = search.best()
         if search.evaluations + len(search.pending) >= spec["evaluations_per_level"]:
+            return True
+        if spec.get("stop_wins") and search.evaluations >= spec["min_evaluations"] and sum(
+                entry[0] >= WIN for entry in search.population) >= spec["stop_wins"]:
+            return True
+        if spec.get("stall_evaluations") and search.evaluations - search.improved_at >= spec["stall_evaluations"]:
             return True
         return (best is not None and best[0] >= WIN + 100 * spec["stop_lives"]
                 and search.evaluations >= spec["min_evaluations"])
@@ -388,7 +472,8 @@ def search_loop(spec, env_factory, ctx, out, *, pools, protocol, replay_fraction
                 if not time_left():
                     stopped_reason = "time_reserve"
                     break
-                level = min(open_levels, key=lambda l: (searches[l].evaluations + len(searches[l].pending), l))
+                weight = lambda l: float(spec.get("level_weights", {}).get(str(l), 1))
+                level = min(open_levels, key=lambda l: ((searches[l].evaluations + len(searches[l].pending)) / weight(l), l))
                 genome = None if level_finished(level) else searches[level].propose()
                 if genome is None:
                     open_levels.remove(level)
@@ -404,7 +489,8 @@ def search_loop(spec, env_factory, ctx, out, *, pools, protocol, replay_fraction
         while inflight:
             drain()
         # 3. Validate the best plans of every level on the other train seeds.
-        if stopped_reason is None and spec["validate_top"]:
+        # A time-reserve stop keeps its reserve for exactly this step.
+        if stopped_reason in (None, "time_reserve") and spec["validate_top"]:
             chosen = {}
             for level, search in sorted(searches.items()):
                 # The best plans by (mean) search fitness, winners first: with several search seeds a plan
@@ -417,7 +503,9 @@ def search_loop(spec, env_factory, ctx, out, *, pools, protocol, replay_fraction
                      for level, entries in sorted(chosen.items()) for entry in entries
                      for seed in spec["validate_seeds"] if seed not in search_seeds]
             for task in tasks:
-                if ctx.games_remaining < 1 or not time_left():
+                # The search stopped VALIDATION_MARGIN short of the reserve it kept for this step.
+                if ctx.games_remaining < 1 or (time_reserve_seconds and ctx.deadline - clock()
+                                               < min(VALIDATION_MARGIN, time_reserve_seconds)):
                     stopped_reason = "validation_budget"
                     break
                 while pending_replays and len(inflight) < workers and ctx.games_remaining >= 1:

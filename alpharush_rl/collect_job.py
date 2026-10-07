@@ -15,7 +15,7 @@ import time
 from pathlib import Path
 
 from . import phase
-from .campaign import level_profile
+from .campaign import task_profile
 from .episode import EpisodeProtocol, run_episode
 from .ops import GateRefused
 from .operator_net import Recorder, save_rows
@@ -37,21 +37,26 @@ def check_collect(spec, pools):
         issues.append("dagger must be {beta: 0..1}")
     if isinstance(spec["workers"], bool) or not isinstance(spec["workers"], int) or not 1 <= spec["workers"] <= 32:
         issues.append("workers must be 1..32")
-    rate = spec["profile_stars_per_level"]
-    if isinstance(rate, bool) or not isinstance(rate, (int, float)) or not 1 <= rate <= 3:
-        issues.append("profile_stars_per_level must be a number from 1 to 3 (an average star rate)")
+    from .campaign import star_rate_ok
+    if not star_rate_ok(spec["profile_stars_per_level"]):
+        issues.append("profile_stars_per_level must be a number from 1 to 3 (an average star rate) "
+                      "or [main rate, elite rate]")
     tasks = spec["tasks"]
     if not isinstance(tasks, list) or not tasks:
         return None, issues + ["tasks must be a nonempty list"]
     seen = set()
     for index, task in enumerate(tasks):
-        if not isinstance(task, dict) or set(task) != {"level", "seed", "genome"}:
-            issues.append(f"tasks[{index}] must have exactly level, seed and genome")
+        if not isinstance(task, dict) or not {"level", "seed", "genome"} <= set(task) <= {"level", "seed", "genome", "mode"}:
+            issues.append(f"tasks[{index}] must have exactly level, seed and genome (and optionally mode)")
+            continue
+        if task.get("mode", 1) not in (1, 2, 3) or isinstance(task.get("mode"), bool) or (
+                task.get("mode", 1) != 1 and not (isinstance(task["level"], int) and 1 <= task["level"] <= 12)):
+            issues.append(f"tasks[{index}]: mode must be 1, or 2/3 (Heroic/Iron) on levels 1-12")
             continue
         if phase.seed_role(pools, task["seed"]) != "train":
             issues.append(f"tasks[{index}]: seed {task['seed']!r} is not a train seed")
         try:
-            key = (task["level"], task["seed"], genome_id(check_genome(task["genome"])))
+            key = (task["level"], task.get("mode", 1), task["seed"], genome_id(check_genome(task["genome"])))
         except ValueError as exc:
             issues.append(f"tasks[{index}]: {exc}")
             continue
@@ -81,8 +86,8 @@ def collect_loop(spec, env_factory, ctx, out, data_dir, *, pools, protocol, port
         port = free.get()
         try:
             genome = check_genome(task["genome"])
-            profile = level_profile(task["level"], spec["profile_stars_per_level"], hero=genome["hero"],
-                                    package=genome.get("pkg", "balanced"))
+            profile = task_profile(task["level"], spec["profile_stars_per_level"], hero=genome["hero"],
+                                   package=genome.get("pkg", "balanced"), mode=task.get("mode", 1))
             env = env_factory(task, profile, index, port)
             try:
                 if spec.get("dagger") is not None:
@@ -94,17 +99,21 @@ def collect_loop(spec, env_factory, ctx, out, data_dir, *, pools, protocol, port
                                      difficulty=difficulty, episode_id=f"{ctx.run_id}-{index:05d}", check=ctx.check)
             finally:
                 env.close()
-            path = data_dir / f"L{task['level']:02d}_s{task['seed']}_{genome_id(genome)}.npz"
+            mode = task.get("mode", 1)
+            path = data_dir / (f"L{task['level']:02d}" + (f"_m{mode}" if mode != 1 else "")
+                               + f"_s{task['seed']}_{genome_id(genome)}.npz")
             outcome = result.get("outcome") or {}
             path.with_suffix(".macro.json").write_text(json.dumps(recorder.macro, separators=(",", ":")),
                                                        encoding="utf-8")
             save_rows(path, recorder.rows, {"level": task["level"], "seed": task["seed"],
+                                            **({"mode": task["mode"]} if task.get("mode", 1) != 1 else {}),
                                             "genome_id": genome_id(genome), "won": bool(outcome.get("level_won")),
                                             "lives": outcome.get("lives"), "status": result["status"],
                                             "labels": "expert", "player": "network" if spec.get("dagger") is not None
                                             else "expert",
                                             "agreement": (recorder.agreements / max(1, len(recorder.rows)))
-                                            if spec.get("dagger") is not None else 1.0})
+                                            if spec.get("dagger") is not None else 1.0},
+                      layout=recorder.net.layout if hasattr(recorder, "net") else recorder.layout)
             return result, path
         finally:
             free.put(port)

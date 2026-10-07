@@ -223,14 +223,18 @@ def _is_power(value, number: int) -> bool:
 #   r  tower ratio digits for archer, barrack, mage, engineer (0..9 each, not all 0)
 #   e  exploration percent (0..100) and s its seed: at each decision, with probability e/100,
 #      a uniformly drawn non-wait, non-sell option replaces the rule's choice.
+#   m  tower cap (0 = none): no new build once this many standard towers stand, so gold goes to upgrades;
+#      a negative m is soft: past -m towers builds resume while SOFT_CAP_GOLD or more is banked
 TEACHER_BRANCHES = {
     "archer": {"r": "tower_ranger", "m": "tower_musketeer"},
     "barrack": {"p": "tower_paladin", "b": "tower_barbarian"},
     "mage": {"a": "tower_arcane_wizard", "s": "tower_sorcerer"},
     "engineer": {"b": "tower_bfg", "t": "tower_tesla"},
 }
-TEACHER_KEYS = ("b", "c", "f", "r", "e", "s")
-TEACHER_DEFAULTS = {"b": "rpab", "c": 50, "f": 50, "r": "3111", "e": 0, "s": 0}
+TEACHER_KEYS = ("b", "c", "f", "r", "e", "s", "m")
+TEACHER_DEFAULTS = {"b": "rpab", "c": 50, "f": 50, "r": "3111", "e": 0, "s": 0, "m": 0}
+# A soft tower cap (m < 0) builds again from this much banked gold: no single upgrade costs that much.
+SOFT_CAP_GOLD = 1000
 
 
 def parse_teacher_params(text: str) -> dict:
@@ -254,7 +258,8 @@ def parse_teacher_params(text: str) -> dict:
                 raise ValueError(f"invalid teacher_v2 ratio: {value!r}")
             params[key] = value
         else:
-            if not value.isdigit() or str(int(value)) != value:
+            digits = value[1:] if key == "m" and value.startswith("-") else value
+            if not digits.isdigit() or str(int(value)) != value:
                 raise ValueError(f"invalid teacher_v2 number: {part!r}")
             number = int(value)
             if key in ("c", "f", "e") and number > 100:
@@ -312,7 +317,8 @@ class TeacherV2:
         for item in menu:
             options.setdefault(item["action"].get("action"), []).append(item)
         towers = {tower.get("id"): tower for tower in state.get("towers", []) if isinstance(tower, dict)}
-        enemies = [enemy for enemy in state.get("enemies", []) if isinstance(enemy, dict)]
+        # A dormant boss (action scope v3) is not on the field yet: no spells for it, no wave hold-back.
+        enemies = [enemy for enemy in state.get("enemies", []) if isinstance(enemy, dict) and not enemy.get("dormant")]
         aim = aim_choice(self, state, menu)
         if aim is not None:
             return aim
@@ -322,6 +328,11 @@ class TeacherV2:
                 return choice
         builds = [item for item in options.get("build_tower", [])
                   if self.ratio.get(item["action"].get("tower_type"), 0) > 0]
+        cap = self.params.get("m", 0)
+        if cap and sum(not tower.get("is_special") and base_kind(tower.get("template")) is not None
+                       for tower in towers.values()) >= abs(cap):
+            if cap > 0 or _number(state.get("gold")) < SOFT_CAP_GOLD:
+                builds = []  # the tower cap is reached: keep the gold for upgrades
         power_ups, tower_ups = options.get("upgrade_power", []), options.get("upgrade_tower", [])
         order = {}
         if builds and (power_ups or tower_ups):

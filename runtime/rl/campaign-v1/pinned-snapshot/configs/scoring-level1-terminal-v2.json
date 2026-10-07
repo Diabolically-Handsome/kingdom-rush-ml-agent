@@ -1,0 +1,15 @@
+{
+  "schema_version": 2,
+  "name": "kr1-level1-terminal-v2",
+  "scope": {"game": "kr1-desktop-6.4.46", "level": 1, "difficulty": 2, "mode": "campaign"},
+  "native_source": "native",
+  "terminal_required": true,
+  "max_lives": 20,
+  "victory_base": 1.0,
+  "victory_lives_denominator": 20.0,
+  "defeat_return": -1.0,
+  "formula": "victory: 1 + lives / 20; defeat: -1",
+  "ignored_fields": ["gold", "tick", "seconds", "wave", "stars", "tower_count", "action_count"],
+  "engineering_invalid_flags": ["truncated", "timed_out", "timeout", "engineering_invalid", "invalid"],
+  "unfinished_episode": "reject_without_return"
+}

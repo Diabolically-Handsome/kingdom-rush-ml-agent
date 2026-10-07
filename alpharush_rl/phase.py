@@ -358,6 +358,7 @@ class PhaseRunContext:
     job_kind: str = ""
     stop_dirs: tuple = ()
     games_played: int = 0
+    _events: object = None  # the run's events journal, opened (and verified) once
 
     def check(self):
         if time.monotonic() >= self.deadline:
@@ -381,8 +382,9 @@ class PhaseRunContext:
 
     def record(self, event, **details):
         self.check()
-        return Journal(self.output_dir / "events.jsonl").append(
-            str(event), dict(run_id=self.run_id, time=_utc(), **details))
+        if self._events is None:
+            self._events = Journal(self.output_dir / "events.jsonl")
+        return self._events.append(str(event), dict(run_id=self.run_id, time=_utc(), **details))
 
 
 @contextmanager

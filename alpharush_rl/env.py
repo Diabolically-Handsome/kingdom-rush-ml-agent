@@ -11,13 +11,15 @@ from .menus import build_menu
 SCOPE_V1 = ("wait", "build_tower", "send_wave")
 SCOPES = {"v1": SCOPE_V1, "v2": SCOPE_V1 + ("upgrade_tower", "upgrade_power", "sell_tower", "use_power",
                                            "point_tower", "click_entity")}
+SCOPES["v3"] = SCOPES["v2"] + ("set_rally",)
 # Native ticks advanced after each verified action before its receipt is checked.
 BUILD_TICKS = 180
 UPGRADE_TICKS = 30
 SELL_TICKS = 30
 CLICK_TICKS = 30
+RALLY_TICKS = 30
 ACTION_TICKS = {"build_tower": BUILD_TICKS, "upgrade_tower": UPGRADE_TICKS, "sell_tower": SELL_TICKS,
-                "click_entity": CLICK_TICKS}
+                "click_entity": CLICK_TICKS, "set_rally": RALLY_TICKS}
 
 
 def observation(raw):
@@ -117,24 +119,36 @@ def _click_entity_receipt(before, after, action, cost):
     return {"executed": offered(before), "offered_after": offered(after)}
 
 
+def _set_rally_receipt(before, after, action, cost):
+    """The barrack (same entity) now reports the clicked point as its rally point."""
+    tower = _tower(after, action["tower_id"])
+    rally = (tower or {}).get("rally_x"), (tower or {}).get("rally_y")
+    return {"executed": tower is not None and rally == (action["x"], action["y"]),
+            "rally_after": list(rally) if tower is not None else None}
+
+
 # v2 completion receipts: each returns {"executed": bool, ...evidence} from the before/after
 # snapshots, the verified action and its menu cost.
 V2_RECEIPTS = {"upgrade_tower": _upgrade_tower_receipt, "upgrade_power": _upgrade_power_receipt,
                "sell_tower": _sell_tower_receipt, "use_power": _use_power_receipt,
-               "point_tower": _point_tower_receipt, "click_entity": _click_entity_receipt}
+               "point_tower": _point_tower_receipt, "click_entity": _click_entity_receipt,
+               "set_rally": _set_rally_receipt}
 
 
 class NativeEnv:
     scope = list(SCOPE_V1)
 
     def __init__(self, seed=1001, level=1, port=9879, difficulty=2, identity=None, rng_mode="",
-                 action_scope="v1", profile=None):
+                 action_scope="v1", profile=None, mode=1):
         if action_scope not in ACTION_SCOPES:
             raise ValueError(f"action_scope must be one of {ACTION_SCOPES}")
         # The v1 Worker call is unchanged (its default scope is v1); other scopes are passed through.
         scoped = {} if action_scope == "v1" else {"action_scope": action_scope}
         if profile is not None:
             scoped["profile"] = profile
+        if mode != 1:
+            scoped["mode"] = mode  # a Heroic (2) or Iron (3) challenge; campaign calls stay unchanged
+        self.mode = mode
         self.profile = profile
         self.worker = Worker(seed=seed, level=level, port=port, difficulty=difficulty, identity=identity,
                              rng_mode=rng_mode, **scoped)
@@ -154,7 +168,10 @@ class NativeEnv:
                 if self.profile is not None:
                     # The level must have loaded exactly the written campaign progress.
                     from .campaign import profile_matches
-                    problems = profile_matches(self.profile, self.worker.meta())
+                    meta = self.worker.meta()
+                    problems = profile_matches(self.profile, meta)
+                    if self.mode != 1 and meta.get("level_mode") != self.mode:
+                        problems.append(f"game mode loaded {meta.get('level_mode')!r} != {self.mode}")
                     if problems:
                         raise RuntimeError("Campaign profile not loaded: " + "; ".join(problems))
                 self.state = observation(raw)

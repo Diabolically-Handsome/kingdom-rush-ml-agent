@@ -46,6 +46,45 @@ SYSTEM = ("You are the strategy brain of an agent playing Kingdom Rush (2011) th
           "difficulty, starting from a new save and playing levels in order. You make only strategic choices; a "
           "separate operator executes them in battle. Winning every level comes first, then keeping lives (18+ "
           "lives left earns 3 stars, 6+ earns 2). Reply with exactly one option label from the list.")
+# Levels after the main campaign get their own system text and the stage's name and boss (main-campaign
+# prompts stay exactly as they were validated).
+ELITE_SYSTEM = ("You are the strategy brain of an agent playing Kingdom Rush (2011) on Normal difficulty. It has "
+                "cleared the 12-level main campaign and now plays the 14 elite stages (levels 13-26). You make only "
+                "strategic choices; a separate operator executes them in battle. Winning every stage comes first, "
+                "then keeping lives (18+ lives left earns 3 stars, 6+ earns 2). Reply with exactly one option label "
+                "from the list.")
+ELITE_STAGES = {13: ("Sarelgaz's Lair", "Sarelgaz, a giant spider that eats soldiers"),
+                14: ("Ruins of Acaroth", "Gul'Thak, an orc shaman who heals nearby enemies"),
+                15: ("Rotten Forest", "Treebeast Greenmuck; fallen soldiers rise as enemies"),
+                16: ("Hushwood", None),
+                17: ("Bandit's Lair", "the Kingpin, who cannot be blocked and heals"),
+                18: ("Glacial Heights", None),
+                19: ("Ha'Kraj Plateau", "Ulgukhai, who takes damage only while soldiers block him"),
+                20: ("Pit of Fire", "Cerberus, asleep until the last wave"),
+                21: ("Pandaemonium", "Moloch, seated until the last wave"),
+                22: ("Fungal Forest", "the Myconid; fallen soldiers rise as enemies"),
+                23: ("Rotwick", None),
+                24: ("Ancient Necropolis", None),
+                25: ("Nightfang Swale", None),
+                26: ("Castle Blackburn", "Lord Blackburn, who stuns towers and raises fallen soldiers")}
+
+
+CHALLENGE_SYSTEM = ("You are the strategy brain of an agent playing Kingdom Rush (2011) on Normal difficulty. It has "
+                    "cleared the 12-level main campaign and now plays the levels' Heroic and Iron challenges, which "
+                    "earn extra stars for upgrades before the elite stages. A challenge has a single life and no hero; "
+                    "you make only strategic choices and a separate operator executes them. Reply with exactly one "
+                    "option label from the list.")
+CHALLENGE_TEXT = {2: "Heroic challenge (6 waves, 1 life, no hero)", 3: "Iron challenge (one long wave, 1 life, no hero)"}
+
+
+def _stage(level, mode=None):
+    """(system text, text naming the level) for a level number (and a Heroic/Iron challenge mode)."""
+    if mode in CHALLENGE_TEXT:
+        return CHALLENGE_SYSTEM, f"Level {level} {CHALLENGE_TEXT[mode]}"
+    if not isinstance(level, int) or level not in ELITE_STAGES:
+        return SYSTEM, f"Level {level}"
+    name, boss = ELITE_STAGES[level]
+    return ELITE_SYSTEM, f"Elite stage {level} ({name}{'; boss: ' + boss if boss else ''})"
 
 
 class RuleBrain:
@@ -54,7 +93,8 @@ class RuleBrain:
 
     def buy(self, stars, owned, context):
         """The allocation the chosen plan was tested with (the balanced rule unless the plan names one)."""
-        return package_upgrades(context.get("plan_package", "balanced"), context["won"]), []
+        return package_upgrades(context.get("plan_package", "balanced"), context["won"],
+                                context.get("challenge_stars", 0)), []
 
     def choose_plan(self, level, candidates, attempt, context):
         return 0, []  # the first offered plan (the runner offers untried plans in validated order)
@@ -77,6 +117,15 @@ def describe_plan(genome, evidence=None):
             + "; after the plan, keeps building archer:barracks:mage:artillery at "
             + ":".join(genome.get("ratio", "3111"))
             + ("; saves spells for the boss" if genome.get("boss") else "")
+            + (f"; {sum(s[0] == 'r' for s in genome['steps'])} barracks rally orders"
+               if any(s[0] == "r" for s in genome["steps"]) else "")
+            + ("; barracks rally onto the boss to block it" if genome.get("block") else "")
+            + ({25: "; after the plan, fills every holder before upgrading",
+                100: "; after the plan, upgrades once half the holders are built",
+                200: "; after the plan, upgrades early with fewer towers",
+                400: "; after the plan, upgrades a few strong towers first"}.get(genome.get("f"), ""))
+            + (f"; never more than {genome['cap']} towers" if genome.get("cap", 0) > 0 else
+               f"; at most {-genome['cap']} towers until 1000 gold is banked" if genome.get("cap") else "")
             + (f"; tested with star upgrades allocated {PACKAGE_TEXT[genome['pkg']]}" if genome.get("pkg") else ""))
     if evidence:
         text += f"; practice results: {evidence}"
@@ -122,7 +171,7 @@ def _allocation(upgrades):
     return ", ".join(f"{TREE_NAME[t]} {upgrades[t]}" for t in STAR_TREES if upgrades[t]) or "nothing"
 
 
-def allocation_packages(won, owned, plan_package, plan_kinds):
+def allocation_packages(won, owned, plan_package, plan_kinds, extra=0):
     """[(text, upgrades)] for the next level: the plan's tested allocation first (recommended), the balanced
     one, a focus on the plan's main tower kind, both spells, and keeping the current allocation."""
     tree_of = {"archer": "archers", "barrack": "barracks", "mage": "mages", "engineer": "engineers"}
@@ -133,7 +182,7 @@ def allocation_packages(won, owned, plan_package, plan_kinds):
         if name in seen:
             continue
         seen.add(name)
-        upgrades = package_upgrades(name, won)
+        upgrades = package_upgrades(name, won, extra)
         label = ("Reset and allocate the stars as this battle plan was tested with (recommended): "
                  if name == plan_package else f"Reset and allocate {PACKAGE_TEXT[name]}: ")
         out.append((label + _allocation(upgrades), upgrades))
@@ -166,7 +215,7 @@ class LanguageBrain:
         self.name = name
         self.counter = 0
 
-    def _ask(self, kind, user, options):
+    def _ask(self, kind, user, options, system=SYSTEM):
         """The option with the highest probability averaged over cyclic orders of the menu (with at most
         ROTATIONS options every option is scored once in every position)."""
         n = len(options)
@@ -176,7 +225,7 @@ class LanguageBrain:
         for shift in shifts:
             order = [(i + shift) % n for i in range(n)]
             self.counter += 1
-            request = {"id": f"strategy-{kind}-{self.counter}", "system": SYSTEM,
+            request = {"id": f"strategy-{kind}-{self.counter}", "system": system,
                        "user": user + "\n\nOptions:\n" + "\n".join(f"{label}. {options[i]}"
                                                                  for label, i in zip(labels, order))
                        + "\n\nAnswer with one label.", "labels": labels}
@@ -198,16 +247,18 @@ class LanguageBrain:
         every star for free, so any package may be applied before any level)."""
         owned = check_upgrades(owned or {})
         packages = allocation_packages(context["won"], owned, context.get("plan_package", "balanced"),
-                                       context.get("plan_kinds") or {})
+                                       context.get("plan_kinds") or {}, context.get("challenge_stars", 0))
         if len({json.dumps(p[1], sort_keys=True) for p in packages}) <= 1:
             return packages[0][1], []
         status = ", ".join(f"{TREE_NAME[t]} {owned[t]}/5" for t in STAR_TREES)
         plan = f" The chosen battle plan for it: {context['plan']}." if context.get("plan") else ""
-        user = (f"Campaign so far: {context['progress']}. Next level: {context['next_level']}.{plan} "
+        system, stage = _stage(context["next_level"], context.get("mode"))
+        next_text = context["next_level"] if system is SYSTEM else stage
+        user = (f"Campaign so far: {context['progress']}. Next level: {next_text}.{plan} "
                 f"Stars earned: {stars}. Current star upgrades: {status}. The upgrades screen can reset all "
                 "upgrades for free and spend the stars again. Choose the allocation for the next level.")
         options = [text for text, _ in packages]
-        index, record = self._ask("upgrade", user, options)
+        index, record = self._ask("upgrade", user, options, system)
         return check_upgrades(packages[index][1]), [record]
 
     def buy_one_by_one(self, stars, owned, context):
@@ -234,12 +285,13 @@ class LanguageBrain:
             owned = {**owned, offers[index]: owned[offers[index]] + 1}
 
     def choose_plan(self, level, candidates, attempt, context):
+        system, stage = _stage(level, context.get("mode"))
         user = (f"Campaign so far: {context['progress']}. Star upgrades owned: {context['upgrades']}. "
-                f"Level {level} is next (attempt {attempt + 1}). Holders are named by map slot ids. "
+                f"{stage} is next (attempt {attempt + 1}). Holders are named by map slot ids. "
                 "Choose the battle plan most likely to win this level with many lives left.")
         options = [describe_plan(genome, evidence) for genome, evidence in candidates]
         if context.get("failed"):
             user += " Plans already tried and lost on this level: " + ", ".join(
                 LABELS[i] for i in context["failed"]) + "."
-        index, record = self._ask("plan", user, options)
+        index, record = self._ask("plan", user, options, system)
         return index, [record]

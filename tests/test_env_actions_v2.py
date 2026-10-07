@@ -604,7 +604,7 @@ class NativeEnvV2Tests(unittest.TestCase):
         self.assertNotIn("action_scope", v1.worker.passed)
         self.assertEqual((v1.worker.kwargs["action_scope"], v2.worker.passed["action_scope"]), ("v1", "v2"))
         with self.assertRaises(ValueError):
-            env_module.NativeEnv(action_scope="v3")
+            env_module.NativeEnv(action_scope="v9")
 
     def test_every_v2_receipt_succeeds_and_is_recorded(self):
         env = self.make()

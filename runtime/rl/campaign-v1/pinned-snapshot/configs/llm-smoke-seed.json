@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "plan_id": "KR1-8B-TRAIN-MODE-SMOKE-ONE-STEP-SEED-V1",
+  "seed": 0,
+  "python_hash_seed": 0,
+  "torch_manual_seed": 0,
+  "cuda_manual_seed_all": 0,
+  "scope": "reproducible zero-residual LoRA initialization and one bounded optimizer step",
+  "formal_training": false,
+  "modifies_inference_comparison_plan": false
+}

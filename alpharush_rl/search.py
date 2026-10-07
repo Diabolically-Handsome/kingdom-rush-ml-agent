@@ -29,9 +29,23 @@ FOUR = {target: kind for kind, targets in BRANCHES.items() for target in targets
 SKIP_GOLD = 800
 GENOME_KEYS = ("hero", "steps", "cast", "early", "branches")
 # Optional plan keys and their defaults (a canonical plan omits a key at its default).
-OPTIONAL_GENOME = {"ratio": "3111", "boss": 0, "pkg": "balanced"}
+OPTIONAL_GENOME = {"ratio": "3111", "boss": 0, "pkg": "balanced", "block": 0, "f": 50, "cap": 0}
+# "f": the fallback's build-first factor (teacher_v2 "f"): after the plan, it keeps building while the empty
+# holders outnumber built towers * f / 100, then upgrades first; elite plans may prefer fewer, stronger towers.
+FALLBACK_F = (25, 50, 100, 200, 400)
+# "cap": the fallback builds no new tower once this many standard towers stand (0 = no cap). A negative cap is
+# soft: past -cap towers the fallback builds again only while SOFT_CAP_GOLD or more is banked (capped elite plans
+# otherwise reach the last boss with thousands of gold and empty holders).
+FALLBACK_CAP = (0, 6, 8, 10, 12)
+SOFT_CAP = (-6, -8, -10, -12)
 # "boss" 1: while a boss is alive, spells are cast only at anchors within BOSS_RADIUS of it, else held.
 BOSS_RADIUS = 80
+# "block" 1 (action scope v3): every barrack with an awake boss in its rally range rallies its soldiers
+# onto the boss's path point, whenever its rally point is more than BLOCK_RADIUS away from that point.
+BLOCK_RADIUS = 50
+# Rally step options ["r", mesh, option] (action scope v3): a barrack's most upstream / central /
+# downstream valid path point in its rally range.
+RALLY_STEP_OPTIONS = ("entry", "center", "exit")
 MAX_STEPS = 80
 
 
@@ -60,6 +74,15 @@ def check_genome(genome: dict) -> dict:
     boss = genome.get("boss", OPTIONAL_GENOME["boss"])
     if boss not in (0, 1) or isinstance(boss, bool):
         raise ValueError("boss must be 0 or 1")
+    block = genome.get("block", OPTIONAL_GENOME["block"])
+    if block not in (0, 1) or isinstance(block, bool):
+        raise ValueError("block must be 0 or 1")
+    build_first = genome.get("f", OPTIONAL_GENOME["f"])
+    if build_first not in FALLBACK_F or isinstance(build_first, bool):
+        raise ValueError(f"f must be one of {FALLBACK_F}")
+    cap = genome.get("cap", OPTIONAL_GENOME["cap"])
+    if cap not in FALLBACK_CAP + SOFT_CAP or isinstance(cap, bool):
+        raise ValueError(f"cap must be one of {FALLBACK_CAP + SOFT_CAP}")
     from .campaign import PACKAGES
     pkg = genome.get("pkg", OPTIONAL_GENOME["pkg"])
     if pkg not in PACKAGES:
@@ -81,7 +104,7 @@ def check_genome(genome: dict) -> dict:
         raise ValueError(f"steps must be a list of at most {MAX_STEPS}")
     out = []
     for step in steps:
-        if not isinstance(step, list) or not step or step[0] not in ("b", "u", "k"):
+        if not isinstance(step, list) or not step or step[0] not in ("b", "u", "k", "r"):
             raise ValueError(f"invalid step {step!r}")
         if not isinstance(step[1] if len(step) > 1 else None, str):
             raise ValueError(f"step holder must be a mesh id string: {step!r}")
@@ -89,12 +112,20 @@ def check_genome(genome: dict) -> dict:
             raise ValueError(f"build step is ['b', mesh, kind]: {step!r}")
         if step[0] in ("u", "k") and len(step) != 2:
             raise ValueError(f"upgrade/skill step is [op, mesh]: {step!r}")
+        if step[0] == "r" and (len(step) != 3 or step[2] not in RALLY_STEP_OPTIONS):
+            raise ValueError(f"rally step is ['r', mesh, one of {RALLY_STEP_OPTIONS}]: {step!r}")
         out.append(list(step))
     extra = {} if ratio == OPTIONAL_GENOME["ratio"] else {"ratio": ratio}
     if boss != OPTIONAL_GENOME["boss"]:
         extra["boss"] = boss
     if pkg != OPTIONAL_GENOME["pkg"]:
         extra["pkg"] = pkg
+    if block != OPTIONAL_GENOME["block"]:
+        extra["block"] = block
+    if build_first != OPTIONAL_GENOME["f"]:
+        extra["f"] = build_first
+    if cap != OPTIONAL_GENOME["cap"]:
+        extra["cap"] = cap
     return {**extra, "hero": hero, "steps": out, "cast": cast, "early": genome["early"],
             "branches": {kind: branches[kind] for kind in KINDS}}
 
@@ -118,7 +149,9 @@ class BuildOrderPolicy:
                 self.genome["branches"][kind]] for kind in KINDS)
         from .scripted_policies import TEACHER_DEFAULTS
         self.fallback = TeacherV2({**TEACHER_DEFAULTS, "b": branch_letters, "c": self.genome["cast"],
-                                   "r": self.genome.get("ratio", OPTIONAL_GENOME["ratio"])})
+                                   "r": self.genome.get("ratio", OPTIONAL_GENOME["ratio"]),
+                                   "f": self.genome.get("f", OPTIONAL_GENOME["f"]),
+                                   "m": self.genome.get("cap", OPTIONAL_GENOME["cap"])})
 
     def _step_option(self, step, state, menu, holders, towers):
         """("take", item) | ("wait", None) | ("skip", reason) for the current step."""
@@ -157,6 +190,13 @@ class BuildOrderPolicy:
             return "skip", "not_standard"
         if level == 0:
             return "wait", None  # still under construction
+        if op == "r":
+            for item in own:
+                if item["action"].get("action") == "set_rally" and item["action"].get("option") == step[2]:
+                    return "take", item
+            if not own:
+                return "wait", None  # the tower's menu is briefly unavailable (upgrading, stunned or frozen)
+            return "skip", "no_rally"  # no rally menu (not a barracks) or no valid point in range
         if op == "u":
             if level == 4:
                 return "skip", "max_level"
@@ -192,12 +232,20 @@ class BuildOrderPolicy:
             item = min(clicks, key=lambda i: (_number(i["action"].get("entity_id")), i["label"]))
             return _choice(self, item["label"], rule="click", entity_id=item["action"].get("entity_id"),
                            plan_cursor=self.cursor)
+        if self.genome.get("block"):
+            item = block_choice(state, menu)
+            if item is not None:
+                return _choice(self, item["label"], rule="block", tower_id=item["action"].get("tower_id"),
+                               plan_cursor=self.cursor)
         aim = aim_choice(self, state, menu)
         if aim is not None:
             return self._own(aim, "point_tower")
-        enemies = [e for e in state.get("enemies", []) if isinstance(e, dict)]
+        # A dormant boss (action scope v3: level 20's sleeping Cerberus, level 21's seated Moloch) is not
+        # on the field yet: it neither triggers spells nor holds back wave calls.
+        enemies = [e for e in state.get("enemies", []) if isinstance(e, dict) and not e.get("dormant")]
         casts = [item for item in menu if item["action"].get("action") == "use_power"]
-        bosses = [e for e in enemies if str(e.get("template") or "").startswith("eb_") and _number(e.get("hp")) > 0]
+        bosses = [e for e in enemies if (e.get("boss") or str(e.get("template") or "").startswith("eb_"))
+                  and _number(e.get("hp")) > 0]
         if self.genome.get("boss") and bosses:
             # Boss focus: spells only near the boss (rain of fire first), otherwise held for it.
             boss = max(bosses, key=lambda e: (_number(e.get("hp")), -_number(e.get("id"))))
@@ -256,6 +304,23 @@ class BuildOrderPolicy:
         return _choice(self, choice["label"], **{**choice["meta"], "rule": rule, "plan_cursor": self.cursor})
 
 
+def block_choice(state: dict, menu: list[dict]) -> dict | None:
+    """The plan's standing "block" order: the lowest-id barrack offered a "boss" rally point that its
+    current rally point is more than BLOCK_RADIUS away from."""
+    towers = {t.get("id"): t for t in state.get("towers", []) if isinstance(t, dict)}
+    due = []
+    for item in menu:
+        action = item["action"]
+        if action.get("action") != "set_rally" or action.get("option") != "boss":
+            continue
+        tower = towers.get(action.get("tower_id"), {})
+        dx = _number(tower.get("rally_x")) - _number(action.get("x"))
+        dy = _number(tower.get("rally_y")) - _number(action.get("y"))
+        if not math.isfinite(dx * dx + dy * dy) or dx * dx + dy * dy > BLOCK_RADIUS ** 2:
+            due.append(item)
+    return min(due, key=lambda i: (_number(i["action"].get("tower_id")), i["label"])) if due else None
+
+
 # ---------------------------------------------------------------- search operators
 
 
@@ -286,8 +351,15 @@ def _weighted_holders(holders, rng, count):
     return chosen
 
 
-def random_genome(holders: list[dict], heroes: list, rng: random.Random, specials=()) -> dict:
-    """A plausible random plan: a handful of builds, upgrades of some of them, maybe skills."""
+def _add_rally(steps, rng, mesh):
+    """A rally step for ``mesh`` somewhere after its build."""
+    first = next(i for i, s in enumerate(steps) if s[0] == "b" and s[1] == mesh)
+    steps.insert(rng.randint(first + 1, len(steps)), ["r", mesh, rng.choice(RALLY_STEP_OPTIONS)])
+
+
+def random_genome(holders: list[dict], heroes: list, rng: random.Random, specials=(), rally=False) -> dict:
+    """A plausible random plan: a handful of builds, upgrades of some of them, maybe skills
+    (with ``rally``, action scope v3: maybe rally steps for its barracks and the boss-blocking order)."""
     count = rng.randint(max(1, min(3, len(holders))), max(1, min(len(holders), 10)))
     meshes = _weighted_holders(holders, rng, count)
     kinds = [rng.choices(KINDS, weights=(3, 2, 3, 2))[0] for _ in meshes]
@@ -301,9 +373,17 @@ def random_genome(holders: list[dict], heroes: list, rng: random.Random, special
     for mesh in specials:
         for _ in range(rng.randint(0, 4)):
             steps.insert(rng.randint(0, len(steps)), ["k", mesh])
+    extra = {}
+    if rally:
+        for mesh in [m for m, kind in zip(meshes, kinds) if kind == "barrack"]:
+            if rng.random() < 0.3:
+                _add_rally(steps, rng, mesh)
+        extra["block"] = rng.choice((0, 1))
+        extra["f"] = rng.choice(FALLBACK_F)
+        extra["cap"] = rng.choice(FALLBACK_CAP + SOFT_CAP)
     return check_genome({"hero": rng.choice(list(heroes)) if heroes else None, "steps": steps[:MAX_STEPS],
                          "cast": rng.choice((30, 40, 50, 60, 70)), "early": rng.choice((0, 1)),
-                         "branches": {kind: rng.choice(BRANCHES[kind]) for kind in KINDS}})
+                         "branches": {kind: rng.choice(BRANCHES[kind]) for kind in KINDS}, **extra})
 
 
 def teacher_genome(holders: list[dict], heroes: list) -> dict:
@@ -333,12 +413,18 @@ def _repair(steps, specials=()):
     return out[:MAX_STEPS]
 
 
-def mutate(genome: dict, holders: list[dict], heroes: list, rng: random.Random, specials=()) -> dict:
+IMMIGRANTS = 0.10  # elite searches: share of proposals that are fresh random plans
+MUTATIONS = ("add_build", "add_upgrade", "add_upgrade", "remove", "swap", "swap", "kind", "move",
+             "skill", "param", "relocate", "relocate", "burst")
+PARAMS = ("cast", "early", "branch", "hero", "ratio", "ratio", "boss", "pkg", "pkg")
+
+
+def mutate(genome: dict, holders: list[dict], heroes: list, rng: random.Random, specials=(), rally=False) -> dict:
+    """A mutated copy; ``rally`` (action scope v3) adds rally-step and boss-blocking mutations."""
     g = copy.deepcopy(check_genome(genome))
     steps = g["steps"]
     for _ in range(rng.choice((1, 1, 1, 2, 2, 3))):
-        op = rng.choice(("add_build", "add_upgrade", "add_upgrade", "remove", "swap", "swap", "kind", "move",
-                         "skill", "param", "relocate", "relocate", "burst"))
+        op = rng.choice(MUTATIONS + (("rally", "rally", "fallback", "fallback", "fallback") if rally else ()))
         built = [s[1] for s in steps if s[0] == "b"]
         free = [h for h in holders if h["mesh"] not in built]
         if op == "add_build" and free:
@@ -372,8 +458,35 @@ def mutate(genome: dict, holders: list[dict], heroes: list, rng: random.Random, 
         elif op == "kind" and built:
             index = rng.choice([i for i, s in enumerate(steps) if s[0] == "b"])
             steps[index] = ["b", steps[index][1], rng.choice([k for k in KINDS if k != steps[index][2]])]
+        elif op == "fallback":
+            # The fallback rules make most elite decisions: resample one of their genes.
+            which = rng.choice(("ratio", "ratio", "hero", "branch", "f", "pkg", "cap", "cap"))
+            if which == "ratio":
+                if rng.random() < 0.5:
+                    digits = [rng.randint(0, 4) for _ in KINDS]
+                else:
+                    digits = [int(d) for d in g.get("ratio", OPTIONAL_GENOME["ratio"])]
+                    index = rng.randrange(4)
+                    digits[index] = min(9, max(0, digits[index] + rng.choice((-1, 1))))
+                if any(digits):
+                    g["ratio"] = "".join(map(str, digits))
+            elif which == "hero" and heroes:
+                g["hero"] = rng.choice(list(heroes))
+            elif which == "branch":
+                kind = rng.choice(KINDS)
+                g["branches"][kind] = rng.choice(BRANCHES[kind])
+            elif which == "f":
+                g["f"] = rng.choice(FALLBACK_F)
+            elif which == "cap":
+                g["cap"] = rng.choice([c for c in FALLBACK_CAP + SOFT_CAP
+                                       if c != g.get("cap", OPTIONAL_GENOME["cap"])])
+            else:
+                from .campaign import PACKAGES
+                g["pkg"] = rng.choice(sorted(PACKAGES))
+        elif op == "rally" and any(s[0] == "b" and s[2] == "barrack" for s in steps):
+            _add_rally(steps, rng, rng.choice([s[1] for s in steps if s[0] == "b" and s[2] == "barrack"]))
         else:
-            which = rng.choice(("cast", "early", "branch", "hero", "ratio", "ratio", "boss", "pkg", "pkg"))
+            which = rng.choice(PARAMS + (("block", "block", "f", "f") if rally else ()))
             if which == "cast":
                 g["cast"] = min(100, max(0, g["cast"] + rng.choice((-20, -10, 10, 20))))
             elif which == "ratio":
@@ -386,6 +499,10 @@ def mutate(genome: dict, holders: list[dict], heroes: list, rng: random.Random, 
                 g["early"] = 1 - g["early"]
             elif which == "boss":
                 g["boss"] = 1 - g.get("boss", OPTIONAL_GENOME["boss"])
+            elif which == "block":
+                g["block"] = 1 - g.get("block", OPTIONAL_GENOME["block"])
+            elif which == "f":
+                g["f"] = rng.choice([f for f in FALLBACK_F if f != g.get("f", OPTIONAL_GENOME["f"])])
             elif which == "pkg":
                 from .campaign import PACKAGES
                 g["pkg"] = rng.choice(sorted(PACKAGES))
@@ -409,6 +526,13 @@ def crossover(a: dict, b: dict, rng: random.Random, specials=()) -> dict:
     child["ratio"] = rng.choice((a.get("ratio", OPTIONAL_GENOME["ratio"]), b.get("ratio", OPTIONAL_GENOME["ratio"])))
     child["boss"] = rng.choice((a.get("boss", OPTIONAL_GENOME["boss"]), b.get("boss", OPTIONAL_GENOME["boss"])))
     child["pkg"] = rng.choice((a.get("pkg", OPTIONAL_GENOME["pkg"]), b.get("pkg", OPTIONAL_GENOME["pkg"])))
+    if "block" in a or "block" in b:
+        child["block"] = rng.choice((a.get("block", OPTIONAL_GENOME["block"]),
+                                     b.get("block", OPTIONAL_GENOME["block"])))
+    if "f" in a or "f" in b:
+        child["f"] = rng.choice((a.get("f", OPTIONAL_GENOME["f"]), b.get("f", OPTIONAL_GENOME["f"])))
+    if "cap" in a or "cap" in b:
+        child["cap"] = rng.choice((a.get("cap", OPTIONAL_GENOME["cap"]), b.get("cap", OPTIONAL_GENOME["cap"])))
     child["branches"] = {kind: rng.choice((a["branches"][kind], b["branches"][kind])) for kind in KINDS}
     return check_genome(child)
 
@@ -430,7 +554,7 @@ class ToughestEnemyWatch:
 
     def watch(self, state):
         for enemy in state.get("enemies", []) if isinstance(state, dict) else []:
-            if not isinstance(enemy, dict) or _finite(enemy.get("hp_max")) <= 0:
+            if not isinstance(enemy, dict) or _finite(enemy.get("hp_max")) <= 0 or enemy.get("dormant"):
                 continue
             hp_max, hp = _finite(enemy.get("hp_max")), max(0.0, _finite(enemy.get("hp")))
             known = self.toughest
@@ -491,9 +615,11 @@ class LevelSearch:
     """Steady-state GA over one level's plans (population kept sorted by fitness)."""
 
     def __init__(self, level: int, holders: list[dict], heroes: list, seed: str, population: int = 24,
-                 seeds_for_wins=(), specials=()):
+                 seeds_for_wins=(), specials=(), rally=False):
         self.level, self.holders, self.heroes = level, holders, list(heroes)
         self.specials = list(specials)
+        self.rally = bool(rally)
+        self.best_seen, self.improved_at = None, 0  # best fitness so far and the evaluation count it came at
         self.rng = random.Random(f"search:{seed}:{level}")
         self.size = population
         self.population: list[tuple[float, str, dict]] = []  # (fitness, genome id, genome)
@@ -516,14 +642,18 @@ class LevelSearch:
                 if not self.seen:
                     genome = teacher_genome(self.holders, self.heroes)
                 else:
-                    genome = random_genome(self.holders, self.heroes, self.rng, self.specials)
+                    genome = random_genome(self.holders, self.heroes, self.rng, self.specials, self.rally)
+            elif self.rally and self.rng.random() < IMMIGRANTS:
+                # Elite searches keep exploring: a fresh random plan now and then (warm starts fill the
+                # population with imported plans, so the random half above never runs there).
+                genome = random_genome(self.holders, self.heroes, self.rng, self.specials, self.rally)
             else:
                 parent = self._tournament()
                 if self.rng.random() < 0.3 and len(self.population) > 1:
                     genome = mutate(crossover(parent, self._tournament(), self.rng, self.specials), self.holders,
-                                    self.heroes, self.rng, self.specials)
+                                    self.heroes, self.rng, self.specials, self.rally)
                 else:
-                    genome = mutate(parent, self.holders, self.heroes, self.rng, self.specials)
+                    genome = mutate(parent, self.holders, self.heroes, self.rng, self.specials, self.rally)
             key = genome_id(genome)
             if key not in self.seen:
                 self.seen.add(key)
@@ -545,6 +675,15 @@ class LevelSearch:
         if key in self.seen:
             return
         self.seen.add(key)
+        if self.best_seen is None or score > self.best_seen:
+            self.best_seen = score
+        self._insert(score, key, genome)
+
+    def _insert(self, score: float, key: str, genome: dict):
+        if self.rally and any(entry[0] == score for entry in self.population):
+            # Elite searches: the exact same mean fitness means the same game on every search seed (waves,
+            # lives and final tick); such a twin of a kept plan would only crowd out diversity and validation.
+            return
         self.population.append((score, key, check_genome(genome)))
         self.population.sort(key=lambda entry: (-entry[0], entry[1]))
         del self.population[self.size:]
@@ -553,9 +692,9 @@ class LevelSearch:
         key = genome_id(genome)
         self.pending.discard(key)
         self.evaluations += 1
-        self.population.append((score, key, check_genome(genome)))
-        self.population.sort(key=lambda entry: (-entry[0], entry[1]))
-        del self.population[self.size:]
+        if self.best_seen is None or score > self.best_seen:
+            self.best_seen, self.improved_at = score, self.evaluations
+        self._insert(score, key, genome)
 
     def best(self):
         return self.population[0] if self.population else None

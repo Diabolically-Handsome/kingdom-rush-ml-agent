@@ -10,7 +10,7 @@ import concurrent.futures as futures
 import queue
 
 from . import phase
-from .campaign import level_profile
+from .campaign import task_profile
 from .episode import EpisodeProtocol, run_episode
 from .ops import GateRefused
 from .search import BuildOrderPolicy, check_genome, genome_id
@@ -25,9 +25,10 @@ def check_eval(spec, pools):
     issues = []
     if isinstance(spec["workers"], bool) or not isinstance(spec["workers"], int) or not 1 <= spec["workers"] <= 32:
         issues.append("workers must be 1..32")
-    rate = spec["profile_stars_per_level"]
-    if isinstance(rate, bool) or not isinstance(rate, (int, float)) or not 1 <= rate <= 3:
-        issues.append("profile_stars_per_level must be a number from 1 to 3 (an average star rate)")
+    from .campaign import star_rate_ok
+    if not star_rate_ok(spec["profile_stars_per_level"]):
+        issues.append("profile_stars_per_level must be a number from 1 to 3 (an average star rate) "
+                      "or [main rate, elite rate]")
     if not isinstance(spec["players"], list) or not spec["players"] or set(spec["players"]) - set(PLAYERS):
         issues.append(f"players must be a nonempty subset of {PLAYERS}")
     tasks = spec["tasks"]
@@ -35,15 +36,19 @@ def check_eval(spec, pools):
         return None, issues + ["tasks must be a nonempty list"]
     roles, seen = set(), set()
     for index, task in enumerate(tasks):
-        if not isinstance(task, dict) or set(task) != {"level", "seed", "genome"}:
-            issues.append(f"tasks[{index}] must have exactly level, seed and genome")
+        if not isinstance(task, dict) or not {"level", "seed", "genome"} <= set(task) <= {"level", "seed", "genome", "mode"}:
+            issues.append(f"tasks[{index}] must have exactly level, seed and genome (and optionally mode)")
+            continue
+        if task.get("mode", 1) not in (1, 2, 3) or isinstance(task.get("mode"), bool) or (
+                task.get("mode", 1) != 1 and not (isinstance(task["level"], int) and 1 <= task["level"] <= 12)):
+            issues.append(f"tasks[{index}]: mode must be 1, or 2/3 (Heroic/Iron) on levels 1-12")
             continue
         role = phase.seed_role(pools, task["seed"])
         roles.add(role)
         if role not in ("train", "evaluation"):
             issues.append(f"tasks[{index}]: seed {task['seed']!r} is {role}")
         try:
-            key = (task["level"], task["seed"], genome_id(check_genome(task["genome"])))
+            key = (task["level"], task.get("mode", 1), task["seed"], genome_id(check_genome(task["genome"])))
         except ValueError as exc:
             issues.append(f"tasks[{index}]: {exc}")
             continue
@@ -75,8 +80,8 @@ def eval_loop(spec, env_factory, ctx, out, *, pools, protocol, ports, make_opera
         port = free.get()
         try:
             genome = check_genome(task["genome"])
-            profile = level_profile(task["level"], spec["profile_stars_per_level"], hero=genome["hero"],
-                                    package=genome.get("pkg", "balanced"))
+            profile = task_profile(task["level"], spec["profile_stars_per_level"], hero=genome["hero"],
+                                   package=genome.get("pkg", "balanced"), mode=task.get("mode", 1))
             if player == "plan":
                 policy = BuildOrderPolicy(genome)
             elif player == "operator":
@@ -111,7 +116,8 @@ def eval_loop(spec, env_factory, ctx, out, *, pools, protocol, ports, make_opera
             for future in finished:
                 index, player, task = inflight.pop(future)
                 base = {"run_id": ctx.run_id, "index": index, "player": player, "level": task["level"],
-                        "seed": task["seed"], "genome_id": genome_id(task["genome"])}
+                        "seed": task["seed"], "genome_id": genome_id(task["genome"]),
+                        **({"mode": task["mode"]} if task.get("mode", 1) != 1 else {})}
                 try:
                     result = future.result()
                 except GateRefused:
@@ -124,7 +130,8 @@ def eval_loop(spec, env_factory, ctx, out, *, pools, protocol, ports, make_opera
                 won = result["status"] == "terminal" and bool(outcome.get("level_won"))
                 out.append("eval_episode", {**base, "won": won, "lives": outcome.get("lives"),
                                             "result": {k: v for k, v in result.items() if k != "decisions"}})
-                entry = results.setdefault(player, {}).setdefault(str(task["level"]), {"games": 0, "wins": 0, "lives": []})
+                key = str(task["level"]) + (f":{task['mode']}" if task.get("mode", 1) != 1 else "")
+                entry = results.setdefault(player, {}).setdefault(key, {"games": 0, "wins": 0, "lives": []})
                 entry["games"] += 1
                 entry["wins"] += won
                 if won:

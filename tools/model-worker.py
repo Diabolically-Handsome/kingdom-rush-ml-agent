@@ -45,9 +45,14 @@ def preflight(spec: dict) -> dict:
             "existing_compute_processes": busy}
 
 
+# --gpu 5090: elite-v1 (2026-10-06) serves the 8B on the RTX 5090 the owner freed for that phase
+# ("[用户原话已省略 / user's message omitted]"), leaving the 5080 alone; the assignment in GPU_MODELS is otherwise unchanged.
+GPU_OVERRIDES = {"5090": {"gpu_uuid": "GPU-4d9f95ae-dfba-0ba5-9aad-09372fa19208", "gpu_name": "NVIDIA GeForce RTX 5090"}}
+
+
 class Scorer:
-    def __init__(self, model_key: str, max_prompt_tokens: int):
-        spec = GPU_MODELS[model_key]
+    def __init__(self, model_key: str, max_prompt_tokens: int, gpu: str | None = None):
+        spec = {**GPU_MODELS[model_key], **GPU_OVERRIDES.get(gpu, {})}
         self.manifest = verify_model_manifest(model_key)
         self.preflight = preflight(spec)
         os.environ["CUDA_VISIBLE_DEVICES"] = spec["gpu_uuid"]
@@ -159,7 +164,10 @@ def main():
     parser.add_argument("--preflight-only", action="store_true")
     parser.add_argument("--serve", action="store_true")
     parser.add_argument("--max-prompt-tokens", type=int, default=16384)
+    parser.add_argument("--gpu", choices=tuple(GPU_OVERRIDES), help="serve on this GPU instead of the assigned one")
     args = parser.parse_args()
+    if args.gpu and not args.serve:
+        parser.error("--gpu is only for --serve")
     if args.request and args.requests:
         parser.error("choose --request or --requests")
     if args.preflight_only:
@@ -197,7 +205,7 @@ def main():
             parser.error("batch must contain one to six requests")
         for request in requests:
             validate_request(request)
-    scorer = Scorer(args.model, args.max_prompt_tokens)
+    scorer = Scorer(args.model, args.max_prompt_tokens, args.gpu)
     if not args.serve:
         responses = [scorer.distribution(request) for request in requests]
         write_result(args.output, {"model": scorer.model_id, "responses": responses,

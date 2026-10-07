@@ -1,0 +1,18 @@
+{
+  "config_sha256": "db51e74d3c2bce743e371028dd8cce02d8c0c5ef3e8b88dfd3492167cb585be6",
+  "error": "GateRefused: Native survey was not accepted: stopped, exit=1",
+  "games_played": 2387,
+  "job_kind": "native-search",
+  "ledger_close_sha256": "ce8d561fc99dc3892ab39c47e4024e8ac2b033a52d13b52489afcc9eed2cde18",
+  "ledger_open_sha256": "c63a9ebc849a0b5ad65d1b1af4d5aaa357f0cce38b49335a82f63bf963b8ed59",
+  "max_games": 8000,
+  "meaning": "Process/budget receipt only; the job must verify its own result",
+  "phase_id": "elite-v1",
+  "pins_sha256": "5e31c993d9b184de1bec05c4d7a1d1bb14edce21b10bcd52aed7f29bb72746c0",
+  "pools_sha256": "62c8c5a92bf070a295ab70b49a3b17bad5f840048badfd28d712563bdc05ab0d",
+  "run_id": "native-search-f7e0e33fbba849399e9bda62a0b629de",
+  "schema_version": 1,
+  "status": "stopped",
+  "verified": false,
+  "wall_seconds": 1801.1719999999987
+}

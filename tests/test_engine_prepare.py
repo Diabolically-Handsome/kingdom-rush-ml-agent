@@ -325,18 +325,18 @@ class WorkerHygieneTests(TempGameMixin, unittest.TestCase):
         parameters = inspect.signature(engine.Worker.__init__).parameters
         self.assertEqual([(n, p.default) for n, p in parameters.items() if n != "self"],
                          [("seed", 1001), ("port", 9879), ("identity", None), ("level", 1), ("difficulty", 2),
-                          ("rng_mode", ""), ("action_scope", "v1"), ("profile", None)])
+                          ("rng_mode", ""), ("action_scope", "v1"), ("profile", None), ("mode", 1)])
         self.assertEqual(len(engine.RNG_MODES), 8)
         self.assertIn(engine.DETERMINISTIC_MODE, engine.RNG_MODES)
         for mode in engine.RNG_MODES:
             self.assertEqual(engine.Worker(rng_mode=mode).rng_mode, mode)
         with self.assertRaises(ValueError):
             engine.Worker(rng_mode="isolate")
-        self.assertEqual(engine.ACTION_SCOPES, ("v1", "v2"))
+        self.assertEqual(engine.ACTION_SCOPES, ("v1", "v2", "v3"))
         self.assertEqual(engine.Worker().action_scope, "v1")
         for scope in engine.ACTION_SCOPES:
             self.assertEqual(engine.Worker(action_scope=scope).action_scope, scope)
-        for bad in ("v3", "V2", "", None, 2):
+        for bad in ("v9", "V2", "", None, 2):
             with self.assertRaises(ValueError):
                 engine.Worker(action_scope=bad)
         worker = engine.Worker(seed=5, identity="unit_worker-1")
@@ -432,7 +432,7 @@ class WorkerHygieneTests(TempGameMixin, unittest.TestCase):
             self.assertEqual(scoped.action_scope, "v2")
             worker_class.reset_mock()
             with self.assertRaises(ValueError):
-                env_module.NativeEnv(action_scope="v3")
+                env_module.NativeEnv(action_scope="v9")
             worker_class.assert_not_called()
             native.worker.rpc.return_value = {"type": "game_state", "tick": 5, "gold": 100, "towers": [],
                                               "holders": [], "enemies": [], "heroes": []}

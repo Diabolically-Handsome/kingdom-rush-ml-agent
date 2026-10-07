@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "pool_id": "KR1-campaign-v1",
+  "supersedes": "KR1-deployment-v1",
+  "difficulty": 2,
+  "mode": "campaign",
+  "levels": {"main_campaign": [1,2,3,4,5,6,7,8,9,10,11,12],
+             "source": "kr1/game_settings.lua main_campaign_levels=12, read offline with the game LuaJIT on 2026-10-05"},
+  "pools": {
+    "train": {"seeds": [1001,1002,1003,1004,1005,1006,1007,1008,1009,1010]},
+    "evaluation": {"seeds": [5001,5002,5003,5004,5005,5006,5007,5008,5009,5010,5011,5012,5013,5014,5015,5016,5017,5018,5019,5020], "never_in_gradients": true},
+    "final_campaign_run": {"seeds": [6001,6002,6003,6004,6005], "access": "one_frozen_evaluation"},
+    "retired": {"seeds": [2001,2002,2003,2004,3001,3002,3003,3004,4001,4002,4003,4004],
+                "note": "KR1-deployment-v1 validation/heldout/never_train seeds; never used in campaign-v1"}
+  },
+  "unlisted_seeds": "never_use"
+}

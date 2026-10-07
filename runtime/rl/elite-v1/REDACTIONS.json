@@ -1,0 +1,302 @@
+{
+ "note": "Files changed only by redaction. original_sha256 (listed for pinned files only) is the file as the frozen jobs used it (pins.json/ledger reference the originals); published_sha256 is the file here. Hash-chained journals are unmodified.",
+ "files": [
+  {
+   "path": "alpharush_rl/model_broker.py",
+   "original_sha256": "dec38272076482de973ff735552fb5bf9b242189fec4db833ab9b3119c5f5ea3",
+   "published_sha256": "9e501f21e790116e94295a9fe8a49b31fab586adbb984afa87b375172517a9d8",
+   "categories": [
+    "local user-name paths",
+    "name of an unrelated private project"
+   ]
+  },
+  {
+   "path": "tools/collect-level1-rewards.py",
+   "original_sha256": "436fdcf95f4460ee2191b9d33c32557a5b11b8edd7ba4f5f75163630fa4562d6",
+   "published_sha256": "b1a6bea5c2584fd09106dabc8e6ef73671c61cce5963df8bc22dcc868c423b06",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "tools/create-model-manifests.py",
+   "original_sha256": "80f95bd4050fc4edd4fa00e9ddf1ae2955b5b0c3cb8e9134cfe4128bc6444250",
+   "published_sha256": "72ce25fbd3517f00d6c3f6d690bb6bdea60c5bbb708e90a449ec6f549d8632fd",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "tools/model-preflight.py",
+   "original_sha256": "a7984f13ecd557c67f2d46b0bed4dbf2a474d52645ac2f9f6985f18e0682747f",
+   "published_sha256": "09dd9cbada20cb6a5b45f8e50a2f203b6999703a5ca07d6828ce5700d7643c66",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "tools/model-worker.py",
+   "original_sha256": "f598d8b378389b4015bc7a866c4533325a0a87e007c6925e0287f41240a65fa1",
+   "published_sha256": "d548eb81307985652bb2eb55ea4ffee745cd1c659d3de6842a1a3c1c8b432ab9",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "tools/setup-model-env.sh",
+   "original_sha256": "42d41b25b183ee2a7552847748df03f8451ace81554540a4da743e81e7a12930",
+   "published_sha256": "7b6583cc2fdd99feada4790355e2eed02d0b4e5c82c4d04079908e57712b6d90",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "tools/train-level1-24b.py",
+   "original_sha256": "031e3b32dbac8d7123c9469c25d2ffbdfa1e6918093e355813652909f67bb751",
+   "published_sha256": "a1f794e52172af13a3a0b26f0b325e04c5b037d357a791543a3927d8dde8e043",
+   "categories": [
+    "local user-name paths",
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "tools/train-llm-smoke.py",
+   "original_sha256": "1ca11a94c5e519448fe7c4b30f3ee52367bca28c9ac0f83dce19b91139d65bdc",
+   "published_sha256": "725f50ee56cb094b6a7abb23f12a7843a5921fdf0a6e5b2ea3d32509b05d2f2f",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "tests/test_phase.py",
+   "published_sha256": "247ba7096265e48e2bcf6b8f719bf89b9ab17e8ab0a39175d66874ff68cda17b",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "configs/level1-24b-training.json",
+   "original_sha256": "818ef9e49b10e5f77386a2ff6d9e424df51d70ca09ada956b560cdc58a7ca4db",
+   "published_sha256": "cda699dbb0de6d53ce068a8e1163205afab6a032c29cb516f5b695211ef12beb",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "configs/llm-smoke-r2.json",
+   "original_sha256": "3894302bf14d6cafb51c884bffcdee687eee37d593cb5ff747a8b80d76bbf497",
+   "published_sha256": "3bf098355ce61cf3eaeb6d15710ed65775a84f20e2aa2b6141411ff23cf62298",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "configs/llm-smoke.json",
+   "original_sha256": "051605203c38082d8ce6efaa17aeb5e57d8a2161020a0fc2bed6b72c757ed214",
+   "published_sha256": "2d6dad54a413646a34ac9fe2242ba7a4812438c12b7657d817bf53e4fd9ef481",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "configs/models-comparison.json",
+   "original_sha256": "c6f3688d827aa7775e3cca1a2c09f03129c1deac3cc630421663a7840a425f68",
+   "published_sha256": "be0fd647877811bbbc1f1f25bcaab7ec953a9440039d47f7fb7d947327865058",
+   "categories": [
+    "name of an unrelated private project"
+   ]
+  },
+  {
+   "path": "configs/phases/campaign-v1.json",
+   "original_sha256": "fd051a84cabd204fe2410b463882944ba035ea8f5333e05af59f5cef6c89a364",
+   "published_sha256": "05704c322f8beb7f5756cf79e8a9c916b1759d16988738c7de1b7e1f80a1f92f",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "configs/phases/elite-v1.json",
+   "original_sha256": "f212b56c0df64387a20637db10c0f66c5975a2fc4c9ba3caece2ebabb15c92fc",
+   "published_sha256": "0416e3bd22c43f58cca6cc6fef165d73c7c283a3c479f8862938a771543304fe",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "configs/rl-deployment.json",
+   "original_sha256": "ca8d046556c6359c6d7558a7b76fa980075b18fe94d6cec063e62ce8e14111ec",
+   "published_sha256": "6763685d60444c083d649c2b0d6dda2a53510a204aa12049c78f313dc01f14cd",
+   "categories": [
+    "local user-name paths",
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "docs/elite/elite-stages-study-2026-10-06.json",
+   "published_sha256": "995ecd313c1647374811c2537846676c86206752ae74f9fed3987a38f06be42c",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "docs/elite/l20-22-practice-plan-2026-10-07.md",
+   "published_sha256": "e98feba84c32219f2e23cba39fcbf7a14465cba6a7303df611ee886563a2b9bb",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "docs/LEVEL1-TRAINING.md",
+   "published_sha256": "ec67bfc58ff82e4818dd282af701556cef7177a53a222ce7dabe76ac3df0520b",
+   "categories": [
+    "name of an unrelated private project"
+   ]
+  },
+  {
+   "path": "docs/MODEL-DEPLOYMENT.md",
+   "published_sha256": "4d6e750098b0d85d3be0ac39b55604284311ba61c4ba468d75bcab98f86e0d77",
+   "categories": [
+    "local user-name paths",
+    "name of an unrelated private project"
+   ]
+  },
+  {
+   "path": "docs/RL-ARCHITECTURE.md",
+   "published_sha256": "2e1f91846d3b012b3afc32101d7ac4e405d42353ce4072d42674e63ab06a5a76",
+   "categories": [
+    "name of an unrelated private project"
+   ]
+  },
+  {
+   "path": "DEPLOYMENT.md",
+   "published_sha256": "0293e5a5cf4285b71e117dc81e5c77b2647d4c7e044fab151cdc9728f4833cde",
+   "categories": [
+    "local user-name paths",
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "docs/DEV-LOG.zh-CN.md",
+   "published_sha256": "85e23618044cedcb84d6cc653a2bcd453e4e09cf4482c13a8f25b116a2932ac5",
+   "categories": [
+    "local user-name paths",
+    "name of an unrelated private project",
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v1/final-artifacts/scripts/build_portfolios.py",
+   "published_sha256": "aa1ec2a3536b09a709f35e7a746f89f201b95e9a715453d09f132cc7ce3b43a6",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v1/final-artifacts/scripts/make_final_jobs.py",
+   "published_sha256": "6ca65da9e5dc18f407ec752928f4532837e78eb9db92f1137ae658103a02ebee",
+   "categories": [
+    "local user-name paths",
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v1/final-artifacts/scripts/config_run9.py",
+   "published_sha256": "dd3084f58a6e20fdfa1ccdc0b4e5494fe12bf5419ee57b2995fbfe3d08098eb4",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v1/final-artifacts/scripts/config_run10.py",
+   "published_sha256": "5ef20ac88d9fbfc44ffacec9d65c599111d18103acd955dd0ce4500b030d0450",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v1/final-artifacts/scripts/config_run11.py",
+   "published_sha256": "2a9b8435229c317b614c529a5f08825469664ad030c9ad20d0f936a6976eb608",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v1/final-artifacts/scripts/config_run12.py",
+   "published_sha256": "56d9fa6cd3afc535213146e299fbc699eefad480a0a8c11204c79453ff9f56f0",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v1/final-artifacts/scripts/config_run13.py",
+   "published_sha256": "8d1633309a9e5feed8a8342dc75c96cba751dcde77cf690450abd409d4927025",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v1/final-artifacts/scripts/config_collect.py",
+   "published_sha256": "a83a0900283eb566ad589e9e65312c1dca01207828905043b16b25c98109ac07",
+   "categories": [
+    "local user-name paths",
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v1/final-artifacts/scripts/patch_dedupe.py",
+   "published_sha256": "1c307d8559a619446938ea5aa51da5f4dd207612140bfb244bd5a6d012559198",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v1/final-artifacts/scripts/patch_softcap_safety.py",
+   "published_sha256": "147868637aa23c457b866621b998eb322fe8921092d140399fc3785e9f4544cc",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v1/final-artifacts/scripts/patch_warm_reeval.py",
+   "published_sha256": "f346ad5225849e8a9bdd44cae5ec7b54ff75088e6d23ce0481d42b0ea7545169",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v1/final-artifacts/scripts/brain_dry_campaign.py",
+   "published_sha256": "4c0d28ba43c6351b7ec35b797a96c490417c9cbad43f249a90fbfc1431ecdd0d",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v1/final-artifacts/scripts/verify_final_reexec.py",
+   "published_sha256": "6d943ff068a3f85db7b4b0c6393bb6d631702229ee220ba0e0df55ce33eb0e5a",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v1/final-artifacts/scripts/brain_replay_final.py",
+   "published_sha256": "be02e66e8b8936ae73caf3455d02dfe7c4458860e58e0f41d751cd4647132234",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v1/final-artifacts/scripts/elite_campaign_progress.py",
+   "published_sha256": "10db9c8df805215f8736f1dd12cc5351e479884bf10bba5c3c8351e464c4de9b",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v1/final-artifacts/scripts/elite_progress.py",
+   "published_sha256": "92a2e8c384861a67a87cef676f136b9712a76195457df022f1c43025591cae28",
+   "categories": [
+    "local user-name paths"
+   ]
+  }
+ ]
+}

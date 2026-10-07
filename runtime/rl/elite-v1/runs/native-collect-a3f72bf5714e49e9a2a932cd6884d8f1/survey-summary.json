@@ -1,0 +1,24 @@
+{
+  "action_scope": "v3",
+  "data_dir": "data",
+  "engine": {
+    "exe_sha256": "5f1df959e444644509cea4c1eb903636f0fa161325ba33daf415343812ade2fc",
+    "host_copy_sha256": "6cdf518c2bff93ff4f03df19ab7d9a95e24ca83a79ab2a49c168a001dd7a7b73",
+    "manifest_sha256": "547aa222d70cab466cf649ba3a4c9b65ee4a66236a0c3939f66ed942caf2a531",
+    "recipe_sha256": "8e06a59561d8c50eeaf5341aec8ebcab72aa1d06d135b239748d889a4db6c72c"
+  },
+  "episode_errors": [],
+  "episodes": 150,
+  "episodes_journal": {
+    "engine_replay_verified": false,
+    "entries": 150,
+    "integrity_verified": true,
+    "tip_sha256": "a41f47eac2b57bf54a81cda1f98dc3a9c94e92b378df27b35e070a38402f69f9"
+  },
+  "games_played": 150,
+  "optimizer_steps": 0,
+  "rng_mode": "isolate_sound+stable_pairs",
+  "run_id": "native-collect-a3f72bf5714e49e9a2a932cd6884d8f1",
+  "schema": "alpharush-collect-v1",
+  "stopped_reason": null
+}

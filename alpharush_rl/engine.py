@@ -247,13 +247,27 @@ RNG_TOKENS = ("audit", "isolate_sound", "stable_pairs")
 RNG_MODES = tuple("+".join(t for i, t in enumerate(RNG_TOKENS) if mask >> i & 1) for mask in range(8))
 # Sound-RNG isolation plus creation-order iteration of coroutine/object-keyed tables.
 DETERMINISTIC_MODE = "isolate_sound+stable_pairs"
-# Native action catalogs the host can serve; "v1" (build/send only) is the replay-stable default.
-ACTION_SCOPES = ("v1", "v2")
+# Native action catalogs the host can serve; "v1" (build/send only) is the replay-stable default,
+# "v3" (elite stages) is v2 plus barracks rally points and dormant/boss-aware enemy data.
+ACTION_SCOPES = ("v1", "v2", "v3")
+MAIN_CAMPAIGN_LEVELS = 12
+
+
+def level_scope(action_scope, level):
+    """The scope a level is played in: v3 is the elite-stage scope, so a v3 job plays the main-campaign
+    levels (1-12) in v2 and their validated plans and operator decisions stay exactly as before."""
+    if action_scope == "v3" and isinstance(level, int) and not isinstance(level, bool) and level <= MAIN_CAMPAIGN_LEVELS:
+        return "v2"
+    return action_scope
+
+
+# Game modes the director accepts with -mode: campaign, and a won level's Heroic and Iron challenges.
+GAME_MODES = {1: "campaign", 2: "heroic", 3: "iron"}
 
 
 class Worker:
     def __init__(self, seed=1001, port=9879, identity=None, level=1, difficulty=2, rng_mode="",
-                 action_scope="v1", profile=None):
+                 action_scope="v1", profile=None, mode=1):
         identity = identity or f"alpharush_rl_{seed}_{uuid.uuid4().hex[:12]}"
         # The identity names the save directory and log file, so keep it a plain file name.
         if not re.fullmatch(r"[A-Za-z0-9_-][A-Za-z0-9_.-]{0,127}", identity):
@@ -262,6 +276,9 @@ class Worker:
             raise ValueError(f"rng_mode must be one of {RNG_MODES}")
         if action_scope not in ACTION_SCOPES:
             raise ValueError(f"action_scope must be one of {ACTION_SCOPES}")
+        if isinstance(mode, bool) or mode not in GAME_MODES:
+            raise ValueError(f"mode must be one of {sorted(GAME_MODES)}")
+        self.mode = mode
         self.rng_mode = rng_mode
         self.action_scope = action_scope
         # Headless (no joystick subsystem) in the isolated-sound modes: after hundreds of
@@ -309,7 +326,7 @@ class Worker:
         startup = subprocess.STARTUPINFO()
         startup.dwFlags |= subprocess.STARTF_USESHOWWINDOW
         startup.wShowWindow = 0
-        self.process = subprocess.Popen([str(exe), "-level", str(self.level), "-mode", "1",
+        self.process = subprocess.Popen([str(exe), "-level", str(self.level), "-mode", str(self.mode),
                                         "-diff", str(self.difficulty), "-windowed"],
                                        cwd=exe.parent, env=environment,
                                        stdout=self.log, stderr=self.log, startupinfo=startup)

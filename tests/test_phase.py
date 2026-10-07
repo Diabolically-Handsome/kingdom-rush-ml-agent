@@ -16,10 +16,10 @@ REAL_PHASE = WORKSPACE / "configs/phases/campaign-v1.json"
 REAL_POOLS = WORKSPACE / "configs/pools-campaign-v1.json"
 AUTHORIZATION = [
     "[用户原话已省略 / user's message omitted]",
-    "主线全部关卡·普通难度（推荐）",
-    "像真人一样从新存档打（推荐）",
-    "8B负责当策略脑 而小神经网络负责当操作脑 只执行8B给他的操作",
-    "所有关卡都能训练，留出评测种子（推荐）",
+    "[用户原话已省略 / user's message omitted]",
+    "[用户原话已省略 / user's message omitted]",
+    "[用户原话已省略 / user's message omitted]",
+    "[用户原话已省略 / user's message omitted]",
 ]
 CAP_KEYS = ("max_wall_seconds", "total_wall_seconds", "max_jobs", "max_games", "gpu", "optimizer_steps", "serial")
 PENDING = "run list must be confirmed by the user before enabling"

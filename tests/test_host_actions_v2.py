@@ -947,7 +947,7 @@ class HostV2GuiRuleTests(HostLuaCase):
 @unittest.skipUnless(os.name == "nt" and LUA_DLL.exists(), "game LuaJIT runtime/rl-engine/lua51.dll unavailable")
 class HostActionScopeInstallTests(unittest.TestCase):
     def test_unknown_scopes_fail_closed_at_install(self):
-        for scope in ("v3", "", "V2", "v1 ", "all"):
+        for scope in ("v9", "", "V2", "v1 ", "all"):
             with self.subTest(scope=scope):
                 lua = load(scope)
                 self.addCleanup(lua.close)

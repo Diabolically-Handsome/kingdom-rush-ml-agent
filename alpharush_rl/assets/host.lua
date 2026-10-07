@@ -8,7 +8,8 @@ local MAX_REQUEST_BYTES = 4096
 -- Per-launch secret from the parent Worker; requests without it are refused.
 local TOKEN = os.getenv("ALPHARUSH_TOKEN")
 -- "v1" keeps the original build/send scope byte for byte; "v2" adds upgrades, tower
--- powers, selling and spells. Any other value fails closed at install.
+-- powers, selling and spells; "v3" (elite stages) is v2 plus barracks rally points, dormant /
+-- untargetable / boss enemy flags and per-lane path progress. Any other value fails closed at install.
 local ACTION_SCOPE = os.getenv("ALPHARUSH_ACTION_SCOPE") or "v1"
 
 -- Strict flat JSON object decoder for RPC requests; it never compiles input.
@@ -214,8 +215,10 @@ local STANDARD_TOWERS = {archer=true, barrack=true, mage=true, engineer=true,
 local ANCHOR_SPACING, ANCHOR_LIMIT = 60, 3
 local V2_ACTIONS = {build_tower=true, send_wave=true, upgrade_tower=true,
     upgrade_power=true, sell_tower=true, use_power=true, point_tower=true, click_entity=true}
+local V3_ACTIONS = {build_tower=true, send_wave=true, upgrade_tower=true, upgrade_power=true, sell_tower=true,
+    use_power=true, point_tower=true, click_entity=true, set_rally=true}
 local V2_MATCH_KEYS = {"action", "holder_id", "tower_id", "tower_type", "target", "power", "x", "y", "anchor_id",
-    "entity_id"}
+    "entity_id", "option"}
 
 local function finite(value)
     return type(value) == "number" and value == value and value ~= math.huge and value ~= -math.huge
@@ -360,6 +363,194 @@ local function click_need(e)
     return nil
 end
 
+-- v3: bit tests on vis flags/bans; a missing game constant never matches.
+local function has_flag(mask, flag)
+    return finite(mask) and type(flag) == "number" and bit.band(mask, flag) ~= 0
+end
+
+-- v3: progress 0..1 along the enemy's route: its own lane (path pi, sub-path spi, node ni), so levels with
+-- several exits (17, 19, 24, 26) measure every enemy against the exit its path actually ends at, extended
+-- through path_db.path_connections (level 18's tunnels move enemies from the end of paths 1 and 2 to node 1
+-- of paths 5 and 6). A path's route = the longest chain of feeder paths before it (head) + its own nodes
+-- + the connected paths after it (tail). Without connections this is exactly (ni - 1) / (#lane - 1).
+local route_cache = setmetatable({}, {__mode = "k"})
+
+local function route_of(P)
+    local cached = route_cache[P.paths]
+    if cached then return cached end
+    local conn = type(P.path_connections) == "table" and P.path_connections or {}
+    local nodes = {}
+    for pi, path in pairs(P.paths) do
+        local lane = type(path) == "table" and path[1]
+        nodes[pi] = type(lane) == "table" and #lane or 0
+    end
+    local function tail(pi, depth)
+        local next_pi = conn[pi]
+        if next_pi == nil or depth > 8 or not nodes[next_pi] then return 0 end
+        return math.max(0, nodes[next_pi] - 1) + tail(next_pi, depth + 1)
+    end
+    local function head(pi, depth)
+        local best = 0
+        if depth > 8 then return 0 end
+        for from, to in pairs(conn) do
+            if to == pi and nodes[from] then best = math.max(best, head(from, depth + 1) + math.max(0, nodes[from] - 1)) end
+        end
+        return best
+    end
+    local route = {}
+    for pi in pairs(nodes) do route[pi] = {head = head(pi, 0), tail = tail(pi, 0)} end
+    route_cache[P.paths] = route
+    return route
+end
+
+local function route_progress(P, pi, n, ni)
+    local r = route_of(P)[pi] or {head = 0, tail = 0}
+    local total = r.head + (n - 1) + r.tail
+    if total <= 0 then return 0 end
+    return math.min(1, math.max(0, (r.head + (ni - 1)) / total))
+end
+
+local function lane_progress(e)
+    local P, np = package.loaded["path_db"], e.nav_path
+    if type(P) ~= "table" or type(P.paths) ~= "table" or type(np) ~= "table" or not finite(np.ni) then return nil end
+    local path = P.paths[np.pi]
+    local lane = type(path) == "table" and path[np.spi]
+    if type(lane) ~= "table" or #lane < 2 then return nil end
+    local ok, progress = pcall(route_progress, P, np.pi, #lane, np.ni)
+    return ok and progress or nil
+end
+
+-- v3: flags on the exported enemies. Dormant = a boss waiting for its wave (level 20's sleeping
+-- Cerberus, level 21's seated Moloch): it never moves before then, so it neither holds back an early
+-- wave call nor anchors a spell. Untargetable = dormant, damage-immune (e.g. Ulgukhai's shield while
+-- unblocked) or banned from every effect. Returns the number of enemies that are not dormant.
+local function augment_enemies(s, store)
+    local active = 0
+    for _, en in ipairs(type(s.enemies) == "table" and s.enemies or {}) do
+        local e = type(en) == "table" and store.entities[en.id]
+        if type(e) ~= "table" then
+            active = active + 1  -- unknown entity: counted, never flagged
+        else
+            local vis = type(e.vis) == "table" and e.vis or {}
+            local bans = finite(vis.bans) and vis.bans or 0
+            local dormant = e.sleeping == true or e.phase == "sitting"
+            local banned_all = bans == -1 or (type(F_ALL) == "number" and bit.band(bans, F_ALL) == bit.tobit(F_ALL))
+            en.dormant = dormant
+            en.untargetable = dormant or (type(e.health) == "table" and e.health.ignore_damage == true) or banned_all
+            en.flying = has_flag(vis.flags, F_FLYING)
+            en.boss = has_flag(vis.flags, F_BOSS) or has_flag(vis.flags, F_MINIBOSS)
+                or (type(e.template_name) == "string" and e.template_name:sub(1, 3) == "eb_")
+            en.unblockable = has_flag(bans, F_BLOCK)
+            local progress = lane_progress(e)
+            if progress then en.path_progress = progress end
+            if not dormant then active = active + 1 end
+        end
+    end
+    return active
+end
+
+local function targetable(enemies)
+    local out = {}
+    for _, en in ipairs(type(enemies) == "table" and enemies or {}) do
+        if type(en) == "table" and not en.untargetable then out[#out+1] = en end
+    end
+    return out
+end
+
+-- v3 rally points, as the GUI's GUI_MODE_RALLY_TOWER click allows them: inside the barrack's
+-- rally_range ellipse (utils.is_inside_ellipse, aspect 0.7) around pos + tower.range_offset, and
+-- (unless rally_anywhere) next to an NF_RALLY path node on rally_terrains only. Candidates are the
+-- path nodes passing those checks (rounded to integers, then checked); the offered options are the
+-- most upstream ("entry"), most downstream ("exit") and most central ("center") candidate, plus
+-- "boss": the candidate nearest an awake boss standing inside the ellipse.
+local RALLY_ASPECT = 0.7
+local rally_cache = setmetatable({}, {__mode = "k"})
+
+local function inside_ellipse(x, y, cx, cy, r)
+    local a, b = r, r * RALLY_ASPECT
+    return ((x - cx) / a) ^ 2 + ((y - cy) / b) ^ 2 <= 1
+end
+
+local function rally_center(e)
+    local off = type(e.tower) == "table" and e.tower.range_offset
+    local ox = type(off) == "table" and finite(off.x) and off.x or 0
+    local oy = type(off) == "table" and finite(off.y) and off.y or 0
+    return e.pos.x + ox, e.pos.y + oy
+end
+
+local function rally_candidates(e)
+    local b = e.barrack
+    local P, GR = package.loaded["path_db"], package.loaded["grid_db"]
+    if type(P) ~= "table" or type(P.paths) ~= "table" or type(GR) ~= "table" or type(NF_RALLY) ~= "number" then
+        return {}
+    end
+    local r = b.rally_range
+    if not finite(r) or r <= 0 or type(e.pos) ~= "table" or not finite(e.pos.x) or not finite(e.pos.y) then return {} end
+    local cx, cy = rally_center(e)
+    local cached = rally_cache[e]
+    if cached and cached.r == r and cached.cx == cx and cached.cy == cy and cached.anywhere == b.rally_anywhere then
+        return cached.points
+    end
+    local points = {}
+    local ok = pcall(function()
+        for pi, path in ipairs(P.paths) do
+            for spi, lane in ipairs(path) do
+                local n = #lane
+                for ni = 1, n do
+                    local node = lane[ni]
+                    if type(node) == "table" and finite(node.x) and finite(node.y) then
+                        local x, y = math.floor(node.x + 0.5), math.floor(node.y + 0.5)
+                        if inside_ellipse(x, y, cx, cy, r) and (b.rally_anywhere
+                            or (P:valid_node_nearby(x, y, nil, NF_RALLY) and GR:cell_is_only(x, y, b.rally_terrains))) then
+                            points[#points+1] = {x=x, y=y, progress=route_progress(P, pi, n, ni), pi=pi, spi=spi, ni=ni}
+                        end
+                    end
+                end
+            end
+        end
+    end)
+    if not ok then points = {} end
+    rally_cache[e] = {r=r, cx=cx, cy=cy, anywhere=b.rally_anywhere, points=points}
+    return points
+end
+
+local function rally_options(e, s)
+    local points = rally_candidates(e)
+    if #points == 0 then return {} end
+    local function order(a, b)
+        if a.pi ~= b.pi then return a.pi < b.pi end
+        if a.spi ~= b.spi then return a.spi < b.spi end
+        return a.ni < b.ni
+    end
+    local function best(score)
+        local chosen, value
+        for _, p in ipairs(points) do
+            local v = score(p)
+            if chosen == nil or v < value or (v == value and order(p, chosen)) then chosen, value = p, v end
+        end
+        return chosen
+    end
+    local cx, cy = rally_center(e)
+    local out = {
+        {option="entry", point=best(function(p) return p.progress end)},
+        {option="center", point=best(function(p) return (p.x - cx) ^ 2 + (p.y - cy) ^ 2 end)},
+        {option="exit", point=best(function(p) return -p.progress end)},
+    }
+    local boss, boss_d
+    for _, en in ipairs(type(s.enemies) == "table" and s.enemies or {}) do
+        if type(en) == "table" and en.boss and not en.dormant and finite(en.x) and finite(en.y) and finite(en.hp)
+            and en.hp > 0 and inside_ellipse(en.x, en.y, cx, cy, e.barrack.rally_range) then
+            local d = (en.x - cx) ^ 2 + (en.y - cy) ^ 2
+            if boss == nil or d < boss_d or (d == boss_d and en.id < boss.id) then boss, boss_d = en, d end
+        end
+    end
+    if boss then
+        out[#out+1] = {option="boss", point=best(function(p) return (p.x - boss.x) ^ 2 + (p.y - boss.y) ^ 2 end),
+                       boss_id=boss.id}
+    end
+    return out
+end
+
 -- GUI price of the next power level: price_base for the first, price_inc for each later one.
 local function power_price(pw)
     local price = pw.level == 0 and (pw.price_base or 0) or (pw.price_inc or 0)
@@ -380,6 +571,12 @@ local function powers_ui()
         out[p] = {id=p, mode=type(mode) == "string" and mode or "missing"}
     end
     return out
+end
+
+-- Live enemies that hold back an early wave call (v3: dormant bosses do not).
+local function wave_count(s)
+    if ACTION_SCOPE == "v3" then return s.active_enemy_count end
+    return s.enemy_count
 end
 
 local function catalog_v2(s)
@@ -433,6 +630,10 @@ local function catalog_v2(s)
                     end
                 elseif item.action == "tw_sell" then
                     if tower.can_be_sold ~= false then add({action="sell_tower", tower_id=id, cost=0}) end
+                elseif item.action == "tw_rally" and ACTION_SCOPE == "v3" and type(e.barrack) == "table" then
+                    for _, o in ipairs(rally_options(e, s)) do
+                        add({action="set_rally", tower_id=id, option=o.option, x=o.point.x, y=o.point.y, cost=0})
+                    end
                 end
             end
         elseif POWER_SPECIALS[kind] and not tower.blocked then
@@ -447,7 +648,7 @@ local function catalog_v2(s)
                         end
                     end
                 elseif item.action == "tw_point" and point_ready(e, store) then
-                    for _, a in ipairs(strong_anchors(s.enemies)) do
+                    for _, a in ipairs(strong_anchors(ACTION_SCOPE == "v3" and targetable(s.enemies) or s.enemies)) do
                         add({action="point_tower", tower_id=id, x=a.x, y=a.y, anchor_id=a.id, cost=0})
                     end
                 end
@@ -461,7 +662,7 @@ local function catalog_v2(s)
                  template=type(e.template_name) == "string" and e.template_name or "", kind=need, cost=0})
         end
     end
-    local anchors = power_anchors(s.enemies)
+    local anchors = power_anchors(ACTION_SCOPE == "v3" and targetable(s.enemies) or s.enemies)
     for p = 1, 2 do
         local btn = power_button(p)
         if btn and btn.mode ~= nil and btn.mode ~= "locked" and btn.mode ~= "cooldown" then
@@ -472,13 +673,13 @@ local function catalog_v2(s)
             end
         end
     end
-    if s.next_wave and not s.wave_spawning and (s.wave==0 or s.enemy_count==0) then
+    if s.next_wave and not s.wave_spawning and (s.wave==0 or wave_count(s)==0) then
         add({action="send_wave", cost=0})
     end
     -- Total order over the identifying keys, so entity traversal order never shows.
     local keys = {}
     for _, a in ipairs(out) do
-        local named = type(a.power) == "string" and a.power or nil
+        local named = type(a.power) == "string" and a.power or a.option
         keys[a] = {a.action or "", a.holder_id or a.tower_id or a.entity_id or 0, a.tower_type or a.target or named or "",
                    type(a.power) == "number" and a.power or 0, a.x or 0, a.y or 0, a.anchor_id or 0}
     end
@@ -506,14 +707,15 @@ local function state()
         s.native_outcome = store.game_outcome
         s.level_won = store.game_outcome and store.game_outcome.victory==true or false
         s.level_lost = store.game_outcome and store.game_outcome.victory==false or false
-        if ACTION_SCOPE == "v2" then
+        if ACTION_SCOPE == "v3" then s.active_enemy_count = augment_enemies(s, store) end
+        if ACTION_SCOPE == "v2" or ACTION_SCOPE == "v3" then
             s.action_catalog = catalog_v2(s)
             s.powers_ui = powers_ui()
-            s.action_scope = "v2"
+            s.action_scope = ACTION_SCOPE
         else
             s.action_catalog = catalog(s)
         end
-        s.wave_ready = s.next_wave ~= nil and not s.wave_spawning and (s.wave==0 or s.enemy_count==0)
+        s.wave_ready = s.next_wave ~= nil and not s.wave_spawning and (s.wave==0 or wave_count(s)==0)
     end
     return s
 end
@@ -632,7 +834,9 @@ end
 -- build_tower's target is implied by tower_type and may be omitted, as in v1 menus;
 -- a stated target must still match.
 local function handle_v2(cmd)
-    if not V2_ACTIONS[cmd.action] then error("Action not enabled in verified experiment scope") end
+    if not (ACTION_SCOPE == "v3" and V3_ACTIONS or V2_ACTIONS)[cmd.action] then
+        error("Action not enabled in verified experiment scope")
+    end
     local legal = false
     for _, a in ipairs(state().action_catalog or {}) do
         local same = true
@@ -677,6 +881,14 @@ local function handle_v2(cmd)
         e.ui.clicked = true
         return {native_wire=native.codec.encode({type="ok", action="click_entity", entity_id=cmd.entity_id,
                                                  x=cmd.x, y=cmd.y})}
+    elseif cmd.action == "set_rally" then
+        -- As the GUI's GUI_MODE_RALLY_TOWER click (game_gui): a new rally_pos vector and rally_new; the
+        -- barrack's own script then moves its soldiers.
+        local e = game.store.entities[cmd.tower_id]
+        e.barrack.rally_pos = {x=cmd.x, y=cmd.y}
+        e.barrack.rally_new = true
+        return {native_wire=native.codec.encode({type="ok", action="set_rally", tower_id=cmd.tower_id,
+                                                 option=cmd.option, x=cmd.x, y=cmd.y})}
     elseif cmd.action == "point_tower" then
         -- As the GUI's tw_point click: the tower's own script picks the enemy at this point and fires.
         local e = game.store.entities[cmd.tower_id]
@@ -721,7 +933,7 @@ local function handle(cmd)
         -- Cumulative random() call counts per calling chunk (diagnostic RNG modes only).
         local rng = ALPHARUSH_RNG
         return {mode = rng and rng.mode or "", counts = rng and plain(rng.counts, 3) or {}}
-    elseif ACTION_SCOPE == "v2" then return handle_v2(cmd)
+    elseif ACTION_SCOPE == "v2" or ACTION_SCOPE == "v3" then return handle_v2(cmd)
     else
         if cmd.action=="build_tower" or cmd.action=="send_wave" then
             local legal=false
@@ -741,8 +953,8 @@ local function handle(cmd)
 end
 
 function M.install(update)
-    if ACTION_SCOPE ~= "v1" and ACTION_SCOPE ~= "v2" then
-        error("Unsupported ALPHARUSH_ACTION_SCOPE " .. string.format("%q", ACTION_SCOPE) .. " (expected v1 or v2)")
+    if ACTION_SCOPE ~= "v1" and ACTION_SCOPE ~= "v2" and ACTION_SCOPE ~= "v3" then
+        error("Unsupported ALPHARUSH_ACTION_SCOPE " .. string.format("%q", ACTION_SCOPE) .. " (expected v1, v2 or v3)")
     end
     original_update = update
     server = assert(socket.bind("127.0.0.1", tonumber(os.getenv("ALPHARUSH_PORT")) or 9879))
@@ -769,6 +981,41 @@ local function reply(i, value)
     return true
 end
 
+-- One request of client i, waiting at most ``timeout`` seconds for it; true when a full line was answered.
+local function serve(i, timeout)
+    local item=clients[i]
+    item.socket:settimeout(timeout)
+    local line,err,partial = item.socket:receive("*l")
+    item.socket:settimeout(0)
+    if partial and #partial>0 then item.buffer=item.buffer..partial end
+    if line then
+        line=item.buffer..line; item.buffer=""
+        local cmd,decode_error=decode_request(line)
+        if not cmd then
+            -- Always answer, so a client never waits out its socket timeout; then disconnect.
+            if reply(i,{id=nil, ok=false, error="Malformed request: "..tostring(decode_error)}) then drop(i) end
+        elseif TOKEN and TOKEN ~= "" and cmd.token ~= TOKEN then
+            if reply(i,{id=nil, ok=false, error="Unauthorized request"}) then drop(i) end
+        else
+            cmd.token = nil
+            local ok,result=pcall(handle,cmd)
+            reply(i,{id=safe_id(cmd.id), ok=ok, result=ok and result or nil,
+                     error=not ok and tostring(result) or nil})
+        end
+        return true
+    elseif err=="closed" then drop(i)
+    elseif #item.buffer > MAX_REQUEST_BYTES then
+        if reply(i,{id=nil, ok=false, error="Malformed request: request exceeds "..MAX_REQUEST_BYTES.." bytes"}) then drop(i) end
+    end
+    return false
+end
+
+-- After an answered request the client usually sends its next one within a millisecond, so it is served
+-- in the same frame (each further wait at most BURST_WAIT s, the frame at most BURST_SECONDS or BURST_MAX
+-- requests). Windows caps the frame rate of hidden windows (about 57 frames/s measured), which otherwise
+-- paced every request. Game time advances only inside "step", so serving faster changes no game.
+local BURST_WAIT, BURST_SECONDS, BURST_MAX = 0.02, 0.1, 64
+
 function M.update(dt)
     if not controlled then
         original_update(1/60)
@@ -776,27 +1023,16 @@ function M.update(dt)
     end
     local c = server:accept()
     if c then c:settimeout(0); clients[#clients+1]={socket=c, buffer=""} end
+    local served = false
     for i=#clients,1,-1 do
-        local item=clients[i]
-        local line,err,partial = item.socket:receive("*l")
-        if partial and #partial>0 then item.buffer=item.buffer..partial end
-        if line then
-            line=item.buffer..line; item.buffer=""
-            local cmd,decode_error=decode_request(line)
-            if not cmd then
-                -- Always answer, so a client never waits out its socket timeout; then disconnect.
-                if reply(i,{id=nil, ok=false, error="Malformed request: "..tostring(decode_error)}) then drop(i) end
-            elseif TOKEN and TOKEN ~= "" and cmd.token ~= TOKEN then
-                if reply(i,{id=nil, ok=false, error="Unauthorized request"}) then drop(i) end
-            else
-                cmd.token = nil
-                local ok,result=pcall(handle,cmd)
-                reply(i,{id=safe_id(cmd.id), ok=ok, result=ok and result or nil,
-                         error=not ok and tostring(result) or nil})
-            end
-        elseif err=="closed" then drop(i)
-        elseif #item.buffer > MAX_REQUEST_BYTES then
-            if reply(i,{id=nil, ok=false, error="Malformed request: request exceeds "..MAX_REQUEST_BYTES.." bytes"}) then drop(i) end
+        if serve(i, 0) then served = true end
+    end
+    local clock = type(socket.gettime) == "function" and socket.gettime or nil
+    local start, count = clock and clock(), 0
+    while served and #clients > 0 and count < BURST_MAX and (not clock or clock() - start < BURST_SECONDS) do
+        served, count = false, count + 1
+        for i=#clients,1,-1 do
+            if serve(i, BURST_WAIT) then served = true end
         end
     end
 end
