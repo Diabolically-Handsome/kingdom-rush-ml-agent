@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "pool_id": "KR1-deployment-v1",
+  "pools": {
+    "train": {"seeds": [1001,1002,1003,1004,1005,1006,1007,1008,1009,1010], "levels": [1]},
+    "validation": {"seeds": [2001,2002,2003,2004], "levels": [2]},
+    "heldout": {"seeds": [3001,3002,3003,3004], "levels": [3]},
+    "never_train": {"seeds": [4001,4002,4003,4004], "levels": []}
+  },
+  "unlisted_levels": "never_train",
+  "unlisted_seeds": "never_train",
+  "anchors": "train_only",
+  "heldout_access": "one_frozen_evaluation",
+  "deployment_live_test_levels": [1]
+}

@@ -50,6 +50,8 @@ BODY_KEYS = {"native-search": "search", "native-campaign": "campaign", "native-c
 # The one-shot final campaign evaluation: its own job kind, final_campaign_run seeds only, one job.
 FINAL_JOB_KIND = "native-final"
 BRAIN_ENDPOINT = "http://127.0.0.1:12081"
+# Opt-in host features a job may switch on (host.lua HOST_FEATURES): human-timed trap clicks, early wave calls.
+HOST_FEATURES = {"timed_clicks", "early_waves"}
 STEPS_ENDPOINT = "http://127.0.0.1:12083"
 SCHEMA = "alpharush-campaign-survey-v1"
 SURVEY_ROLES = ("train", "evaluation")
@@ -1157,6 +1159,13 @@ def worker_main(config, run_dir, *, permit_wait=10.0, job_kind=JOB_KIND):
                                 stop_dirs=tuple(Path(p) for p in permit["stop_dirs"]))
     ctx.check()
     job, pools = verify_frozen(config, permit, job_kind)
+    features = job.get("host_features", [])
+    if not isinstance(features, list) or not set(features) <= HOST_FEATURES:
+        raise GateRefused(f"host_features must be a subset of {sorted(HOST_FEATURES)}")
+    # Every game this worker starts inherits the job's opt-in human-capability features.
+    os.environ["ALPHARUSH_HOST_FEATURES"] = ",".join(sorted(features))
+    if features:
+        ctx.record("host_features", features=sorted(features))
     if job_kind in SEARCH_JOB_KINDS:
         return _search_main(config, permit, ctx, job, pools, run_dir, job_kind)
     if job_kind == "native-campaign":

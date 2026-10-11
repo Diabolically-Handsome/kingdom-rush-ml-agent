@@ -30,7 +30,12 @@ INSTRUCTION_O = 4  # trailing option dims: matches with the instruction
 def load(run_ids, only_won, runs=RUNS):
     episodes = []
     for run_id in run_ids:
-        data = runs / run_id / "data"
+        # "<phase>/<run id>": a run of another phase under runtime/rl (e.g. campaign-v1's demonstrations).
+        phase_name, _, plain = run_id.rpartition("/")
+        base = (ROOT / "runtime/rl" / phase_name / "runs") if phase_name else runs
+        if phase_name and not base.resolve().is_relative_to((ROOT / "runtime/rl").resolve()):
+            raise SystemExit(f"run {run_id!r} is outside runtime/rl")
+        data = base / plain / "data"
         for path in sorted(data.glob("*.npz")):
             rows, meta = load_rows(path)
             # Expert-labelled network play (DAgger) teaches from lost games too.

@@ -92,6 +92,12 @@ class ProfileTests(unittest.TestCase):
         self.assertEqual(["hero_gerald"], heroes_available(4))
         self.assertIn("hero_ignus", heroes_available(11))
         self.assertNotIn("hero_ignus", heroes_available(10))
+        # After the main campaign the hero room offers all 13 heroes (7 of them from level 12 on).
+        self.assertEqual(6, len(heroes_available(11)))
+        self.assertEqual(13, len(heroes_available(12)))
+        self.assertIn("hero_oni", heroes_available(20))
+        from alpharush_rl.strategy_brain import HERO_TEXT
+        self.assertEqual(set(heroes_available(26)), set(HERO_TEXT))
         with self.assertRaises(ValueError):
             level_profile(3, hero="hero_gerald")
         self.assertEqual("hero_gerald", level_profile(4, hero="hero_gerald")["hero"])

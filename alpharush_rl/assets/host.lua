@@ -11,6 +11,9 @@ local TOKEN = os.getenv("ALPHARUSH_TOKEN")
 -- powers, selling and spells; "v3" (elite stages) is v2 plus barracks rally points, dormant /
 -- untargetable / boss enemy flags and per-lane path progress. Any other value fails closed at install.
 local ACTION_SCOPE = os.getenv("ALPHARUSH_ACTION_SCOPE") or "v1"
+-- Opt-in human-capability features of a job (comma list): timed_clicks, early_waves.
+local HOST_FEATURES = {}
+for name in string.gmatch(os.getenv("ALPHARUSH_HOST_FEATURES") or "", "[%w_]+") do HOST_FEATURES[name] = true end
 
 -- Strict flat JSON object decoder for RPC requests; it never compiles input.
 -- Values: string, number, true, false, null (null = absent). Returns table or nil, err.
@@ -358,6 +361,12 @@ local function click_need(e)
         return "downed_boss"
     end
     if type(e.modifier) == "table" and finite(e.required_clicks) and e.required_clicks > 0 then
+        if HOST_FEATURES.timed_clicks and finite(e.click_time) then
+            -- A timed hold counts clicks only while its click prompt (sprite 2) shows: before it (start
+            -- animation, clicks not yet routed to it) and after the window (held, then released) a tap is lost.
+            local prompt = type(e.render) == "table" and type(e.render.sprites) == "table" and e.render.sprites[2]
+            if type(prompt) ~= "table" or prompt.hidden then return nil end
+        end
         return "tower_trap"
     end
     return nil
@@ -673,7 +682,8 @@ local function catalog_v2(s)
             end
         end
     end
-    if s.next_wave and not s.wave_spawning and (s.wave==0 or wave_count(s)==0) then
+    -- A human can tap the next-wave flag whenever it shows (early_waves); the default offers it on a clear field.
+    if s.next_wave and not s.wave_spawning and (s.wave==0 or wave_count(s)==0 or HOST_FEATURES.early_waves) then
         add({action="send_wave", cost=0})
     end
     -- Total order over the identifying keys, so entity traversal order never shows.
@@ -715,7 +725,8 @@ local function state()
         else
             s.action_catalog = catalog(s)
         end
-        s.wave_ready = s.next_wave ~= nil and not s.wave_spawning and (s.wave==0 or wave_count(s)==0)
+        s.wave_ready = s.next_wave ~= nil and not s.wave_spawning
+            and (s.wave==0 or wave_count(s)==0 or HOST_FEATURES.early_waves == true)
     end
     return s
 end

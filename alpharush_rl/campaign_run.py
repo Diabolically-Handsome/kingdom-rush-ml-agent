@@ -27,7 +27,9 @@ CAMPAIGN_KEYS = {"levels", "seeds", "attempts_per_level", "plans", "policy", "br
 # adds one star to the upgrade budget, a lost one costs nothing else. "star_attempts" = up to that many replays
 # of each main level won with fewer than 3 stars, after level 12 and before the challenges (a re-win with more
 # lives raises the stored stars, and a level's challenges open only at 3 stars).
-OPTIONAL_CAMPAIGN_KEYS = {"start", "challenges", "challenge_attempts", "star_attempts"}
+# "detour" (bool): when every plan of a main level has lost, replay earlier levels for stars and play the open
+# challenges, then retry the level with the new upgrades (as a stuck player does); each plan is tried once per save.
+OPTIONAL_CAMPAIGN_KEYS = {"start", "challenges", "challenge_attempts", "star_attempts", "detour"}
 POLICIES = ("plan", "operator", "steps")
 BRAINS = ("rule", "8b")
 
@@ -64,6 +66,8 @@ def check_campaign(spec, pools, phase_module):
     if not isinstance(challenges, dict):
         issues.append("challenges must map 'level:mode' to lists of plans")
         challenges = {}
+    if not isinstance(spec.get("detour", False), bool):
+        issues.append("detour must be true or false")
     replays = spec.get("star_attempts", 0)
     if isinstance(replays, bool) or not isinstance(replays, int) or not 0 <= replays <= 5:
         issues.append("star_attempts must be 0..5")
@@ -204,6 +208,8 @@ def run_campaign(spec, env_factory, ctx, out, *, protocol, make_policy, difficul
     stopped_reason, failed_level = None, None
     failed_levels, blocked_levels = [], []
     won_challenges, challenge_log, replay_log = {}, [], []
+    detour = bool(spec.get("detour"))
+    detours, replay_counts, challenge_counts, challenge_tried = [], {}, {}, {}
     challenges_played = [not (spec.get("challenges") or spec.get("star_attempts"))]
     started = time.monotonic()
     ctx.record("campaign_start", seed=spec["seed"], levels=spec["levels"], policy=spec["policy"],
@@ -236,15 +242,18 @@ def run_campaign(spec, env_factory, ctx, out, *, protocol, make_policy, difficul
             raise RuntimeError("strategy brain bought more upgrades than the stars allow")
         return bought, records
 
-    def replay_for_stars():
-        """Replays of main levels won with fewer than 3 stars (their portfolio plans in order, now with the
-        upgrades of the whole main campaign); a re-win with more lives raises the stored stars."""
+    def replay_for_stars(limit=MAIN_LEVELS + 1):
+        """Replays of main levels (below ``limit``) won with fewer than 3 stars (their portfolio plans in order,
+        now with the upgrades earned so far); a re-win with more lives raises the stored stars. Replay numbers
+        continue across calls, so a later pass tries the next plans."""
         nonlocal owned
-        for level in range(1, MAIN_LEVELS + 1):
+        for level in range(1, min(limit, MAIN_LEVELS + 1)):
             if won.get(level, 3) >= 3 or str(level) not in spec["plans"]:
                 continue
             candidates = [(check_genome(plan_genome(e)), plan_evidence(e)) for e in spec["plans"][str(level)]]
-            for attempt in range(spec.get("star_attempts", 0)):
+            first = replay_counts.get(level, 0)
+            replay_counts[level] = first + spec.get("star_attempts", 0)
+            for attempt in range(first, first + spec.get("star_attempts", 0)):
                 index = attempt % len(candidates)
                 genome = candidates[index][0]
                 owned, records = allocate(genome, level)
@@ -282,11 +291,14 @@ def run_campaign(spec, env_factory, ctx, out, *, protocol, make_policy, difficul
                     break
         return None
 
-    def play_challenges():
-        """The 3-star main levels' Heroic/Iron challenges, in level order; returns a stop reason or None."""
+    def play_challenges(limit=None):
+        """The 3-star main levels' Heroic/Iron challenges, in level order; returns a stop reason or None.
+        With ``limit`` (a detour before main level ``limit``) only the levels before it; a challenge already won,
+        or already lost with as many stars as now, is skipped; attempt numbers continue across calls."""
         nonlocal owned
-        challenges_played[0] = True
-        stop = replay_for_stars() if spec.get("star_attempts") else None
+        if limit is None:
+            challenges_played[0] = True
+        stop = replay_for_stars(limit or MAIN_LEVELS + 1) if spec.get("star_attempts") else None
         if stop:
             return stop
         make = make_elite_policy if make_elite_policy is not None else make_policy
@@ -294,9 +306,16 @@ def run_campaign(spec, env_factory, ctx, out, *, protocol, make_policy, difficul
             level, mode = (int(x) for x in key.split(":"))
             if won.get(level) != 3:
                 continue  # the map keeps a level's challenges locked below 3 campaign stars
+            if (limit is not None and level >= limit) or mode in won_challenges.get(level, []):
+                continue
+            if challenge_tried.get(key, -1) >= total_stars():
+                continue  # lost before with as many stars: the same games would be lost again
+            challenge_tried[key] = total_stars()
             candidates = [(check_genome(plan_genome(e)), plan_evidence(e)) for e in spec["challenges"][key]]
             failed = []
-            for attempt in range(spec["challenge_attempts"]):
+            first = challenge_counts.get(key, 0)
+            challenge_counts[key] = first + spec["challenge_attempts"]
+            for attempt in range(first, first + spec["challenge_attempts"]):
                 open_plans = [i for i in range(len(candidates)) if i not in failed] or list(range(len(candidates)))
                 context = {"progress": _progress(won), "upgrades": dict(owned), "failed": [], "mode": mode}
                 choice, records = brain.choose_plan(level, [candidates[i] for i in open_plans], attempt, context)
@@ -341,6 +360,78 @@ def run_campaign(spec, env_factory, ctx, out, *, protocol, make_policy, difficul
                 failed.append(index)
         return None
 
+    def play_attempts(level, candidates, attempts, failed):
+        """Attempts with the given indices at one level; returns (victory, stop reason or None). With detour, a
+        main level stops once every plan has lost with this save (a retry would replay a lost game)."""
+        nonlocal owned
+        victory = False
+        for attempt in attempts:
+            if detour and level <= MAIN_LEVELS and len(set(failed)) >= len(candidates):
+                break
+            # The engine is deterministic: a plan already lost here with this save and seed loses again,
+            # so a retry offers only the untried plans (all of them again once every plan was tried).
+            open_plans = [i for i in range(len(candidates)) if i not in failed] or list(range(len(candidates)))
+            context = {"progress": _progress(won), "upgrades": dict(owned), "failed": []}
+            choice, records = brain.choose_plan(level, [candidates[i] for i in open_plans], attempt, context)
+            index = open_plans[choice % len(open_plans)]
+            for record in records:
+                record["plan_index"] = index
+            journal_strategy(records, level, attempt)
+            genome = candidates[index][0]
+            if won:
+                owned, records = allocate(genome, level)
+                journal_strategy(records, level, attempt)
+                ctx.record("upgrades_bought", seed=spec["seed"], before_level=level, upgrades=owned)
+            profile = check_profile({"upgrades": owned, "hero": genome["hero"], "levels": won,
+                                     "challenges": won_challenges})
+            if ctx.games_remaining < 1:
+                return victory, "max_games"
+            ctx.claim_game()
+            ctx.record("game_claimed", level=level, attempt=attempt, games_played=ctx.games_played)
+            env = None
+            base = {"run_id": ctx.run_id, "level": level, "attempt": attempt, "seed": spec["seed"],
+                    "genome_id": genome_id(genome), "plan_index": index, "genome": genome, "profile": profile}
+            make = make_elite_policy if make_elite_policy is not None and level > MAIN_LEVELS else make_policy
+            try:
+                env = env_factory(level, spec["seed"], profile, attempt)
+                result = run_episode(env, make(genome), protocol, seed=spec["seed"], level=level,
+                                     difficulty=difficulty, episode_id=f"{ctx.run_id}-L{level:02d}-a{attempt}",
+                                     check=ctx.check, observe_meta=True)
+            except GateRefused:
+                raise
+            except Exception as exc:
+                out.append("campaign_error", {**base, "error": f"{type(exc).__name__}: {exc}"})
+                attempts_log.append({"level": level, "attempt": attempt, "error": True})
+                continue
+            finally:
+                _close(env, out, base)
+            outcome = result.get("outcome") or {}
+            victory = result["status"] == "terminal" and bool(outcome.get("level_won"))
+            stars = stars_for_lives(int(outcome["lives"])) if victory else 0
+            out.append("campaign_attempt", {**base, "won": victory, "stars": stars,
+                                            "result": {k: v for k, v in result.items() if k != "decisions"}})
+            attempts_log.append({"level": level, "attempt": attempt, "won": victory, "stars": stars,
+                                 "lives": outcome.get("lives"), "wave": (result.get("final_summary") or {}).get("wave")})
+            if victory:
+                won[level] = stars
+                break
+            failed.append(index)
+        return victory, None
+
+    def detour_level(level, candidates, failed):
+        """A stuck player's detour before retrying main level ``level``: replays and open challenges of the
+        earlier levels; a retry only if they raised the star total. Returns (victory, stop reason or None)."""
+        before = total_stars()
+        stop = play_challenges(limit=level)
+        after = total_stars()
+        detours.append({"level": level, "stars_before": before, "stars_after": after})
+        ctx.record("campaign_detour", seed=spec["seed"], level=level, stars_before=before, stars_after=after)
+        if stop or after <= before:
+            return False, stop
+        tried = sum(1 for a in attempts_log if a.get("level") == level and "attempt" in a)
+        failed.clear()
+        return play_attempts(level, candidates, range(tried, tried + spec["attempts_per_level"]), failed)
+
     try:
         for level in spec["levels"]:
             if level > MAIN_LEVELS and not challenges_played[0] and MAIN_LEVELS in won:
@@ -356,57 +447,12 @@ def run_campaign(spec, env_factory, ctx, out, *, protocol, make_policy, difficul
                 continue
             entries = spec["plans"][str(level)]
             candidates = [(check_genome(plan_genome(e)), plan_evidence(e)) for e in entries]
-            victory, failed = False, []
-            for attempt in range(spec["attempts_per_level"]):
-                # The engine is deterministic: a plan already lost here with this save and seed loses again,
-                # so a retry offers only the untried plans (all of them again once every plan was tried).
-                open_plans = [i for i in range(len(candidates)) if i not in failed] or list(range(len(candidates)))
-                context = {"progress": _progress(won), "upgrades": dict(owned), "failed": []}
-                choice, records = brain.choose_plan(level, [candidates[i] for i in open_plans], attempt, context)
-                index = open_plans[choice % len(open_plans)]
-                for record in records:
-                    record["plan_index"] = index
-                journal_strategy(records, level, attempt)
-                genome = candidates[index][0]
-                if won:
-                    owned, records = allocate(genome, level)
-                    journal_strategy(records, level, attempt)
-                    ctx.record("upgrades_bought", seed=spec["seed"], before_level=level, upgrades=owned)
-                profile = check_profile({"upgrades": owned, "hero": genome["hero"], "levels": won,
-                                         "challenges": won_challenges})
-                if ctx.games_remaining < 1:
-                    stopped_reason = "max_games"
-                    break
-                ctx.claim_game()
-                ctx.record("game_claimed", level=level, attempt=attempt, games_played=ctx.games_played)
-                env = None
-                base = {"run_id": ctx.run_id, "level": level, "attempt": attempt, "seed": spec["seed"],
-                        "genome_id": genome_id(genome), "plan_index": index, "genome": genome, "profile": profile}
-                make = make_elite_policy if make_elite_policy is not None and level > MAIN_LEVELS else make_policy
-                try:
-                    env = env_factory(level, spec["seed"], profile, attempt)
-                    result = run_episode(env, make(genome), protocol, seed=spec["seed"], level=level,
-                                         difficulty=difficulty, episode_id=f"{ctx.run_id}-L{level:02d}-a{attempt}",
-                                         check=ctx.check, observe_meta=True)
-                except GateRefused:
-                    raise
-                except Exception as exc:
-                    out.append("campaign_error", {**base, "error": f"{type(exc).__name__}: {exc}"})
-                    attempts_log.append({"level": level, "attempt": attempt, "error": True})
-                    continue
-                finally:
-                    _close(env, out, base)
-                outcome = result.get("outcome") or {}
-                victory = result["status"] == "terminal" and bool(outcome.get("level_won"))
-                stars = stars_for_lives(int(outcome["lives"])) if victory else 0
-                out.append("campaign_attempt", {**base, "won": victory, "stars": stars,
-                                                "result": {k: v for k, v in result.items() if k != "decisions"}})
-                attempts_log.append({"level": level, "attempt": attempt, "won": victory, "stars": stars,
-                                     "lives": outcome.get("lives"), "wave": (result.get("final_summary") or {}).get("wave")})
-                if victory:
-                    won[level] = stars
-                    break
-                failed.append(index)
+            failed = []
+            victory, stop = play_attempts(level, candidates, range(spec["attempts_per_level"]), failed)
+            if not stop and not victory and detour and level <= MAIN_LEVELS:
+                victory, stop = detour_level(level, candidates, failed)
+            if stop:
+                stopped_reason = stop
             if stopped_reason:
                 break
             if not victory:
@@ -437,6 +483,8 @@ def run_campaign(spec, env_factory, ctx, out, *, protocol, make_policy, difficul
                        levels_won=sorted(level for level in won if level in played))
     if spec.get("star_attempts"):
         summary.update(star_replays=replay_log)
+    if detour:
+        summary.update(detours=detours)
     if spec.get("challenges"):
         summary.update(challenges_won={str(k): v for k, v in won_challenges.items()},
                        challenge_stars=challenge_stars(won_challenges), challenge_attempts=challenge_log)

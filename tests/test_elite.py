@@ -626,6 +626,108 @@ class WarmStartTests(unittest.TestCase):
             self.assertEqual({genome_id(strong): 5250.0, genome_id(weak): 400.0, genome_id(other): 150.0}, adopted)
 
 
+class DetourTests(unittest.TestCase):
+    """The campaign route of a stuck player (spec key detour)."""
+
+    def run(self, result=None):
+        with tempfile.TemporaryDirectory(prefix="alpharush-detour-") as tmp:
+            self.tmp = Path(tmp)
+            return super().run(result)
+
+    def play(self, spec, lose):
+        class Toy(LoseOn):
+            pass
+        Toy.lose = tuple(lose)
+        made = []
+
+        def factory(level, seed, profile, attempt, port, mode=1):
+            made.append((level, mode, attempt))
+            return Toy(seed=seed, level=level, gold=600)
+        run_dir = self.tmp / "runs" / f"native-campaign-{len(list(self.tmp.glob('**/episodes.jsonl')))}"
+        run_dir.mkdir(parents=True)
+        ctx = phase.PhaseRunContext("native-campaign-0001", run_dir, self.tmp, time.monotonic() + 300, 400,
+                                    job_kind="native-campaign")
+        out = Journal(run_dir / "episodes.jsonl")
+        summary = run_campaigns(spec, factory, ctx, out, protocol=PROTOCOL, make_policy=BuildOrderPolicy,
+                                ports=[9001])
+        return summary["campaigns"][0], made, out
+
+    def spec(self, **extra):
+        return {"levels": [1, 2, 3], "seeds": [1001], "attempts_per_level": 3, "policy": "plan", "brain": "rule",
+                "plans": {"1": [WIN_PLAN], "2": [WIN_PLAN], "3": [WIN_PLAN, genome([["b", "02", "mage"]])]},
+                **extra}
+
+    def test_without_detour_a_lost_main_level_ends_the_campaign_as_before(self):
+        campaign, made, _ = self.play(self.spec(), lose=(3,))
+        self.assertEqual(("level_failed", 3), (campaign["stopped_reason"], campaign["failed_level"]))
+        self.assertEqual([(3, 1, 0), (3, 1, 1), (3, 1, 2)], [m for m in made if m[0] == 3])  # repeats plan 0
+        self.assertNotIn("detours", campaign)
+
+    def test_detour_plays_open_challenges_then_retries_with_fresh_attempts(self):
+        spec = self.spec(detour=True, challenges={"1:2": [WIN_PLAN]}, challenge_attempts=1)
+        spec["levels"] = list(range(1, 13))
+        spec["plans"] = {str(level): [WIN_PLAN, genome([["b", "02", "mage"]])] for level in range(1, 13)}
+        campaign, made, out = self.play(spec, lose=(3,))
+        level3 = [m for m in made if m[0] == 3]
+        # each plan once, the challenge of 3-star level 1 (the detour), then each plan once more with +1 star
+        self.assertEqual([(3, 1, 0), (3, 1, 1), (3, 1, 2), (3, 1, 3)], level3)
+        challenge = made.index((1, 2, 0))
+        self.assertLess(made.index((3, 1, 1)), challenge)
+        self.assertLess(challenge, made.index((3, 1, 2)))
+        self.assertEqual([{"level": 3, "stars_before": 6, "stars_after": 7}], campaign["detours"])
+        self.assertEqual(("level_failed", 3), (campaign["stopped_reason"], campaign["failed_level"]))
+        self.assertEqual({"1": [2]}, campaign["challenges_won"])
+
+    def test_a_detour_without_new_stars_does_not_retry(self):
+        campaign, made, _ = self.play(self.spec(detour=True), lose=(3,))
+        self.assertEqual([(3, 1, 0), (3, 1, 1)], [m for m in made if m[0] == 3])
+        self.assertEqual([{"level": 3, "stars_before": 6, "stars_after": 6}], campaign["detours"])
+
+    def test_detour_must_be_a_bool(self):
+        self.assertIsNone(check_campaign(self.spec(detour="yes"), POOLS, phase)[0])
+        self.assertEqual([], check_campaign(self.spec(detour=True), POOLS, phase)[1])
+
+
+class HumanTimingTests(unittest.TestCase):
+    def test_click_ticks_protocol_field(self):
+        from alpharush_rl.episode import EpisodeProtocol
+        self.assertIsNone(EpisodeProtocol().click_ticks)
+        self.assertEqual(9, EpisodeProtocol(click_ticks=9).click_ticks)
+        for bad in (0, -3, 1.5, True):
+            with self.assertRaises(ValueError):
+                EpisodeProtocol(click_ticks=bad)
+
+    def test_early_two_calls_the_flag_unless_an_enemy_is_near_the_exit(self):
+        import os
+        from alpharush_rl import search as search_module
+        g = genome([], early=2)
+        self.assertEqual(2, g["early"])
+        self.assertIn("as soon as its flag shows", strategy_brain.describe_plan(g))
+        menu = [WAIT, option("B", {"action": "send_wave"}, 0.0)]
+        far = {"gold": 0, "wave": 3, "towers": [], "holders": [],
+               "enemies": [{"id": 1, "path_progress": 0.2, "hp": 10, "hp_max": 10}]}
+        near = {**far, "enemies": [{"id": 1, "path_progress": 0.8, "hp": 10, "hp_max": 10}]}
+        self.assertEqual("B", BuildOrderPolicy(g).choose(far, menu, {"decision_index": 0})["label"])
+        self.assertNotEqual("B", BuildOrderPolicy(g).choose(near, menu, {"decision_index": 0})["label"])
+        self.assertNotEqual("B", BuildOrderPolicy(genome([], early=1)).choose(far, menu, {"decision_index": 0})["label"])
+        old = os.environ.get("ALPHARUSH_HOST_FEATURES")
+        try:
+            os.environ["ALPHARUSH_HOST_FEATURES"] = ""
+            self.assertEqual((0, 1), search_module.early_values())
+            os.environ["ALPHARUSH_HOST_FEATURES"] = "early_waves,timed_clicks"
+            self.assertEqual((0, 1, 2), search_module.early_values())
+            rng = random.Random(4)
+            seen = {random_genome(HOLDERS, [], rng, rally=True)["early"] for _ in range(60)}
+            self.assertEqual({0, 1, 2}, seen)
+        finally:
+            if old is None:
+                os.environ.pop("ALPHARUSH_HOST_FEATURES", None)
+            else:
+                os.environ["ALPHARUSH_HOST_FEATURES"] = old
+        with self.assertRaises(ValueError):
+            genome([], early=3)
+
+
 class JournalTests(unittest.TestCase):
     def test_appends_track_the_tip_and_still_refuse_tampering(self):
         with tempfile.TemporaryDirectory() as tmp:

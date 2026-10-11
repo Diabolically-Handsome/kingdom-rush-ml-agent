@@ -16,6 +16,7 @@ import copy
 import math
 import hashlib
 import json
+import os
 import random
 
 from .menus import validate_menu
@@ -93,8 +94,8 @@ def check_genome(genome: dict) -> dict:
     cast = genome["cast"]
     if isinstance(cast, bool) or not isinstance(cast, int) or not 0 <= cast <= 100:
         raise ValueError("cast must be a percent 0..100")
-    if genome["early"] not in (0, 1) or isinstance(genome["early"], bool):
-        raise ValueError("early must be 0 or 1")
+    if genome["early"] not in (0, 1, 2) or isinstance(genome["early"], bool):
+        raise ValueError("early must be 0, 1 or 2")
     branches = genome["branches"]
     if not isinstance(branches, dict) or set(branches) != set(KINDS) or any(
             branches[kind] not in BRANCHES[kind] for kind in KINDS):
@@ -133,6 +134,22 @@ def check_genome(genome: dict) -> dict:
 def genome_id(genome: dict) -> str:
     text = json.dumps(check_genome(genome), sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(text.encode()).hexdigest()[:16]
+
+
+# early=2: call the next wave as soon as its flag shows (host feature early_waves) unless a live enemy has
+# already covered this much of its path.
+EARLY2_MAX_PROGRESS = 0.5
+
+
+def early_values():
+    """Plan values of the early gene a search may draw: 2 only while the job offers the flag with enemies on the
+    field (host feature early_waves, exported to ALPHARUSH_HOST_FEATURES by the job worker)."""
+    features = os.environ.get("ALPHARUSH_HOST_FEATURES", "").split(",")
+    return (0, 1, 2) if "early_waves" in features else (0, 1)
+
+
+def _calm(enemies):
+    return all(_number(e.get("path_progress")) < EARLY2_MAX_PROGRESS for e in enemies)
 
 
 class BuildOrderPolicy:
@@ -290,9 +307,14 @@ class BuildOrderPolicy:
                 continue
             self.pending += 1
             sends = [item for item in menu if item["action"].get("action") == "send_wave"]
-            if sends and (state.get("wave") == 0 or (self.genome["early"] and not enemies)):
+            if sends and (state.get("wave") == 0 or (self.genome["early"] == 1 and not enemies)
+                          or (self.genome["early"] == 2 and _calm(enemies))):
                 return _choice(self, sends[0]["label"], rule="send_wave", plan_cursor=self.cursor, skipped=skipped)
             return _choice(self, _wait_label(menu), rule="plan_wait", plan_cursor=self.cursor, skipped=skipped)
+        if self.genome["early"] == 2 and state.get("wave") != 0 and _calm(enemies):
+            sends = [item for item in menu if item["action"].get("action") == "send_wave"]
+            if sends:
+                return _choice(self, sends[0]["label"], rule="early_wave", plan_cursor=self.cursor)
         choice = self.fallback.choose(state, menu, context)
         rule = choice["meta"].get("rule")
         if rule == "send_wave" and not self.genome["early"] and state.get("wave") != 0:
@@ -382,7 +404,7 @@ def random_genome(holders: list[dict], heroes: list, rng: random.Random, special
         extra["f"] = rng.choice(FALLBACK_F)
         extra["cap"] = rng.choice(FALLBACK_CAP + SOFT_CAP)
     return check_genome({"hero": rng.choice(list(heroes)) if heroes else None, "steps": steps[:MAX_STEPS],
-                         "cast": rng.choice((30, 40, 50, 60, 70)), "early": rng.choice((0, 1)),
+                         "cast": rng.choice((30, 40, 50, 60, 70)), "early": rng.choice(early_values()),
                          "branches": {kind: rng.choice(BRANCHES[kind]) for kind in KINDS}, **extra})
 
 
@@ -496,7 +518,9 @@ def mutate(genome: dict, holders: list[dict], heroes: list, rng: random.Random, 
                 if any(digits):
                     g["ratio"] = "".join(map(str, digits))
             elif which == "early":
-                g["early"] = 1 - g["early"]
+                values = early_values()
+                g["early"] = (1 - g["early"]) if values == (0, 1) and g["early"] in (0, 1) else rng.choice(
+                    [v for v in values if v != g["early"]])
             elif which == "boss":
                 g["boss"] = 1 - g.get("boss", OPTIONAL_GENOME["boss"])
             elif which == "block":

@@ -9,6 +9,12 @@ the **first publicly documented machine-learning agent to clear the full main ca
 Earlier work is credited [below](#prior-work); if you know of an earlier full-campaign clear by an ML agent,
 please open an issue and we will correct this claim.
 
+**All 26 levels (2026-10-11):** in a third one-shot final over all 26 levels, on 5 new seeds, the agent cleared
+**120 of 130 levels**, and on seed 8101 it cleared **all 26 levels** (the 12-level main campaign and all 14 elite
+stages) from a new save on Normal; all five seeds cleared the main campaign. We know of no earlier machine-learning
+agent result that clears all 26 levels (same search as above). Video and details:
+[below](#all-26-levels-cleared-2026-10-11).
+
 **Elite stages (2026-10-07):** in a second one-shot final over all 26 levels (main campaign, then the 14 elite
 stages) the agent cleared 79 of 130 levels; two of five seeds won 21 levels including 9 elite stages, while on two
 others the unchanged main-campaign agent lost level 11, so the main campaign was cleared on 3 of these 5 new seeds
@@ -41,7 +47,92 @@ the others 3–5).
 **Video:** a rendered replay of the full campaign of final seed 6001: each level re-played by the same operator
 network and verified to reach exactly the same end state (SHA256) as the logged final run. Highlights (1.8 min):
 [`media/kingdom-rush-ml-agent_seed6001_highlights.mp4`](media/kingdom-rush-ml-agent_seed6001_highlights.mp4);
-full campaign (25 min, about 8–19× game speed) and a 4× faster cut: [GitHub release](../../releases).
+full campaign (25 min, about 4–10× game speed; its captions say 8–20× because they assumed 30 game ticks per second, the game runs 60) and a 4× faster cut: [GitHub release](../../releases).
+
+## All 26 levels cleared (2026-10-11)
+
+The third phase (elite-v2) targeted the weak points of the 2026-10-07 final: main level 11, and elite stages 20–22,
+which had never been won. Everything ran under the same phase gate, with new seed pools: train 1001–1010 and
+1101–1140, evaluation 7101–7120, one-shot final 8101–8105 (all earlier evaluation and final seeds retired).
+
+**One-shot final evaluation on 5 new seeds, all 26 levels from a new save, Normal:**
+
+| Seed | Levels cleared (of 26) | Not cleared | Games | Stars: campaign + challenges |
+|---|---|---|---|---|
+| **8101** | **26** | — | 63 | 61 + 11 |
+| 8102 | 25 | 22 | 69 | 62 + 11 |
+| 8103 | 22 | 22, 24 (so 25, 26 stayed locked) | 84 | 50 + 10 |
+| 8104 | 25 | 22 | 73 | 58 + 11 |
+| 8105 | 22 | 17, 19, 22, 26 | 110 | 52 + 10 |
+
+120 of 130 levels (the 2026-10-07 final: 79). Every seed cleared the main campaign (level 11 in 1–2 attempts,
+level 12 in 1–3), and elite stages 13–16, 18, 20, 21 and 23 were won on every seed. Level 22 (Fungal Forest) is
+still the hardest: only seed 8101 won it (on its 2nd attempt); the level's 10-plan portfolio wins on about 14%
+(7/50) of the training seeds.
+
+**Video:** seed 8101's winning game of every level, re-played by the same networks with rendering on, each verified
+to reach exactly the final run's end state (SHA256), 26/26. Highlights (2.8 min):
+[`media/kingdom-rush-ml-agent_seed8101_highlights.mp4`](media/kingdom-rush-ml-agent_seed8101_highlights.mp4);
+the full game (77 min, about 5.6–10× game speed) and a 4× cut (19 min): [GitHub release v2.0](../../releases/tag/v2.0). Captions name each level with the game's own English
+and Chinese titles.
+
+**What changed** (details in [`docs/DEV-LOG.zh-CN.md`](docs/DEV-LOG.zh-CN.md)):
+
+* **Project rule: the agent's action set should match a human Steam player's, no more and no less (remaining gaps
+  below and under Limitations).** A read-only audit listed 32 things a
+  human Steam player can do and compared each with the agent
+  ([`docs/elite/human-capability-audit-2026-10-10.md`](docs/elite/human-capability-audit-2026-10-10.md), Chinese).
+  From it:
+  * all **13 heroes** (the hero room unlocks the 7 others by campaign progress; verified natively; no purchases). Shop
+    items stay unused: on the Steam desktop build the shop and item bag are unreachable for players;
+  * **a human campaign route:** when every plan of a main level has lost, the agent first replays earlier levels
+    for stars and plays the open Heroic/Iron challenges, then retries with the extra upgrades. In a rehearsal this
+    rescued a campaign at level 12 (27 → 42 stars, then a win);
+  * **human-timed trap clicks:** a tower held by Vez'nan (level 12) is clicked only inside the game's own click
+    window, one tap every 9 ticks (0.15 s at the game's 60 ticks per second), as a quick human does. On train seeds
+    1111–1120 (never used for level-12 search or training) this raised the plan executor's level-12 wins from 54/80
+    to 80/80 with the same 8 plans (73/80 in an earlier run that also had the early-wave menu on);
+  * **early wave calls with enemies on the field** were implemented and measured but *not* used: they lowered the
+    existing plans' level-11 wins (38/70 → 30/70; 2/70 for plans that call every flag). Free spell targets, hero
+    movement and rally points on main levels are left for later.
+* **Search:** five new search runs on training seeds. Elite stages 21 and 22 had collapsed onto one losing opening
+  each (e.g. 1,041 of 1,276 level-22 plans opened with the same mage tower); restarting them from random populations,
+  then warm-starting from the best, produced the first wins on both. Best validated plans: level 20 18/20,
+  level 21 16/20, level 22 2/20 (validation on 20 other training seeds).
+* **Operators:** the main network was retrained with the new level-11 plans, all 8 (unchanged) level-12 plans and
+  human-timed clicks (train seeds 1111–1120, not used to train any operator: level 11 35/70, level 12 79/80,
+  levels 1–10 99/100, the one loss being a level-6 game the plan executor also lost); the elite network with the
+  new heroes and plans plus DAgger (train seeds 1121–1127, not used to train any operator: 193 elite and 127
+  challenge wins, vs 198 and 125 for the plan executor it imitates). Levels 11 and 20–22 had been searched or validated
+  on these seeds, see Verification.
+
+**The 8B strategy model's contribution, measured.** The final's configuration was rehearsed twice on evaluation
+seeds 7101–7105, once with the 8B model choosing plans and star upgrades and once with fixed rules instead
+(everything else identical): **123 vs 122 of 130 levels**. The single difference (level 26 of seed 7104, same plan
+for both) was a close game: the two campaigns had already diverged in stars (63 for the 8B side, 66 for the rule
+side; maxing every upgrade costs 65), so the rule side maxed every upgrade and lost, while the 8B side could not
+afford the last reinforcement level and won with 1 life left. So in this agent the 8B model's measured
+contribution is about zero; the capability comes from the searched plans, the operator networks (which make every
+in-game decision) and the campaign route. Giving the language model decisions that need judgement is future work.
+
+**Verification:**
+* all 399 final games re-executed by the same networks: identical traces and end states; all 745 8B decisions
+  asked again: identical prompts and choices (maximum probability difference 0.0);
+* a read-only adversarial audit after the final (15 agents, 38 checks, all passed; nine minor caveats, none
+  affecting the result: [`final-audit.json`](runtime/rl/elite-v2/final-artifacts/verification/final-audit.json)).
+  Two worth stating here: the train seeds used to choose between operator networks (1111–1127) had all been used
+  by plan searches (as search or validation seeds) for levels 11 and 20–22, so the win rates quoted at selection time for those levels are
+  optimistic (the final seeds were never used anywhere before); and no game is entered through the game's menus:
+  before each game the harness writes a save slot from the run's own earned progress (stars, won challenges,
+  star upgrades and the chosen hero), then starts the game with its launch flags (`-level/-mode/-diff`) on Normal.
+  Every level, mode, hero and upgrade used had been earned (audit: 0 violations in 399 games), so this is the
+  equivalent of picking the level on the map, not a way around unlocks, though strictly it bypasses the menus;
+* `verify_evidence.py` checks V1–V8 (journals, one-shot ledger entry, pinned files, the recomputed 120/130 and
+  8101's 26/26, seed isolation across all phases, the re-execution / replay / video records, and the ablation
+  counts). Evidence: [`runtime/rl/elite-v2/`](runtime/rl/elite-v2/).
+
+**Correction to the 2026-10-06 video:** its captions give speeds of "≈8–20×", computed with 30 game ticks per
+second; the game runs 60 ticks per second, so the replay runs at about 4–10× game speed.
 
 ## Elite stages (2026-10-07)
 
@@ -94,7 +185,9 @@ python verify_evidence.py
 
 This checks every hash-chained journal, that the one-shot final job was frozen on exactly the published code and
 configuration, recomputes the 5/5 result from the attempt records, and confirms the final seeds appear in no
-other run; it does the same for the elite-stage final (and checks its re-execution and strategy-replay records).
+other run; it does the same for the 2026-10-07 elite-stage final (and checks its re-execution and strategy-replay
+records), and runs checks V1–V8 on the 2026-10-11 final (the recomputed 120/130 and seed 8101's 26/26, seed
+isolation across all phases, the re-execution, replay and video records, and the 123 vs 122 ablation counts).
 Expected output ends with `ALL CHECKS PASSED`.
 
 ## What the agent is
@@ -114,8 +207,9 @@ Expected output ends with `ALL CHECKS PASSED`.
             └────────────────────────────────────────────────────────────────────┘
 ```
 
-* **Plans** come from an evolutionary search (steady-state genetic algorithm, 20,794 games over 22 search runs) on
-  the 10 *training* seeds only, scored over several seeds for the hard levels and validated on others. Each level
+* **Plans** come from an evolutionary search (steady-state genetic algorithm; 158,928 games over 40 search runs:
+  22 runs / 20,794 games for the main campaign, 13 / 69,564 in the 2026-10-07 elite phase, 5 / 68,570 in the
+  2026-10-11 phase) on *training* seeds only, scored over several seeds for the hard levels and validated on others. Each level
   gets a small retry portfolio of plans chosen to cover different seeds.
 * **The 8B model is not fine-tuned** in the final agent. It scores the legal options of each strategic choice;
   each menu is scored in every cyclic order and averaged, because the raw model strongly prefers option "B".
@@ -173,9 +267,12 @@ The full development log (Chinese) is in [`docs/DEV-LOG.zh-CN.md`](docs/DEV-LOG.
 * It is not an end-to-end reinforcement-learning policy: plans come from evolutionary search, the operator is
   trained by imitation, and the 8B model is used zero-shot.
 * Observations come from the game's internal state (through the RPC host), not from pixels.
-* Elite stages: 13, 20, 21, 22 and 26 were not won in the final; main level 11 is the weakest link of the
-  campaign. Heroic/Iron challenges are played only as a source of upgrade stars (not all of them are won).
-* Normal difficulty only; the six heroes available without purchases.
+* Elite stages (2026-10-11 final): level 22 was won on 1 of 5 seeds; levels 17, 19, 24 and 26 were each lost on
+  one seed, and on seed 8103 levels 25 and 26 stayed locked (never played) after level 24 was lost. Heroic/Iron challenges are played only as a source of upgrade stars (not all of them are won).
+* Normal difficulty only; the heroes the game's hero room offers by campaign progress (all 13 from level 12 on),
+  no purchases or shop items.
+* Spells and reinforcements target only the leading enemies; the hero is not moved during a level; early wave
+  calls with enemies on the field are implemented but unused (see above).
 
 ## Reproducing
 
@@ -193,13 +290,16 @@ No game files are included in this repository. The strategy brain needs the 8B m
 
 ## Redactions
 
-The authorization messages quoted from the project owner's chat, local user-name paths and the name of an
-unrelated private project were removed from some text files before publishing. Every such file is listed in
-[`runtime/rl/campaign-v1/REDACTIONS.json`](runtime/rl/campaign-v1/REDACTIONS.json) and
-[`runtime/rl/elite-v1/REDACTIONS.json`](runtime/rl/elite-v1/REDACTIONS.json) with its published SHA256 and, for
+Text quoted from the project owner's chat messages (authorizations, requests and other remarks), local user-name
+paths and scratch directories, and the name of an unrelated private project were
+removed from some text files before publishing. Every such file is listed in
+[`runtime/rl/campaign-v1/REDACTIONS.json`](runtime/rl/campaign-v1/REDACTIONS.json),
+[`runtime/rl/elite-v1/REDACTIONS.json`](runtime/rl/elite-v1/REDACTIONS.json) and
+[`runtime/rl/elite-v2/REDACTIONS.json`](runtime/rl/elite-v2/REDACTIONS.json) with its published SHA256 and, for
 files pinned by a frozen job, its original SHA256 (the hash that job used). Hash-chained journals were not modified. The code tree has moved on
-since the main-campaign result; the files that result's job pinned are kept in
-[`runtime/rl/campaign-v1/pinned-snapshot/`](runtime/rl/campaign-v1/pinned-snapshot/).
+since the earlier results; the files their jobs pinned are kept in
+[`runtime/rl/campaign-v1/pinned-snapshot/`](runtime/rl/campaign-v1/pinned-snapshot/) and
+[`runtime/rl/elite-v1/pinned-snapshot/`](runtime/rl/elite-v1/pinned-snapshot/).
 
 ## License and notices
 

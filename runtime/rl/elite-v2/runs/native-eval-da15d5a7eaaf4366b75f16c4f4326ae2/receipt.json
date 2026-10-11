@@ -1,0 +1,18 @@
+{
+  "config_sha256": "7adee18f962155609c82d249208b4e5d723933db8b126b86f51abc8e1e655294",
+  "error": null,
+  "games_played": 490,
+  "job_kind": "native-eval",
+  "ledger_close_sha256": "e8216987644bb10f02033be4b2b2e6f345df89d58247226e2cc13636638e73af",
+  "ledger_open_sha256": "4b845922f5de53ce4a2b600306569ef7b2bacec180bacc1509c25e57d2b94870",
+  "max_games": 500,
+  "meaning": "Process/budget receipt only; the job must verify its own result",
+  "phase_id": "elite-v2",
+  "pins_sha256": "c4d7891e2c5cd55788d1cbea83d873d2b1ebf95bbf612d9f6e8190a2e3509971",
+  "pools_sha256": "8e6d71490ec69e665cfcd782cd9c4c622da38f81fe49e1a4c29b4e1911766682",
+  "run_id": "native-eval-da15d5a7eaaf4366b75f16c4f4326ae2",
+  "schema_version": 1,
+  "status": "ok",
+  "verified": false,
+  "wall_seconds": 864.2820000000065
+}

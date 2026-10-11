@@ -1,0 +1,241 @@
+{
+  "action_scope": "v3",
+  "engine": {
+    "exe_sha256": "9e64ef21523a1bf52418fc8c85cac83a52dd53a5bd41ab3936166b4fa5b621ac",
+    "host_copy_sha256": "9383decc9008d28f364619cd9e5c6e1580f7ba88b530dc90044cdb5eabc9454f",
+    "manifest_sha256": "76151a8bf1acf8b7cde382b50f3447257aba7f04cc3c9006e54bdf0a52dfb50a",
+    "recipe_sha256": "8e06a59561d8c50eeaf5341aec8ebcab72aa1d06d135b239748d889a4db6c72c"
+  },
+  "episode_errors": [],
+  "episodes_journal": {
+    "engine_replay_verified": false,
+    "entries": 180,
+    "integrity_verified": true,
+    "tip_sha256": "194ff47a400bcb2f3d6255a029279850bb40c9ab4a48021e4680b80740f60f73"
+  },
+  "games_played": 180,
+  "optimizer_steps": 0,
+  "players": [
+    "operator"
+  ],
+  "results": {
+    "operator": {
+      "1": {
+        "games": 10,
+        "lives": [
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20
+        ],
+        "wins": 10
+      },
+      "10": {
+        "games": 10,
+        "lives": [
+          18,
+          16,
+          17,
+          18,
+          18,
+          19,
+          17,
+          15,
+          19,
+          19
+        ],
+        "wins": 10
+      },
+      "11": {
+        "games": 70,
+        "lives": [
+          14,
+          12,
+          13,
+          13,
+          4,
+          11,
+          6,
+          15,
+          8,
+          3,
+          18,
+          16,
+          2,
+          2,
+          9,
+          5,
+          12,
+          9,
+          15,
+          13,
+          16,
+          1,
+          16,
+          5,
+          1,
+          10,
+          3,
+          9,
+          9,
+          9,
+          10,
+          9,
+          7,
+          13,
+          6
+        ],
+        "wins": 35
+      },
+      "12": {
+        "games": 10,
+        "lives": [
+          15,
+          16,
+          14,
+          19,
+          16
+        ],
+        "wins": 5
+      },
+      "2": {
+        "games": 10,
+        "lives": [
+          20,
+          20,
+          20,
+          20,
+          20,
+          18,
+          20,
+          19,
+          19,
+          20
+        ],
+        "wins": 10
+      },
+      "3": {
+        "games": 10,
+        "lives": [
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20,
+          20
+        ],
+        "wins": 10
+      },
+      "4": {
+        "games": 10,
+        "lives": [
+          18,
+          18,
+          19,
+          13,
+          12,
+          16,
+          12,
+          10,
+          11,
+          17
+        ],
+        "wins": 10
+      },
+      "5": {
+        "games": 10,
+        "lives": [
+          15,
+          20,
+          18,
+          20,
+          18,
+          14,
+          20,
+          19,
+          19,
+          20
+        ],
+        "wins": 10
+      },
+      "6": {
+        "games": 10,
+        "lives": [
+          20,
+          14,
+          17,
+          19,
+          11,
+          12,
+          20,
+          20,
+          20,
+          18
+        ],
+        "wins": 10
+      },
+      "7": {
+        "games": 10,
+        "lives": [
+          20,
+          17,
+          20,
+          19,
+          19,
+          18,
+          19,
+          18,
+          20,
+          19
+        ],
+        "wins": 10
+      },
+      "8": {
+        "games": 10,
+        "lives": [
+          20,
+          14,
+          12,
+          7,
+          18,
+          14,
+          15,
+          13,
+          10,
+          18
+        ],
+        "wins": 10
+      },
+      "9": {
+        "games": 10,
+        "lives": [
+          20,
+          17,
+          20,
+          20,
+          20,
+          19,
+          20,
+          19,
+          20,
+          16
+        ],
+        "wins": 10
+      }
+    }
+  },
+  "rng_mode": "isolate_sound+stable_pairs",
+  "run_id": "native-eval-57681a8031804b73b46c5c508a35eab9",
+  "schema": "alpharush-eval-v1",
+  "stopped_reason": null
+}

@@ -4,6 +4,8 @@
 
 *Kingdom Rush* is a game by Ironhide Game Studio. This repository is an independent research project, not affiliated with or endorsed by Ironhide, and contains no game files, assets or game source code. To run anything, use your own legally obtained copy of the game; the engine builder reads it from your local install.
 
+The videos (`media/` and the GitHub releases) are muted screen recordings of the agent's own games, made to document the results; the game artwork visible in them is © Ironhide Game Studio.
+
 ## Lumi_Nox (MIT)
 
 The engine host of this project builds on the in-game TCP bridge `games/kingdom_rush/bridge.lua` of [Lumi_Nox](https://github.com/MIO-456/Lumi_Nox) (commit 77f973431c49f5ab72d3b2501c0e89286997ec46), which is not redistributed here; clone it to `./Lumi_Nox`. Its license:

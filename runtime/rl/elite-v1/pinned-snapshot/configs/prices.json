@@ -1,0 +1,14 @@
+{
+  "templates": {
+    "tower_archer_1": 70,
+    "tower_barrack_1": 70,
+    "tower_mage_1": 100,
+    "tower_engineer_1": 125
+  },
+  "build_templates": {
+    "archer": "tower_archer_1",
+    "barrack": "tower_barrack_1",
+    "mage": "tower_mage_1",
+    "engineer": "tower_engineer_1"
+  }
+}

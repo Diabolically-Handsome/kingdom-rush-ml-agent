@@ -1,5 +1,5 @@
 {
- "note": "Files changed only by redaction. original_sha256 (listed for pinned files only) is the file as the frozen jobs used it (pins.json/ledger reference the originals); published_sha256 is the file here (for pinned code, the copy in pinned-snapshot/). Hash-chained journals are unmodified.",
+ "note": "Files changed only by redaction. original_sha256 (listed for pinned files only) is the file as the frozen jobs used it (pins.json/ledger reference the originals); published_sha256 is the file as published with the campaign-v1 result (for pinned code, the copy in pinned-snapshot/, which does not change); files that are not pinned may have been updated since, and their current hashes are in the latest phase's REDACTIONS.json. Hash-chained journals are unmodified.",
  "files": [
   {
    "path": "DEPLOYMENT.md",

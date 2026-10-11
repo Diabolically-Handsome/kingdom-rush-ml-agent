@@ -40,7 +40,14 @@ HERO_TEXT = {"hero_gerald": "Gerald Lightseeker (sturdy paladin, blocks melee en
              "hero_malik": "Malik Hammerfury (melee, area stun smash)",
              "hero_bolin": "Bolin Farslayer (rifleman, tar bombs and mines)",
              "hero_magnus": "Magnus Spellbane (mage, creates illusions, arcane rain)",
-             "hero_ignus": "Ignus (fire elemental, area fire damage)"}
+             "hero_ignus": "Ignus (fire elemental, area fire damage)",
+             "hero_denas": "King Denas (throws barrels and bottles, boosts nearby towers, calls a catapult barrage)",
+             "hero_elora": "Elora (ranged frost mage, ice bolts slow or freeze enemies, ice spikes)",
+             "hero_ingvar": "Ingvar (viking, melee, calls ancestor warriors, turns into a regenerating bear)",
+             "hero_hacksaw": "Hacksaw (dwarf in a war machine, melee, throws saw blades)",
+             "hero_oni": "Oni (samurai demon slayer, melee, area sword strikes, unharmed by demons' death blasts)",
+             "hero_thor": "Thor (melee, chain lightning and a stunning thunderclap)",
+             "hero_10yr": "the anniversary fire hero (fireballs, fire bombs, stuns nearby enemies)"}
 KIND_NAME = {"archer": "archer", "barrack": "barracks", "mage": "mage", "engineer": "artillery"}
 SYSTEM = ("You are the strategy brain of an agent playing Kingdom Rush (2011) through the main campaign on Normal "
           "difficulty, starting from a new save and playing levels in order. You make only strategic choices; a "
@@ -113,7 +120,9 @@ def describe_plan(genome, evidence=None):
             + ", ".join(f"{counts[k]} {KIND_NAME[k]}" for k in KINDS if counts[k])
             + f"; {upgrades} planned upgrades, {skills} special-skill purchases; level-4 choices: {branches}; "
             + f"spells when the leading enemy has covered {genome['cast']}% of its path; "
-            + ("calls the next wave early when the field is clear" if genome["early"] else "lets waves come on their own")
+            + ("calls each next wave as soon as its flag shows (unless an enemy is near the exit)" if genome["early"] == 2
+               else "calls the next wave early when the field is clear" if genome["early"]
+               else "lets waves come on their own")
             + "; after the plan, keeps building archer:barracks:mage:artillery at "
             + ":".join(genome.get("ratio", "3111"))
             + ("; saves spells for the boss" if genome.get("boss") else "")

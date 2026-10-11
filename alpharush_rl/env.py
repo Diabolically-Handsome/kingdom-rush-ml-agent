@@ -150,6 +150,7 @@ class NativeEnv:
             scoped["mode"] = mode  # a Heroic (2) or Iron (3) challenge; campaign calls stay unchanged
         self.mode = mode
         self.profile = profile
+        self.action_ticks = dict(ACTION_TICKS)  # an episode protocol may shorten the click step (click_ticks)
         self.worker = Worker(seed=seed, level=level, port=port, difficulty=difficulty, identity=identity,
                              rng_mode=rng_mode, **scoped)
         self.action_scope = action_scope
@@ -215,7 +216,7 @@ class NativeEnv:
             reply = self.worker.rpc(**action)
             if reply.get("type") != "ok":
                 raise RuntimeError(f"Native action rejected: {reply}")
-            after = self.advance(ACTION_TICKS.get(name, 2), record_plan=False)
+            after = self.advance(self.action_ticks.get(name, 2), record_plan=False)
             if name == "build_tower":
                 holder = next(h for h in before["holders"] if h["id"] == action["holder_id"])
                 towers = [t for t in after["towers"] if str(t["holder_id"]) == str(holder["mesh_id"])]

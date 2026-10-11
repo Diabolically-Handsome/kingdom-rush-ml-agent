@@ -19,10 +19,14 @@ BUY_PRIORITY = ("rain", "archers", "mages", "barracks", "engineers", "reinforcem
 # Every hero the slot template carries (a new save lists each with no xp and no skills).
 HERO_NAMES = ("hero_10yr", "hero_alleria", "hero_bolin", "hero_denas", "hero_elora", "hero_gerald",
               "hero_hacksaw", "hero_ignus", "hero_ingvar", "hero_magnus", "hero_malik", "hero_oni", "hero_thor")
-# Heroes a new desktop save can select without purchases, and the level from which the hero room
-# offers each (map_data hero_data.available_level: a level N campaign has N levels unlocked).
+# Heroes the desktop hero room offers, and the level from which it offers each (kr1-desktop map_data
+# hero_data.available_level: a level N campaign has N levels unlocked). The hero room gates a hero only by that
+# level (screen_map HeroRoomViewKR1); the desktop build has no purchase for heroes (features.lua: no in-app service;
+# hero_data has no price). The seven heroes at level 12 were natively verified on 2026-10-10 to load as the
+# selected hero and take the field (elite-v1 used only the first six).
 FREE_HEROES = {"hero_gerald": 4, "hero_alleria": 6, "hero_malik": 8, "hero_bolin": 8, "hero_magnus": 9,
-               "hero_ignus": 11}
+               "hero_ignus": 11, "hero_denas": 12, "hero_elora": 12, "hero_ingvar": 12, "hero_hacksaw": 12,
+               "hero_oni": 12, "hero_thor": 12, "hero_10yr": 12}
 VERSION_STRING = "kr1-desktop-6.4.46"
 CAMPAIGN_MODE, NORMAL = 1, 2
 # A 3-star campaign level's Heroic (6 waves) and Iron (1 wave) challenges, 1 life each (the map keeps both tabs

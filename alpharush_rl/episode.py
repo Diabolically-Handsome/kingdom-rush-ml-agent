@@ -52,6 +52,9 @@ class EpisodeProtocol:
     # A wait-only menu forgets the last decided option set, so options that come
     # back after a gap (e.g. the next wave_ready) are asked about again.
     reset_on_trivial_menu: bool = True
+    # A pending click (boss finishing tap, tower trap) is decided at once and each click advances this many
+    # ticks (a human taps a few times a second); None keeps the old 30-tick click step and decision rule.
+    click_ticks: int | None = None
 
     def __post_init__(self):
         if not isinstance(self.name, str) or not self.name:
@@ -62,6 +65,8 @@ class EpisodeProtocol:
         deadline = self.first_wave_deadline_ticks
         if deadline is not None and not _positive_int(deadline):
             raise ValueError("first_wave_deadline_ticks must be None or a positive integer")
+        if self.click_ticks is not None and not _positive_int(self.click_ticks):
+            raise ValueError("click_ticks must be None or a positive integer")
         if not isinstance(self.reset_on_trivial_menu, bool):
             raise ValueError("reset_on_trivial_menu must be a boolean")
 
@@ -183,6 +188,8 @@ def run_episode(env, policy: Policy, protocol: EpisodeProtocol, *, seed: int, le
     # Option set and tick of the last decision. A non-trivial menu never equals
     # the empty set, so the first one is always a decision event.
     decided_keys, decided_tick = frozenset(), None
+    if protocol.click_ticks and isinstance(getattr(env, "action_ticks", None), dict):
+        env.action_ticks["click_entity"] = protocol.click_ticks
     while True:
         check()
         state = env.state
@@ -206,6 +213,8 @@ def run_episode(env, policy: Policy, protocol: EpisodeProtocol, *, seed: int, le
             decided_keys = frozenset()
         due = bool(option_keys) and (option_keys != decided_keys
                                      or tick - decided_tick >= protocol.max_interval_ticks)
+        if protocol.click_ticks and any(item["action"].get("action") == "click_entity" for item in menu[1:]):
+            due = True  # a tap the game is waiting for: a human does not wait for the menu to change
         if not due:
             void_reason = _act(env, wait, tick)
             if void_reason:

@@ -1,0 +1,15 @@
+{
+  "seed": 0,
+  "hidden_size": 16,
+  "steps": 10,
+  "learning_rate": 0.003,
+  "max_grad_norm": 1.0,
+  "beta_fork": 0.03,
+  "beta_anchor": 0.03,
+  "hard_fork_mean_kl": 0.05,
+  "hard_train_p90_kl": 0.10,
+  "hard_anchor_mean_kl": 0.05,
+  "entropy_reference_fraction": 0.5,
+  "learncheck_min_delta": 0.000001,
+  "stop_file": "runtime/rl/STOP"
+}
