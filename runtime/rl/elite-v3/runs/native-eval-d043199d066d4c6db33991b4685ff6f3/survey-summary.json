@@ -1,0 +1,249 @@
+{
+  "action_scope": "v4",
+  "engine": {
+    "exe_sha256": "3fa71b3ee5431b02b0e6944dec39209fe3f0229431291013a0a5a803dc56eb81",
+    "host_copy_sha256": "1c2cc0ecd518930157f79bc89c72f638a853168f88b40a87bf049031318795d5",
+    "manifest_sha256": "f4c5ac958ff7824e7416874ed12e1b69211c7cd47f6dd260938c50bb9edd19aa",
+    "recipe_sha256": "8e06a59561d8c50eeaf5341aec8ebcab72aa1d06d135b239748d889a4db6c72c"
+  },
+  "episode_errors": [],
+  "episodes_journal": {
+    "engine_replay_verified": false,
+    "entries": 224,
+    "integrity_verified": true,
+    "tip_sha256": "2503c09d69c6bf916909cbe9fa33173a6bdae5a21aebb8dca7c96e76f2b6158a"
+  },
+  "games_played": 224,
+  "optimizer_steps": 0,
+  "players": [
+    "cmd_steady",
+    "cmd_rule",
+    "cmd_random",
+    "cmd_placebo"
+  ],
+  "results": {
+    "cmd_placebo": {
+      "15": {
+        "games": 8,
+        "lives": [],
+        "wins": 0
+      },
+      "17": {
+        "games": 8,
+        "lives": [
+          3,
+          14,
+          16,
+          12
+        ],
+        "wins": 4
+      },
+      "19": {
+        "games": 8,
+        "lives": [],
+        "wins": 0
+      },
+      "20": {
+        "games": 8,
+        "lives": [
+          12,
+          12,
+          11,
+          8,
+          12,
+          12,
+          8,
+          10
+        ],
+        "wins": 8
+      },
+      "21": {
+        "games": 8,
+        "lives": [],
+        "wins": 0
+      },
+      "22": {
+        "games": 8,
+        "lives": [],
+        "wins": 0
+      },
+      "26": {
+        "games": 8,
+        "lives": [],
+        "wins": 0
+      }
+    },
+    "cmd_random": {
+      "15": {
+        "games": 8,
+        "lives": [
+          2
+        ],
+        "wins": 1
+      },
+      "17": {
+        "games": 8,
+        "lives": [
+          3
+        ],
+        "wins": 1
+      },
+      "19": {
+        "games": 8,
+        "lives": [],
+        "wins": 0
+      },
+      "20": {
+        "games": 8,
+        "lives": [
+          9,
+          7,
+          7
+        ],
+        "wins": 3
+      },
+      "21": {
+        "games": 8,
+        "lives": [],
+        "wins": 0
+      },
+      "22": {
+        "games": 8,
+        "lives": [],
+        "wins": 0
+      },
+      "26": {
+        "games": 8,
+        "lives": [],
+        "wins": 0
+      }
+    },
+    "cmd_rule": {
+      "15": {
+        "games": 8,
+        "lives": [
+          4,
+          4
+        ],
+        "wins": 2
+      },
+      "17": {
+        "games": 8,
+        "lives": [
+          7,
+          3,
+          7,
+          7,
+          1
+        ],
+        "wins": 5
+      },
+      "19": {
+        "games": 8,
+        "lives": [],
+        "wins": 0
+      },
+      "20": {
+        "games": 8,
+        "lives": [
+          9,
+          15,
+          14,
+          18,
+          5,
+          5
+        ],
+        "wins": 6
+      },
+      "21": {
+        "games": 8,
+        "lives": [],
+        "wins": 0
+      },
+      "22": {
+        "games": 8,
+        "lives": [],
+        "wins": 0
+      },
+      "26": {
+        "games": 8,
+        "lives": [
+          1
+        ],
+        "wins": 1
+      }
+    },
+    "cmd_steady": {
+      "15": {
+        "games": 8,
+        "lives": [
+          9,
+          20,
+          10
+        ],
+        "wins": 3
+      },
+      "17": {
+        "games": 8,
+        "lives": [
+          8,
+          13,
+          5
+        ],
+        "wins": 3
+      },
+      "19": {
+        "games": 8,
+        "lives": [
+          5,
+          8,
+          11,
+          14
+        ],
+        "wins": 4
+      },
+      "20": {
+        "games": 8,
+        "lives": [
+          12,
+          12,
+          12,
+          4,
+          5,
+          1,
+          7
+        ],
+        "wins": 7
+      },
+      "21": {
+        "games": 8,
+        "lives": [
+          5,
+          1,
+          4,
+          1
+        ],
+        "wins": 4
+      },
+      "22": {
+        "games": 8,
+        "lives": [
+          12,
+          3
+        ],
+        "wins": 2
+      },
+      "26": {
+        "games": 8,
+        "lives": [
+          3
+        ],
+        "wins": 1
+      }
+    }
+  },
+  "rng_mode": "isolate_sound+stable_pairs",
+  "run_id": "native-eval-d043199d066d4c6db33991b4685ff6f3",
+  "schema": "alpharush-eval-v1",
+  "stopped_reason": null
+}

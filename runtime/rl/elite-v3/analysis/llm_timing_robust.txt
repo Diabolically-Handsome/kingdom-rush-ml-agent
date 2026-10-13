@@ -1,0 +1,3 @@
+rule         detrended cov +0.001730 (z +0.38) perm p 0.3437 | raw cov won +0.03130 lost +0.00751 | signal~t corr 0.29
+timing_8b    detrended cov -0.000185 (z -0.34) perm p 0.6173 | raw cov won +0.00528 lost +0.00204 | signal~t corr 0.519
+timing_24b   detrended cov -0.000378 (z -1.57) perm p 0.9416 | raw cov won +0.00153 lost +0.00014 | signal~t corr 0.423

@@ -382,6 +382,8 @@ class CheckFreezeRunTests(TempWorkspace):
         self.assertTrue(any("declares no replay_fraction" in i for i in self.check()[1]["issues"]))
         self.assertFalse((self.state / "ledger.jsonl").exists())
 
+    @unittest.skipUnless((WORKSPACE / "runtime/rl/native-validation/branches.json").exists(),
+                         "needs the historic native-validation evidence, which is not published")
     def test_real_campaign_run_list_is_the_approved_plan(self):
         plan = SURVEY.plan_survey(REAL_PHASE)  # reads only the shipped config, pools and historic evidence
         self.assertEqual([], plan["issues"])
@@ -933,7 +935,7 @@ class JobActionScopeTests(TempWorkspace):
         for scope in ("v9", "", None, "V2", 2):
             with self.subTest(scope=scope):
                 _, issues = SURVEY.check_run_list([item(1001)], self.pools, None, "", scope)
-                self.assertEqual([f"action_scope {scope!r} is not one of ['v1', 'v2', 'v3']"], issues)
+                self.assertEqual([f"action_scope {scope!r} is not one of ['v1', 'v2', 'v3', 'v4']"], issues)
                 ctx, factory = self.context(), ScopeFactory()
                 with self.assertRaisesRegex(GateRefused, "action_scope"):
                     self.run_loop([item(1001)], ctx, factory, action_scope=scope)

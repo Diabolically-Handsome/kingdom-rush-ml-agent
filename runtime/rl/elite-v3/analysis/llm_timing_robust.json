@@ -1,0 +1,26 @@
+{
+ "rule": {
+  "detrended_cov": 0.00173,
+  "z": 0.38,
+  "perm_p": 0.3437,
+  "raw_cov_won_games": 0.031298,
+  "raw_cov_lost_games": 0.007506,
+  "mean_within_game_corr_with_t": 0.29
+ },
+ "timing_8b": {
+  "detrended_cov": -0.000185,
+  "z": -0.34,
+  "perm_p": 0.6173,
+  "raw_cov_won_games": 0.005277,
+  "raw_cov_lost_games": 0.002041,
+  "mean_within_game_corr_with_t": 0.519
+ },
+ "timing_24b": {
+  "detrended_cov": -0.000378,
+  "z": -1.57,
+  "perm_p": 0.9416,
+  "raw_cov_won_games": 0.001529,
+  "raw_cov_lost_games": 0.000142,
+  "mean_within_game_corr_with_t": 0.423
+ }
+}

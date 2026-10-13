@@ -1,0 +1,45 @@
+
+Loading weights:   0%|          | 0/531 [00:00<?, ?it/s]
+Loading weights:   0%|          | 1/531 [00:00<01:41,  5.24it/s]
+Loading weights:   0%|          | 2/531 [00:00<04:20,  2.03it/s]
+Loading weights:   1%|          | 4/531 [00:01<02:25,  3.63it/s]
+Loading weights:   2%|▏         | 13/531 [00:01<00:33, 15.61it/s]
+Loading weights:   5%|▌         | 28/531 [00:01<00:13, 37.75it/s]
+Loading weights:   8%|▊         | 42/531 [00:01<00:08, 56.42it/s]
+Loading weights:  11%|█         | 59/531 [00:01<00:05, 79.20it/s]
+Loading weights:  14%|█▍        | 76/531 [00:01<00:04, 98.65it/s]
+Loading weights:  17%|█▋        | 91/531 [00:01<00:03, 111.11it/s]
+Loading weights:  20%|█▉        | 105/531 [00:01<00:03, 116.59it/s]
+Loading weights:  23%|██▎       | 122/531 [00:02<00:03, 129.55it/s]
+Loading weights:  26%|██▌       | 137/531 [00:02<00:02, 134.41it/s]
+Loading weights:  29%|██▊       | 152/531 [00:02<00:02, 135.90it/s]
+Loading weights:  31%|███▏      | 167/531 [00:02<00:02, 138.80it/s]
+Loading weights:  35%|███▍      | 184/531 [00:02<00:02, 145.14it/s]
+Loading weights:  37%|███▋      | 199/531 [00:02<00:02, 145.48it/s]
+Loading weights:  40%|████      | 214/531 [00:02<00:02, 143.35it/s]
+Loading weights:  44%|████▎     | 231/531 [00:02<00:02, 144.57it/s]
+Loading weights:  47%|████▋     | 248/531 [00:02<00:01, 150.67it/s]
+Loading weights:  50%|████▉     | 265/531 [00:02<00:01, 151.89it/s]
+Loading weights:  53%|█████▎    | 281/531 [00:03<00:01, 151.44it/s]
+Loading weights:  56%|█████▌    | 297/531 [00:03<00:01, 148.83it/s]
+Loading weights:  65%|██████▍   | 343/531 [00:03<00:00, 236.47it/s]
+Loading weights:  86%|████████▌ | 456/531 [00:03<00:00, 492.23it/s]
+Loading weights: 100%|██████████| 531/531 [00:03<00:00, 153.16it/s]
+[transformers] `use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`.
+/home/<user>/alpharush/.venv/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py:1298: UserWarning: torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly. Starting in PyTorch 2.9, calling checkpoint without use_reentrant will raise an exception. use_reentrant=False is recommended, but if you need to preserve the current default behavior, you can pass use_reentrant=True. Refer to docs for more details on the differences between the two variants.
+  return fn(*args, **kwargs)
+step 20: loss 0.6735
+step 40: loss 0.6209
+step 60: loss 0.6320
+step 80: loss 0.6258
+step 100: loss 0.5961
+step 120: loss 0.6315
+step 140: loss 0.5867
+step 160: loss 0.5929
+step 180: loss 0.5513
+step 200: loss 0.6199
+step 220: loss 0.5895
+step 240: loss 0.5782
+[transformers] Calling `crop` with a positive value is deprecated and will be removed in version 5.18. Please use a negative integer to remove that number of tokens from the cache instead.
+holdout after {'examples': 1, 'accuracy': 0.0, 'mean_rank': 4.0}
+{"holdout_before": null, "holdout_after": {"examples": 1, "accuracy": 0.0, "mean_rank": 4.0}, "optimizer_steps": 253, "wall_seconds": 1487.13596534729}

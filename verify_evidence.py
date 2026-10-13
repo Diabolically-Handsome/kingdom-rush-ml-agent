@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""Verify the published evidence: the main-campaign clears (campaign-v1), the elite-stage final (elite-v1) and the
-all-26-levels final of 2026-10-11 (elite-v2).
+"""Verify the published evidence: the main-campaign clears (campaign-v1), the elite-stage final (elite-v1), the
+all-26-levels final of 2026-10-11 (elite-v2) and the language-model commander experiments of 2026-10-11/12 (elite-v3
+and its pre-registered fair re-test elite-v3b; development evidence on train seeds, a null result).
 
 campaign-v1 checks, using only files in this repository (no game needed):
   1. every hash-chained journal (episodes/events/ledger/pins-history) is intact;
@@ -40,8 +41,8 @@ elite-v2 checks (all 26 levels, one-shot final 2026-10-11, seeds 8101-8105):
       each seed starts from an empty save; per seed, levels won (by campaign attempts), stars and challenge wins
       recomputed from the game records match the summary and the published table (26 / 25 / 22 / 25 / 22 = 120 of
       130; seed 8101 wins every level 1-26); Normal difficulty;
-  V5. the final seeds appear in no seed field of any other published JSON run file of any phase, and in no other job of
-      the final configuration; the elite-v2 ledger opened them to no other job (the only other jobs are searches,
+  V5. the final seeds appear in no seed field of any other published JSON run file of campaign-v1, elite-v1 and
+      elite-v2 (C3 covers the elite-v3 run files), and in no other job of the final configuration; the elite-v2 ledger opened them to no other job (the only other jobs are searches,
       collects and evaluations, whose frozen seed gates - the published files, per pins-history - accept train and
       evaluation seeds only, and the two published rehearsals on evaluation seeds); the seed pools mark them as the
       one-shot final seeds;
@@ -52,6 +53,36 @@ elite-v2 checks (all 26 levels, one-shot final 2026-10-11, seeds 8101-8105):
   V8. the brain ablation: the two rehearsals on evaluation seeds 7101-7105 (one with the 8B brain, whose every
       strategy decision names the final's 8B model, one with the rule brain, which logs none) played only plans of the
       final configuration, and their level counts recomputed from the game records are 123 and 122 of 130.
+The code tree has moved on since elite-v2 too: its pinned files (and the seed-gate files of V5) are checked against
+runtime/rl/elite-v2/pinned-snapshot/ (the files as published with that result).
+
+elite-v3 checks (the in-battle language-model commander, development evidence on train seeds 1201-1205, of which
+S1b, the fork pilot and the replay use 1201-1204; the project was archived after it):
+  C1. every elite-v3 hash-chained journal is intact (the fork pilot's 263 MB journal is published as a deterministic
+      gzip; its decompressed bytes match the SHA256 and size recorded in COMPRESSED.json);
+  C2. the elite-v3 ledger opened exactly four jobs, all evaluations (the stopped S1, S1b, the fork pilot, the capture
+      replay), each with a published run directory, under the published seed pools; the published configuration is
+      sealed (every job kind disabled);
+  C3. every game of those runs is on a train seed of the pools; the pools' evaluation (7201-7260) and final
+      (8201-8205) seeds, and every earlier phase's final seeds (6001-6005, 8001-8005, 8101-8105) and elite-v2
+      rehearsal seeds (7101-7105), appear in no seed field of any elite-v3 run file or of the fork journal;
+  C4. S1b (whole games, 4 arms x 56 tasks): wins recomputed per arm are steady 24, rule 14, placebo 12, random 5, and
+      no game was void;
+  C5. the fork pilot: 3,026 terminal games; every branch replays its base game exactly up to the forced consult (at
+      every earlier consult the same tick, prompt hash, offered plays and choice; at the forced consult the same tick,
+      prompt hash and offered plays) and takes the forced play there; the published fork table is recomputed exactly
+      from the two runs;
+  C6. the capture replay reproduces the 56 S1b steady games exactly (trace, end state, outcome; every consult's
+      tick, plays, briefing and prompt hash) and records the screen at every consult;
+  C7. the zero-shot 8B and 24B choice files cover every recorded consult with the recorded prompt hash, and on the
+      985 consults with a choice they pick P1 955 and 937 times;
+  C8. the fair re-test: the files frozen in the pre-registration are published unchanged (or redacted with the frozen
+      original hash); every old-format prompt hashes to the consult's recorded prompt; the parity gate (50 consults
+      per model, identical choices); M1 of every language-model arm and of the cross-fitted fixed ranking recomputed
+      from the model outputs and the fork table equals the published analysis; the pre-registered tiers fail on
+      recomputed values (T2: the primary arm's fold M1 is below half of the fixed ranking's in fold B; T3: the
+      primary arm is below the fixed ranking in both folds; T1 for the 8B: rich minus thin_new is negative), and T1
+      for the 24B fails on the published cluster-bootstrap interval, whose point estimate is recomputed.
 
 usage: python verify_evidence.py
 """
@@ -400,6 +431,7 @@ check(report["decisions"] == report["prompt_equal"] == report["choice_equal"] ==
 
 # ------------------------------------------------------------------ elite-v2
 VV = ROOT / "runtime/rl/elite-v2"
+VSNAPSHOT = VV / "pinned-snapshot"
 VFINAL = VV / "runs/native-final-af081b54e5f54478aa76b24bc02bdbf5"
 VFINAL_SEEDS = [8101, 8102, 8103, 8104, 8105]
 VEXPECTED = {8101: 26, 8102: 25, 8103: 22, 8104: 25, 8105: 22}
@@ -430,8 +462,9 @@ check(vpre.get("job_kind") == "native-final" and vpre.get("pins_sha256") == sha(
       "elite-v2 final job committed to the published elite-v2 pins.json")
 vredactions = {r["path"]: r for r in json.loads((VV / "REDACTIONS.json").read_text(encoding="utf-8"))["files"]}
 vconfig = vredactions.get("configs/phases/elite-v2.json", {})
+VCONFIG_FILE = (VSNAPSHOT if VSNAPSHOT.exists() else ROOT) / "configs/phases/elite-v2.json"
 check(vpre.get("config_sha256") == vconfig.get("original_sha256")
-      and vconfig.get("published_sha256") == sha(ROOT / "configs/phases/elite-v2.json"),
+      and vconfig.get("published_sha256") == sha(VCONFIG_FILE),
       "elite-v2 final job configuration = the original of the published (quote-redacted) configs/phases/elite-v2.json")
 check(vpre.get("pools_sha256") == sha(ROOT / "configs/pools-elite-v2.json"),
       "elite-v2 final job seed pools = published configs/pools-elite-v2.json")
@@ -439,7 +472,7 @@ vpools = json.loads((ROOT / "configs/pools-elite-v2.json").read_text(encoding="u
 vfinal_pool = vpools.get("pools", {}).get("final_campaign_run", {})
 check(sorted(vfinal_pool.get("seeds", [])) == VFINAL_SEEDS and vfinal_pool.get("access") == "one_frozen_evaluation",
       "elite-v2 final seeds 8101-8105 are the pool's one-shot final_campaign_run seeds")
-vjobs = json.loads((ROOT / "configs/phases/elite-v2.json").read_text(encoding="utf-8"))["jobs"]
+vjobs = json.loads(VCONFIG_FILE.read_text(encoding="utf-8"))["jobs"]
 vjob = vjobs["native-final"]
 check(vjob["campaign"]["seeds"] == VFINAL_SEEDS and vjob["campaign"]["levels"] == list(range(1, 27))
       and "start" not in vjob["campaign"] and vjob["campaign"]["policy"] == "operator"
@@ -459,6 +492,8 @@ for rel, digest in sorted(vpins.items()):
         else:
             external.append(rel)
         continue
+    if (VSNAPSHOT / rel).exists():
+        path = VSNAPSHOT / rel
     if not path.exists():
         mismatched.append(rel + " (missing)")
     elif sha(path) == digest:
@@ -568,7 +603,7 @@ for name, job in vjobs.items():
     if name != "native-final" and any(v in VFINAL_SEEDS for v in seed_values(job)):
         leaks.append(f"configs/phases/elite-v2.json job {name}")
 check(not leaks and scanned > 0, f"elite-v2 final seeds appear in no seed field of any other published run file "
-      f"({scanned} files scanned, all phases) or other job" + ("" if not leaks else f": {leaks}"))
+      f"({scanned} files scanned: campaign-v1, elite-v1, elite-v2; C3 covers elite-v3) or other job" + ("" if not leaks else f": {leaks}"))
 other_kinds = {p.get("job_kind") for p in vopens if p.get("run_id") != VFINAL.name}
 rehearsal_ids = {run.name for run, _ in VREHEARSALS.values()}
 campaign_runs = {p.get("run_id") for p in vopens if p.get("job_kind") == "native-campaign"}
@@ -582,7 +617,8 @@ SEED_GATES = ["alpharush_rl/search_job.py", "alpharush_rl/collect_job.py", "alph
               "alpharush_rl/phase.py", "alpharush_rl/pools.py"]
 ungated = [p.get("run_id") for p in vopens if p.get("run_id") != VFINAL.name
            and not ((VV / "runs" / str(p.get("run_id"))).is_dir()
-                    and all(vhistory.get(p.get("preflight", {}).get("pins_sha256"), {}).get(g) == sha(ROOT / g)
+                    and all(vhistory.get(p.get("preflight", {}).get("pins_sha256"), {}).get(g)
+                            == sha((VSNAPSHOT if (VSNAPSHOT / g).exists() else ROOT) / g)
                             for g in SEED_GATES))]
 check(not ungated, f"elite-v2: each of the {len(vopens) - 1} other jobs has a published run directory and ran under a frozen "
       "pins manifest (pins-history.jsonl) whose seed-gate files (search_job, collect_job, eval_job, phase, pools) are "
@@ -658,6 +694,313 @@ for brain, (run, expected_total) in VREHEARSALS.items():
     check(seeds == [7101, 7102, 7103, 7104, 7105] and brain_ok and not foreign and total == expected_total,
           f"rehearsal with the {brain} brain ({len(rdecisions)} logged strategy decisions): evaluation seeds "
           f"7101-7105, only plans of the final configuration ({len(rgames)} games), {total}/130 levels won")
+
+# ------------------------------------------------------------------ elite-v3 (development evidence, null result)
+import atexit  # noqa: E402
+import gzip  # noqa: E402
+import statistics  # noqa: E402
+import tempfile  # noqa: E402
+
+V3 = ROOT / "runtime/rl/elite-v3"
+V3B = ROOT / "runtime/rl/elite-v3b"
+S1STOP, S1B, FORK, REPLAY = ("native-eval-44ebfd934a1c4ffdb8a1928e86cff6a3", "native-eval-d043199d066d4c6db33991b4685ff6f3",
+                             "native-eval-da28d8e25ce443c1b6c4c7f8724de6be", "native-eval-f18114d98c9044228f1fb1d5ae5160a2")
+JOURNAL_NAMES = ("episodes.jsonl", "events.jsonl", "ledger.jsonl", "pins-history.jsonl")
+print("\n== elite-v3: in-battle language-model commander and its fair re-test (train seeds; null result) ==")
+
+# C1. journals (the fork pilot's journal decompressed from its gzip)
+v3_compressed = json.loads((V3 / "COMPRESSED.json").read_text(encoding="utf-8"))["files"]
+v3_paths, gz_ok, temporaries = {}, True, []
+for rel, info in v3_compressed.items():
+    data = gzip.decompress((ROOT / info["published"]).read_bytes())
+    gz_ok &= (hashlib.sha256(data).hexdigest() == info["original_sha256"] and len(data) == info["original_bytes"]
+              and sha(ROOT / info["published"]) == info["gzip_sha256"])
+    handle = tempfile.NamedTemporaryFile(delete=False, suffix=".jsonl")
+    atexit.register(Path(handle.name).unlink, missing_ok=True)  # removed on any exit, error or interrupt
+    handle.write(data)
+    handle.close()
+    temporaries.append(Path(handle.name))
+    v3_paths[rel] = Path(handle.name)
+    del data
+v3_journals = sorted(p for p in V3.rglob("*.jsonl") if p.name in JOURNAL_NAMES) + list(v3_paths.values())
+bad = []
+for path in v3_journals:
+    try:
+        Journal(path).verify()
+    except Exception as exc:  # noqa: BLE001
+        bad.append(f"{path}: {exc}")
+check(gz_ok and not bad, f"elite-v3: {len(v3_journals)} hash-chained journals intact; the compressed fork-pilot journal "
+                         "decompresses to its recorded SHA256 and size" + ("" if not bad else f": {bad}"))
+
+
+def run_journal(run_id):
+    rel = f"runtime/rl/elite-v3/runs/{run_id}/episodes.jsonl"
+    return v3_paths.get(rel, ROOT / rel)
+
+
+def eval_rows(run_id):
+    """The eval_episode payloads of a run, streamed (the fork pilot's journal is large)."""
+    with open(run_journal(run_id), encoding="utf-8") as handle:
+        for line in handle:
+            if '"eval_episode"' in line[:40]:
+                yield json.loads(line)["payload"]
+
+
+# C2. ledger: four evaluation jobs, published runs, pools; sealed configuration
+l3_opens = [r["payload"] for r in rows(V3 / "ledger.jsonl") if r["kind"] == "open"]
+v3_pools_sha = sha(ROOT / "configs/pools-elite-v3.json")
+check(sorted(p.get("run_id") for p in l3_opens) == sorted([S1STOP, S1B, FORK, REPLAY])
+      and all(p.get("job_kind") == "native-eval" for p in l3_opens)
+      and all((V3 / "runs" / p["run_id"]).is_dir() for p in l3_opens)
+      and all(p.get("preflight", {}).get("pools_sha256") == v3_pools_sha for p in l3_opens),
+      "elite-v3 ledger opened exactly four jobs, all native evaluations with published run directories, under the "
+      "published seed pools (no search, collect, campaign or final job)")
+v3_config = json.loads((ROOT / "configs/phases/elite-v3.json").read_text(encoding="utf-8"))
+check(v3_config["jobs"] and all(job.get("enabled") is False for job in v3_config["jobs"].values()),
+      "elite-v3 is sealed: every job kind of the published configuration is disabled")
+
+# C3. seeds
+v3_pools = json.loads((ROOT / "configs/pools-elite-v3.json").read_text(encoding="utf-8"))["pools"]
+train_seeds = set(v3_pools["train"]["seeds"])
+protected = set(v3_pools["evaluation"]["seeds"]) | set(v3_pools["final_campaign_run"]["seeds"])
+earlier = set(FINAL_SEEDS) | set(EFINAL_SEEDS) | set(VFINAL_SEEDS) | {7101, 7102, 7103, 7104, 7105}
+protected |= earlier
+game_seeds, leaked, scanned = set(), [], 0
+for run_id in (S1STOP, S1B, FORK, REPLAY):
+    for payload in eval_rows(run_id):
+        game_seeds.add(payload.get("seed"))
+    for path in sorted((V3 / "runs" / run_id).iterdir()):
+        if path.suffix not in (".json", ".jsonl") or not path.stat().st_size:
+            continue
+        scanned += 1
+        docs = rows(path) if path.suffix == ".jsonl" else [json.loads(path.read_text(encoding="utf-8"))]
+        if any(v in protected for doc in docs for v in seed_values(doc)):
+            leaked.append(path.name)
+for payload in eval_rows(FORK):
+    if any(v in protected for v in seed_values(payload)):
+        leaked.append("fork episodes")
+        break
+check(game_seeds and game_seeds <= train_seeds and not leaked,
+      f"elite-v3 games are on train seeds only ({sorted(game_seeds)}); its evaluation and final seeds, and every "
+      f"earlier phase's final and rehearsal seeds, appear in no seed field of any elite-v3 run file ({scanned} files "
+      f"and the fork journal scanned)" + ("" if not leaked else f": {leaked}"))
+
+
+def v3_score(result):
+    out, summary = result.get("outcome") or {}, result.get("final_summary") or {}
+    if result.get("status") != "terminal":
+        return None
+    total = summary.get("wave_total") or 15
+    return ((1.0 if out.get("level_won") else 0.0) + 0.5 * min(1.0, (summary.get("wave") or 0) / total)
+            + 0.25 * (out.get("lives") or 0) / 20)
+
+
+# C4. S1b arms
+s1b = list(eval_rows(S1B))
+wins = {}
+for r in s1b:
+    wins.setdefault(r["player"], [0, 0, 0])
+    wins[r["player"]][0] += bool((r["result"].get("outcome") or {}).get("level_won"))
+    wins[r["player"]][1] += 1
+    wins[r["player"]][2] += r["result"].get("status") != "terminal"
+check({k: v[0] for k, v in wins.items()} == {"cmd_steady": 24, "cmd_rule": 14, "cmd_placebo": 12, "cmd_random": 5}
+      and all(v[1] == 56 and v[2] == 0 for v in wins.values()),
+      "S1b whole games recomputed: steady 24/56, rule 14/56, placebo 12/56, random 5/56 wins; no void game")
+
+# C5. fork pilot: prefix identity, forced plays, the published table recomputed
+base = {(r["level"], r["seed"], r["genome_id"]): r for r in s1b if r["player"] == "cmd_steady"}
+consult_fields = ("consult", "tick", "prompt_sha256", "plays")
+table, n_fork, problems = {}, 0, 0
+for r in eval_rows(FORK):
+    n_fork += 1
+    f = r.get("fork") or {}
+    key = (r["level"], r["seed"], r["genome_id"])
+    b = base.get(key)
+    score = v3_score(r["result"])
+    if b is None or score is None or r.get("player") != "cmd_fork":
+        problems += 1
+        continue
+    bc = {c["consult"]: c for c in b["result"]["commander"]["consults"]}
+    fc = {c["consult"]: c for c in r["result"]["commander"]["consults"]}
+    k = f.get("consult")
+    if k not in fc or k not in bc or fc[k]["choice"] != f.get("play") or any(i not in fc for i in bc if i < k) \
+            or any(tuple(fc[i].get(x) for x in consult_fields + ("choice",))
+                   != tuple(bc[i].get(x) for x in consult_fields + ("choice",)) for i in bc if i < k) \
+            or tuple(fc[k].get(x) for x in consult_fields) != tuple(bc[k].get(x) for x in consult_fields):
+        problems += 1
+    table.setdefault(key + (k,), {})[f.get("play")] = score
+published_table = json.loads((V3 / "analysis/fork_table_c7f8724de6be.json").read_text(encoding="utf-8"))
+mismatch = 0
+for entry in published_table:
+    key = tuple(entry["key"])
+    plays = {int(j): v for j, v in entry["plays"].items()}
+    mine = {0: v3_score(base[key[:3]]["result"]), **table.get(key, {})}
+    if set(mine) != set(plays) or any(abs(mine[j] - plays[j]) > 1e-12 for j in plays):
+        mismatch += 1
+complete = sum(1 for key, branches in table.items()
+               if len(branches) + 1 == len(next(c for c in base[key[:3]]["result"]["commander"]["consults"]
+                                                 if c["consult"] == key[3])["plays"]))
+check(n_fork == 3026 and problems == 0 and mismatch == 0 and len(published_table) == complete == 985,
+      f"fork pilot: {n_fork} terminal games, each replaying its base game exactly up to the forced consult and taking "
+      f"the forced play; the published fork table (985 consults, all branches measured) is recomputed exactly"
+      + ("" if not (problems or mismatch) else f" ({problems} branch problems, {mismatch} table mismatches)"))
+
+# C6. capture replay
+replay = {(r["level"], r["seed"], r["genome_id"]): r for r in eval_rows(REPLAY) if r["player"] == "cmd_steady_capture"}
+bad_games, bad_consults, n_consults = 0, 0, 0
+for key, b in base.items():
+    r = replay.get(key)
+    if r is None or any(b["result"].get(x) != r["result"].get(x)
+                        for x in ("trace_sha256", "final_state_sha256", "final_tick", "outcome", "status")):
+        bad_games += 1
+        continue
+    for x, y in zip(b["result"]["commander"]["consults"], r["result"]["commander"]["consults"]):
+        n_consults += 1
+        if any(x.get(f) != y.get(f) for f in ("consult", "tick", "wave", "reason", "group", "plays", "prompt_sha256",
+                                              "briefing", "choice")) or not all(k in y for k in ("capture", "ledger")):
+            bad_consults += 1
+check(len(replay) == len(base) == 56 and bad_games == 0 and bad_consults == 0 and n_consults == 992,
+      f"capture replay: 56/56 S1b steady games reproduced exactly (trace, end state, outcome) and {n_consults}/992 "
+      "consults identical (tick, plays, briefing, prompt hash), each with the screen recorded")
+
+# C7. zero-shot choice files
+consult_hash = {f"{k[0]}:{k[1]}:{k[2]}:{c['consult']}": (c["prompt_sha256"], c["plays"])
+                for k, b in base.items() for c in b["result"]["commander"]["consults"]}
+p1_counts = {}
+for name, path in (("8b", V3 / "analysis/llm_choices_s1b.records.json"),
+                   ("24b", V3 / "analysis/llm24_choices_s1b.records.json")):
+    recs = json.loads(path.read_text(encoding="utf-8"))
+    ok = len(recs) == 992 and {r["key"] for r in recs} == set(consult_hash) and all(r["same_prompt"] for r in recs)
+    p1_counts[name] = (ok, sum(1 for r in recs if r["n"] >= 2 and r["play_id"] == "P1"))
+check(all(v[0] for v in p1_counts.values()) and p1_counts["8b"][1] == 955 and p1_counts["24b"][1] == 937,
+      "zero-shot 8B and 24B answered all 992 recorded consults with the recorded prompts; on the 985 consults with a "
+      f"choice they pick P1 {p1_counts['8b'][1]} and {p1_counts['24b'][1]} times")
+
+# C8. the fair re-test (elite-v3b)
+prereg = (ROOT / "docs/elite/elite-v3b-preregistration-2026-10-12.md").read_text(encoding="utf-8")
+v3_redactions = {r["path"]: r for r in json.loads((V3 / "REDACTIONS.json").read_text(encoding="utf-8"))["files"]}
+frozen_bad, frozen_n = [], 0
+import re  # noqa: E402
+for label, digest in re.findall(r"\| ([^|\n]+?) \| ([0-9a-f]{64}) \|", prereg):
+    label = label.strip()
+    if label.startswith(("runtime/", "alpharush_rl/")):
+        rel = label
+    elif "fork_table" in label:
+        rel = "runtime/rl/elite-v3/analysis/fork_table_c7f8724de6be.json"
+    else:
+        rel = "runtime/rl/elite-v3b/" + label
+    frozen_n += 1
+    path = ROOT / rel
+    entry = v3_redactions.get(rel, {})
+    if not path.exists() or not (sha(path) == digest or (entry.get("original_sha256") == digest
+                                                         and entry.get("published_sha256") == sha(path))):
+        frozen_bad.append(rel)
+check(frozen_n == 15 and not frozen_bad, f"elite-v3b: the {frozen_n} files frozen in the pre-registration are published "
+      "unchanged or redacted from the frozen original" + ("" if not frozen_bad else f": {frozen_bad}"))
+old_bad, n_old = 0, 0
+with open(V3B / "requests/thin_old.jsonl", encoding="utf-8") as handle:
+    for line in handle:
+        row = json.loads(line)
+        n_old += 1
+        recorded, plays = consult_hash[row["key"]]
+        if hashlib.sha256(row["rotations"][0]["user"].encode("utf-8")).hexdigest() != recorded \
+                or [p["id"] for p in plays] != row["ids"]:
+            old_bad += 1
+check(n_old == 985 and old_bad == 0, f"elite-v3b: all {n_old} old-format prompts hash to the consult's recorded prompt")
+parity = []
+for name, rec_path in (("8b", "llm_choices_s1b.records.json"), ("24b", "llm24_choices_s1b.records.json")):
+    recs = {r["key"]: r for r in json.loads((V3 / "analysis" / rec_path).read_text(encoding="utf-8"))}
+    out = [json.loads(line) for line in (V3B / f"results/parity_{name}_thin_old.jsonl").read_text(
+        encoding="utf-8").splitlines() if line.strip()]
+    parity.append(len(out) == 50 and all(o["choice"] == recs[o["key"]]["choice"] and max(
+        abs(a - b) for a, b in zip(o["p"], recs[o["key"]]["p"])) <= 1e-3 for o in out))
+check(all(parity), "elite-v3b parity gate: the standalone scorer reproduces the recorded zero-shot scores on 50 "
+                   "consults per model (identical choices, probabilities within 1e-3)")
+ftable = {":".join(map(str, e["key"])): [e["plays"][str(j)] for j in range(len(e["plays"]))] for e in published_table}
+analysis = json.loads((V3B / "analysis_final.json").read_text(encoding="utf-8"))
+
+
+def m1_of(choices):
+    vals = [ftable[k][j] - statistics.mean(ftable[k][1:]) for k, j in choices.items()]
+    return statistics.mean(vals), len(vals)
+
+
+def nonp0(p):
+    return max(range(1, len(p)), key=lambda i: (p[i], -i))
+
+
+arm_bad, arm_choices = [], {}
+arms = {"8b_thin_old": V3 / "analysis/llm_choices_s1b.records.json",
+        "24b_thin_old": V3 / "analysis/llm24_choices_s1b.records.json"}
+for model in ("8b", "24b"):
+    for arm in ("thin_new", "rich", "rich_reason"):
+        arms[f"{model}_{arm}"] = V3B / f"results/{model}_{arm}.jsonl"
+for name, path in arms.items():
+    if path.suffix == ".json":
+        recs = {r["key"]: r["p"] for r in json.loads(path.read_text(encoding="utf-8"))}
+    else:
+        recs = {}
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if line.strip():
+                r = json.loads(line)
+                recs[r["key"]] = r["p"]
+    arm_choices[name] = {k: nonp0(recs[k]) for k in ftable}
+    value, n = m1_of(arm_choices[name])
+    published = analysis["brains"][name]["M1"][0]
+    if n != 985 or abs(value - published) > 1e-9:
+        arm_bad.append((name, round(value, 4), round(published, 4)))
+fixed = {}
+for fit, scored in (({1203, 1204}, {1201, 1202}), ({1201, 1202}, {1203, 1204})):
+    effects = {}
+    for k, y in ftable.items():
+        if int(k.split(":")[1]) in fit:
+            ids = [p["id"] for p in consult_hash[k][1]]
+            m = statistics.mean(y[1:])
+            for j in range(1, len(y)):
+                effects.setdefault(ids[j], []).append(y[j] - m)
+    rank = {pid: statistics.mean(v) for pid, v in effects.items()}
+    for k in ftable:
+        if int(k.split(":")[1]) in scored:
+            ids = [p["id"] for p in consult_hash[k][1]]
+            fixed[k] = max(range(1, len(ids)), key=lambda j: (rank.get(ids[j], 0.0), -j))
+fixed_value, _ = m1_of(fixed)
+if abs(fixed_value - analysis["brains"]["fixed_ranking_crossfit"]["M1"][0]) > 1e-9:
+    arm_bad.append(("fixed_ranking_crossfit", round(fixed_value, 4)))
+check(not arm_bad, f"elite-v3b: M1 of all {len(arms)} language-model arms and of the cross-fitted fixed ranking "
+                   f"({fixed_value:+.3f}) recomputed from the model outputs and the fork table equal the published "
+                   "analysis" + ("" if not arm_bad else f": {arm_bad}"))
+FOLDS = {"A": {1201, 1202}, "B": {1203, 1204}}
+
+
+def fold_m1(choices, fold):
+    return m1_of({k: j for k, j in choices.items() if int(k.split(":")[1]) in FOLDS[fold]})[0]
+
+
+tiers = analysis.get("tiers", {})
+primary = {fold: fold_m1(arm_choices["24b_rich_reason"], fold) for fold in FOLDS}
+fixed_folds = {fold: fold_m1(fixed, fold) for fold in FOLDS}
+t1 = {model: m1_of(arm_choices[f"{model}_rich"])[0] - m1_of(arm_choices[f"{model}_thin_new"])[0]
+      for model in ("8b", "24b")}
+try:
+    t1_24b = [float(v) for v in tiers["T1"]["24b"]["diff"]]
+    same = (all(abs(primary[f] - tiers["T2"]["primary_folds"][f]) <= 1e-9
+                and abs(fixed_folds[f] - tiers["T2"]["fixed_folds"][f]) <= 1e-9 for f in FOLDS)
+            and abs(t1["8b"] - tiers["T1"]["8b"]["diff"][0]) <= 1e-9 and abs(t1["24b"] - t1_24b[0]) <= 1e-9
+            and tiers["T1"]["pass_any"] is False and tiers["T2"]["pass"] is False
+            and tiers["T3_exploratory"]["pass"] is False)
+except (KeyError, IndexError, TypeError, ValueError):
+    t1_24b, same = [float("nan")] * 3, False
+t2_fails = any(primary[f] < 0.5 * fixed_folds[f] for f in FOLDS)
+t3_fails = all(primary[f] - fixed_folds[f] < 0 for f in FOLDS)
+t1_fails = t1["8b"] <= 0 and t1_24b[1] <= 0
+check(same and t2_fails and t3_fails and t1_fails,
+      f"elite-v3b tiers recomputed: T2 fails (primary arm fold M1 A {primary['A']:+.4f}, B {primary['B']:+.4f} vs half "
+      f"of the fixed ranking's {0.5 * fixed_folds['A']:+.4f}, {0.5 * fixed_folds['B']:+.4f}); T3 fails (below the fixed "
+      f"ranking in both folds); T1 fails for the 8B (rich - thin_new {t1['8b']:+.4f}) and for the 24B "
+      f"({t1['24b']:+.4f}, published cluster-bootstrap interval [{t1_24b[1]:+.4f}, {t1_24b[2]:+.4f}] includes 0); "
+      "the published analysis records all three tiers as failed")
+for path in temporaries:
+    path.unlink(missing_ok=True)
 
 print("\nALL CHECKS PASSED" if not failures else f"\n{len(failures)} CHECK(S) FAILED")
 sys.exit(1 if failures else 0)

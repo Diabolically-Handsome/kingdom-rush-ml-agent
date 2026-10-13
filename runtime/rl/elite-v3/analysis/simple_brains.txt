@@ -1,0 +1,10 @@
+== fit [1201, 1202] -> score [1203, 1204]: fitted play ranking ['P3', 'P4', 'P2', 'P1'] effects {'P1': -0.0245, 'P4': 0.0343, 'P2': -0.0195, 'P3': 0.0541}
+  steady            gain vs steady +0.000 [+0.000,+0.000]  d_np +0.000 [+0.000,+0.000]  deviations 0/489  games 28
+  rule              gain vs steady +0.027 [-0.074,+0.128]  d_np -0.003 [-0.052,+0.045]  deviations 281/489  games 28
+  rule_timing_best  gain vs steady +0.065 [-0.027,+0.150]  d_np +0.063 [+0.016,+0.113]  deviations 281/489  games 28
+  always_best       gain vs steady +0.098 [-0.063,+0.253]  d_np +0.071 [+0.031,+0.113]  deviations 489/489  games 28
+== fit [1203, 1204] -> score [1201, 1202]: fitted play ranking ['P3', 'P4', 'P2', 'P1'] effects {'P1': -0.0363, 'P4': 0.0443, 'P2': -0.0324, 'P3': 0.15}
+  steady            gain vs steady +0.000 [+0.000,+0.000]  d_np +0.000 [+0.000,+0.000]  deviations 0/496  games 28
+  rule              gain vs steady -0.140 [-0.241,-0.036]  d_np +0.004 [-0.042,+0.046]  deviations 297/496  games 28
+  rule_timing_best  gain vs steady -0.097 [-0.203,+0.014]  d_np +0.075 [+0.021,+0.125]  deviations 297/496  games 28
+  always_best       gain vs steady -0.182 [-0.342,-0.006]  d_np +0.056 [+0.015,+0.095]  deviations 496/496  games 28

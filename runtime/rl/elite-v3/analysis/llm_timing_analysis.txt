@@ -1,0 +1,11 @@
+== timing: within-game cov(signal, mean nonP0 - P0); null = signal shuffled within each base game ==
+rule (deviate indicator)     cov +0.01929  (null sd 0.00596, z +3.24)  perm p 0.0006
+timing_8b                    cov +0.00364  (null sd 0.00086, z +4.24)  perm p 0.0002
+timing_24b                   cov +0.00083  (null sd 0.00035, z +2.39)  perm p 0.0072
+== cross-fitted brain: intervene when the signal is above the fit seeds' per-level median; best-ranked play ==
+rule (deviate indicator)     score [1203, 1204]: gain vs steady +0.020 [-0.022,+0.065]  deviations 83
+rule (deviate indicator)     score [1201, 1202]: gain vs steady -0.003 [-0.033,+0.027]  deviations 48
+timing_8b                    score [1203, 1204]: gain vs steady +0.047 [-0.045,+0.140]  deviations 257
+timing_8b                    score [1201, 1202]: gain vs steady -0.061 [-0.145,+0.028]  deviations 239
+timing_24b                   score [1203, 1204]: gain vs steady +0.043 [-0.028,+0.114]  deviations 234
+timing_24b                   score [1201, 1202]: gain vs steady -0.070 [-0.149,+0.013]  deviations 256

@@ -1,0 +1,267 @@
+[
+ {
+  "key": "ENEMY_BOSS_BLACKBURN",
+  "name": "eb_blackburn",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_ROTTEN_TREE_BOSS",
+  "name": "eb_greenmuck",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_BOSS_BANDIT",
+  "name": "eb_kingpin",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_DEMON_MOLOCH",
+  "name": "eb_moloch",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_ROTTEN_MYCONID",
+  "name": "eb_myconid",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_TROLL_BOSS",
+  "name": "eb_ulgukhai",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_HALLOWEEN_ABOMINATION",
+  "name": "enemy_abomination",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_BANDIT",
+  "name": "enemy_bandit",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_BRIGAND",
+  "name": "enemy_brigand",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_DEMON",
+  "name": "enemy_demon",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_DEMON_CERBERUS",
+  "name": "enemy_demon_cerberus",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_DEMON_FLAREON",
+  "name": "enemy_demon_flareon",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_DEMON_GULAEMON",
+  "name": "enemy_demon_gulaemon",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_DEMON_IMP",
+  "name": "enemy_demon_imp",
+  "flying": true
+ },
+ {
+  "key": "ENEMY_DEMON_LEGION",
+  "name": "enemy_demon_legion",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_DEMON_MAGE",
+  "name": "enemy_demon_mage",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_DEMON_WOLF",
+  "name": "enemy_demon_wolf",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_FALLEN_KNIGHT",
+  "name": "enemy_fallen_knight",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_GARGOYLE",
+  "name": "enemy_gargoyle",
+  "flying": true
+ },
+ {
+  "key": "ENEMY_GIANT_RAT",
+  "name": "enemy_giant_rat",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_HALLOWEEN_ZOMBIE",
+  "name": "enemy_halloween_zombie",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_HALLOWEEN_LYCAN",
+  "name": "enemy_lycan",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_HALLOWEEN_LYCAN",
+  "name": "enemy_lycan_werewolf",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_MARAUDER",
+  "name": "enemy_marauder",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_NECROMANCER",
+  "name": "enemy_necromancer",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_PILLAGER",
+  "name": "enemy_pillager",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_RAIDER",
+  "name": "enemy_raider",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_ROTTEN_LESSER",
+  "name": "enemy_rotten_lesser",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_ROTTEN_TREE",
+  "name": "enemy_rotten_tree",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_SHEEP",
+  "name": "enemy_sheep_ground",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_SKELETON",
+  "name": "enemy_skeleton",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_SKELETON_BIG",
+  "name": "enemy_skeleton_big",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_SKELETON",
+  "name": "enemy_skeleton_blackburn",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_SPECTRAL_KNIGHT",
+  "name": "enemy_spectral_knight",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_SPECTRAL_KNIGHT",
+  "name": "enemy_spectral_knight_spawn",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_SPIDER",
+  "name": "enemy_spider_big",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_SPIDER_ROTTEN",
+  "name": "enemy_spider_rotten",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_SPIDERTINY_ROTTEN",
+  "name": "enemy_spider_rotten_tiny",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_SPIDERSMALL",
+  "name": "enemy_spider_small",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_SPIDERTINY",
+  "name": "enemy_spider_tiny",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_SWAMP_THING",
+  "name": "enemy_swamp_thing",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_TROLL",
+  "name": "enemy_troll",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_TROLL_AXE_THROWER",
+  "name": "enemy_troll_axe_thrower",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_TROLL_BRUTE",
+  "name": "enemy_troll_brute",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_TROLL_CHIEFTAIN",
+  "name": "enemy_troll_chieftain",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_TROLL_SKATER",
+  "name": "enemy_troll_skater",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_WERERAT",
+  "name": "enemy_wererat",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_HALLOWEEN_WEREWOLF",
+  "name": "enemy_werewolf",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_WHITE_WOLF",
+  "name": "enemy_whitewolf",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_WITCH",
+  "name": "enemy_witch",
+  "flying": true
+ },
+ {
+  "key": "ENEMY_WORG",
+  "name": "enemy_wolf",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_WULF",
+  "name": "enemy_wolf_small",
+  "flying": false
+ },
+ {
+  "key": "ENEMY_ZOMBIE",
+  "name": "enemy_zombie",
+  "flying": false
+ }
+]

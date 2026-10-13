@@ -9,8 +9,12 @@ local MAX_REQUEST_BYTES = 4096
 local TOKEN = os.getenv("ALPHARUSH_TOKEN")
 -- "v1" keeps the original build/send scope byte for byte; "v2" adds upgrades, tower
 -- powers, selling and spells; "v3" (elite stages) is v2 plus barracks rally points, dormant /
--- untargetable / boss enemy flags and per-lane path progress. Any other value fails closed at install.
+-- untargetable / boss enemy flags and per-lane path progress; "v4" (commander) is v3 plus aimed spells
+-- (aim_power) and hero moves (move_hero). Any other value fails closed at install.
 local ACTION_SCOPE = os.getenv("ALPHARUSH_ACTION_SCOPE") or "v1"
+-- Everything v3 does, v4 does identically; V4 alone gates the v4 additions.
+local V3PLUS = ACTION_SCOPE == "v3" or ACTION_SCOPE == "v4"
+local V4 = ACTION_SCOPE == "v4"
 -- Opt-in human-capability features of a job (comma list): timed_clicks, early_waves.
 local HOST_FEATURES = {}
 for name in string.gmatch(os.getenv("ALPHARUSH_HOST_FEATURES") or "", "[%w_]+") do HOST_FEATURES[name] = true end
@@ -220,8 +224,12 @@ local V2_ACTIONS = {build_tower=true, send_wave=true, upgrade_tower=true,
     upgrade_power=true, sell_tower=true, use_power=true, point_tower=true, click_entity=true}
 local V3_ACTIONS = {build_tower=true, send_wave=true, upgrade_tower=true, upgrade_power=true, sell_tower=true,
     use_power=true, point_tower=true, click_entity=true, set_rally=true}
+local V4_ACTIONS = {build_tower=true, send_wave=true, upgrade_tower=true, upgrade_power=true, sell_tower=true,
+    use_power=true, point_tower=true, click_entity=true, set_rally=true, aim_power=true, move_hero=true}
 local V2_MATCH_KEYS = {"action", "holder_id", "tower_id", "tower_type", "target", "power", "x", "y", "anchor_id",
     "entity_id", "option"}
+local V4_MATCH_KEYS = {"action", "holder_id", "tower_id", "tower_type", "target", "power", "x", "y", "anchor_id",
+    "entity_id", "option", "hero_id", "target_id"}
 
 local function finite(value)
     return type(value) == "number" and value == value and value ~= math.huge and value ~= -math.huge
@@ -334,10 +342,11 @@ local function power_point_valid(p, x, y)
         if p == 1 then
             if GR:cell_is(x, y, bit.bor(TERRAIN_CLIFF, TERRAIN_FAERIE)) then return false end
             if P:valid_node_nearby(x, y, 1 / 0.7, NF_POWER_1) or GR:cell_is(x, y, TERRAIN_WATER) then return true end
-            -- Some levels (8, 10, 12) also allow fire inside level-defined areas.
+            -- Some levels (8, 10, 12) also allow fire inside level-defined areas. The game's GUI_MODE_POWER_1 is
+            -- the string "POWER_1": v1-v3 keep their number test (never true), v4 asks the level as the GUI does.
             local level = game.store and game.store.level
             return type(level) == "table" and type(level.fn_can_power) == "function"
-                and type(GUI_MODE_POWER_1) == "number"
+                and (V4 and GUI_MODE_POWER_1 ~= nil or type(GUI_MODE_POWER_1) == "number")
                 and level:fn_can_power(game.store, GUI_MODE_POWER_1, {x = x, y = y}) and true or false
         end
         return P:valid_node_nearby(x, y, nil, NF_RALLY) and GR:cell_is_only(x, y, bit.bor(TERRAIN_LAND, TERRAIN_ICE))
@@ -582,9 +591,433 @@ local function powers_ui()
     return out
 end
 
+-- v4 aimed spells (aim_power): at most AIM_LIMIT named points per ready power, each at integer coordinates,
+-- distinct and accepted by power_point_valid; executed as use_power at that point. Rain of fire: "threat:<id>"
+-- (an awake boss or a THREAT_TEMPLATES enemy where it stands; bosses, then most health), "lead:<id>" (the
+-- leading spaced anchors, LEAD_SECONDS ahead along their lane at their speed; no lead while blocked) and
+-- "cluster:<k>" (hp-weighted centroids of the CLUSTER_RADIUS neighbourhoods holding the most health, at least
+-- two enemies, CLUSTER_RADIUS apart). Reinforcements: "block:<id>" (BLOCK_AHEAD px ahead of the leading
+-- spaced blockable ground enemies) and "cluster:<k>" over those enemies. Earlier kinds win a shared point.
+local AIM_LIMIT, LEAD_SECONDS, BLOCK_AHEAD, CLUSTER_RADIUS = 6, 1.2, 40, 60
+-- Named threats besides bosses (elite-stage mechanics study): egg layers and summoners/cloners, the swamp
+-- thing's regeneration, the demon mage's shields, the abomination's death blast, the unblockable skater.
+local THREAT_TEMPLATES = {enemy_spider_big=true, enemy_spider_rotten=true, enemy_necromancer=true,
+    enemy_demon_legion=true, enemy_demon_mage=true, enemy_swamp_thing=true, enemy_abomination=true,
+    enemy_troll_skater=true}
+
+-- Where enemy entity e stands after walking `dist` px further along its own lane (in its walking direction),
+-- clamped at the lane's end. Starts from its position, heading for node ni unless it is already past it.
+local function ahead_on_lane(e, dist)
+    local x, y = e.pos.x, e.pos.y
+    local P, np = package.loaded["path_db"], e.nav_path
+    if type(P) ~= "table" or type(P.paths) ~= "table" or type(np) ~= "table" or not finite(np.ni) then return x, y end
+    local path = P.paths[np.pi]
+    local lane = type(path) == "table" and path[np.spi]
+    if type(lane) ~= "table" then return x, y end
+    local step = np.dir == -1 and -1 or 1
+    local function node(i)
+        local n = lane[i]
+        return type(n) == "table" and finite(n.x) and finite(n.y) and n or nil
+    end
+    local ni = np.ni
+    local a, b = node(ni), node(ni + step)
+    if a and b and (b.x - x) ^ 2 + (b.y - y) ^ 2 <= (b.x - a.x) ^ 2 + (b.y - a.y) ^ 2 then ni = ni + step end
+    local left = dist
+    while left > 0 do
+        local n = node(ni)
+        if not n then break end
+        local d = math.sqrt((n.x - x) ^ 2 + (n.y - y) ^ 2)
+        if d >= left then
+            return x + (n.x - x) * left / d, y + (n.y - y) * left / d
+        end
+        x, y, left, ni = n.x, n.y, left - d, ni + step
+    end
+    return x, y
+end
+
+local function blocked(e)
+    local b = type(e.enemy) == "table" and e.enemy.blockers
+    return type(b) == "table" and next(b) ~= nil
+end
+
+-- Neighbourhoods: every enemy seeds one of the enemies within CLUSTER_RADIUS (itself included); best first.
+local function clusters(pool)
+    local out = {}
+    for _, a in ipairs(pool) do
+        local members, score, sx, sy = 0, 0, 0, 0
+        for _, b in ipairs(pool) do
+            if (a.x - b.x) ^ 2 + (a.y - b.y) ^ 2 <= CLUSTER_RADIUS * CLUSTER_RADIUS then
+                local w = finite(b.hp) and b.hp > 0 and b.hp or 0
+                members, score, sx, sy = members + 1, score + w, sx + w * b.x, sy + w * b.y
+            end
+        end
+        if members >= 2 and score > 0 then
+            out[#out+1] = {id=a.id, members=members, score=score, x=sx / score, y=sy / score}
+        end
+    end
+    table.sort(out, function(a, b)
+        if a.score ~= b.score then return a.score > b.score end
+        if a.members ~= b.members then return a.members > b.members end
+        return a.id < b.id
+    end)
+    return out
+end
+
+local function aim_options(p, s, store)
+    local out, used = {}, {}
+    local function offer(option, x, y, target_id)
+        if #out >= AIM_LIMIT or not finite(x) or not finite(y) then return false end
+        x, y = math.floor(x + 0.5), math.floor(y + 0.5)
+        if used[x .. "," .. y] or not power_point_valid(p, x, y) then return false end
+        used[x .. "," .. y] = true
+        out[#out+1] = {option=option, x=x, y=y, target_id=target_id}
+        return true
+    end
+    local pool = {}
+    for _, en in ipairs(targetable(s.enemies)) do
+        if type(en.id) == "number" and finite(en.x) and finite(en.y)
+            and (p == 1 or not (en.flying or en.unblockable)) then
+            pool[#pool+1] = en
+        end
+    end
+    local function entity(en)
+        local e = store.entities[en.id]
+        return type(e) == "table" and type(e.pos) == "table" and finite(e.pos.x) and finite(e.pos.y) and e or nil
+    end
+    if p == 1 then
+        local threats = {}
+        for _, en in ipairs(pool) do
+            if en.boss or THREAT_TEMPLATES[en.template] then threats[#threats+1] = en end
+        end
+        table.sort(threats, function(a, b)
+            if (a.boss and 1 or 0) ~= (b.boss and 1 or 0) then return a.boss and true or false end
+            local ha, hb = finite(a.hp) and a.hp or 0, finite(b.hp) and b.hp or 0
+            if ha ~= hb then return ha > hb end
+            local pa, pb = a.path_progress or 0, b.path_progress or 0
+            if pa ~= pb then return pa > pb end
+            return a.id < b.id
+        end)
+        local n = 0
+        for _, en in ipairs(threats) do
+            if n < 2 and offer("threat:" .. en.id, en.x, en.y, en.id) then n = n + 1 end
+        end
+        n = 0
+        for _, a in ipairs(power_anchors(pool)) do
+            local e = entity(a.enemy)
+            local speed = e and type(e.motion) == "table" and finite(e.motion.max_speed) and e.motion.max_speed or 0
+            local x, y = a.enemy.x, a.enemy.y
+            if e and not blocked(e) and speed > 0 then x, y = ahead_on_lane(e, speed * LEAD_SECONDS) end
+            if n < 2 and offer("lead:" .. a.id, x, y, a.id) then n = n + 1 end
+        end
+    else
+        local ground = {}
+        for _, en in ipairs(pool) do
+            if finite(en.path_progress) then ground[#ground+1] = en end
+        end
+        table.sort(ground, function(a, b)
+            if a.path_progress ~= b.path_progress then return a.path_progress > b.path_progress end
+            return a.id < b.id
+        end)
+        local chosen = {}
+        for _, en in ipairs(ground) do
+            local spaced = #chosen < 4
+            for _, c in ipairs(chosen) do
+                if (en.x - c.x) ^ 2 + (en.y - c.y) ^ 2 < ANCHOR_SPACING * ANCHOR_SPACING then spaced = false; break end
+            end
+            local e = spaced and entity(en)
+            if e then
+                local x, y = ahead_on_lane(e, BLOCK_AHEAD)
+                if offer("block:" .. en.id, x, y, en.id) then chosen[#chosen+1] = en end
+            end
+        end
+    end
+    local centres = {}
+    for _, c in ipairs(clusters(pool)) do
+        local spaced = #centres < 2
+        for _, o in ipairs(centres) do
+            if (c.x - o.x) ^ 2 + (c.y - o.y) ^ 2 < CLUSTER_RADIUS * CLUSTER_RADIUS then spaced = false; break end
+        end
+        if spaced and offer("cluster:" .. (#centres + 1), c.x, c.y) then centres[#centres+1] = c end
+    end
+    return out
+end
+
+-- v4 hero moves (move_hero), as the GUI's GUI_MODE_RALLY_HERO click allows them (game_gui L4989-5008): a point
+-- next to an NF_RALLY path node (if nav_rally.requires_node_nearby), on nav_grid.valid_terrains_dest cells only,
+-- and either a teleport longer than teleport.min_distance (unless disabled), or nav_grid.ignore_waypoints, or a
+-- route found by the game's GR:find_waypoints(pos, nav_rally.pos, point, nav_grid.valid_terrains). Options (at
+-- most HERO_LIMIT, integer, distinct): "home" (the hero's respawn_point, else its level spawn point), "exit:<k>"
+-- (EXIT_PROGRESS of the lowest path ending at level exit k), "up:<pi>" (UP_PROGRESS of path pi; the next wave's
+-- paths, then the live enemies' paths). A path point is its route's (lane 1 through path_connections) node at that
+-- progress, or the nearest passing node within HERO_SEARCH nodes; home is itself or the nearest passing node.
+local HERO_LIMIT, HERO_SEARCH, EXIT_PROGRESS, UP_PROGRESS = 6, 8, 0.9, 0.35
+local hero_routes = setmetatable({}, {__mode = "k"})
+local waypoint_answers = setmetatable({}, {__mode = "k"})
+
+-- The last move_hero order per hero: the rally vector its click wrote, its point and tick, and, once a game script
+-- gives the hero another rally vector, when, which point, and whether that point was the hero's own position (the
+-- new rally pos and center both equal to its pos). Ignus' Surge of Flame does exactly that: its dash loop never
+-- looks at nav_rally.new and, on arrival, sets nav_rally.center and nav_rally.pos to clones of its position (kr1
+-- game_scripts hero_ignus.update L2803-2809), so a click landing between the dash's start and its end, a player's
+-- too, is replaced by the dash's end point. No other hero or script_utils function assigns a hero's own rally
+-- vector (the death script moves it in place, at the respawn). Watched after every native tick of "step" (v4 only);
+-- the game never reads it.
+local hero_orders = setmetatable({}, {__mode = "k"})
+
+local function watch_hero_orders(store)
+    for e, o in pairs(hero_orders) do
+        local nr = e.nav_rally
+        if o.replaced == nil and type(nr) == "table" and nr.pos ~= o.pos then
+            local p, rp, c = e.pos, nr.pos, nr.center
+            local function at_hero(v)
+                return type(v) == "table" and type(p) == "table" and finite(p.x) and finite(p.y)
+                    and v.x == p.x and v.y == p.y
+            end
+            o.replaced = {tick = store.tick, x = type(rp) == "table" and rp.x or nil,
+                          y = type(rp) == "table" and rp.y or nil, at_hero = at_hero(rp) and at_hero(c)}
+        end
+    end
+end
+
+-- What a player can rally now: alive (not health.dead, which also covers the whole respawn wait), not stunned
+-- (its script idles until then), clickable and selectable (game_gui select_entity), with the nav components the
+-- click writes; and the GUI neither disabled nor in a notification. Like GUI_MODE_RALLY_HERO, it never looks at
+-- health.ignore_damage: a hero that merely ignores damage is rallied as usual.
+local function hero_commandable(e)
+    local gui = game and game.game_gui
+    local mode = type(gui) == "table" and gui.mode
+    local ui, h, u = e.ui, e.health, e.unit
+    return type(gui) == "table" and mode ~= (GUI_MODE_DISABLED or "DISABLED")
+        and mode ~= (GUI_MODE_NOTIFICATION or "NOTIFICATION")
+        and type(e.hero) == "table" and type(ui) == "table" and ui.can_click ~= false and ui.can_select and true
+        and type(h) == "table" and not h.dead and not (type(u) == "table" and u.is_stunned)
+        and type(e.pos) == "table" and finite(e.pos.x) and finite(e.pos.y)
+        and type(e.nav_rally) == "table" and type(e.nav_grid) == "table" or false
+end
+
+-- find_waypoints is an A* over grid cells: its yes/no depends only on the cells of the hero, of its rally point
+-- (the fallback start) and of the point. Answers are kept per grid and cells, and the game's one-entry
+-- waypoints_cache is put back after asking, so asking never changes what the game computes later.
+local function waypoints_found(GR, e, x, y)
+    local from, back, terrains = e.pos, e.nav_rally.pos, e.nav_grid.valid_terrains
+    local key
+    if type(GR.get_coords) == "function" and type(GR.grid) == "table" then
+        local fx, fy = GR:get_coords(from.x, from.y)
+        local bx, by = "-", "-"
+        if type(back) == "table" and finite(back.x) and finite(back.y) then bx, by = GR:get_coords(back.x, back.y) end
+        local tx, ty = GR:get_coords(x, y)
+        key = table.concat({tostring(fx), tostring(fy), tostring(bx), tostring(by), tostring(tx), tostring(ty),
+                            tostring(terrains)}, ",")
+        local known = waypoint_answers[GR.grid]
+        if known and known.answers[key] ~= nil then return known.answers[key] end
+    end
+    local wc = type(GR.waypoints_cache) == "table" and GR.waypoints_cache
+    local saved = wc and {wc.from_c, wc.to_c, wc.path_c, wc.path}
+    local ok, path = pcall(GR.find_waypoints, GR, from, back, {x = x, y = y}, terrains)
+    if wc then wc.from_c, wc.to_c, wc.path_c, wc.path = saved[1], saved[2], saved[3], saved[4] end
+    if not ok then error(path, 0) end
+    if key then
+        local known = waypoint_answers[GR.grid]
+        if not known or known.count >= 4096 then
+            known = {answers = {}, count = 0}
+            waypoint_answers[GR.grid] = known
+        end
+        known.answers[key], known.count = path ~= nil, known.count + 1
+    end
+    return path ~= nil
+end
+
+local function hero_point_valid(e, x, y)
+    local P, GR = package.loaded["path_db"], package.loaded["grid_db"]
+    if type(P) ~= "table" or type(GR) ~= "table" or type(NF_RALLY) ~= "number" then return false end
+    local ok, valid = pcall(function()
+        local nr, ng, tp = e.nav_rally, e.nav_grid, e.teleport
+        if nr.requires_node_nearby and not P:valid_node_nearby(x, y, nil, NF_RALLY) then return false end
+        if not GR:cell_is_only(x, y, ng.valid_terrains_dest) then return false end
+        if type(tp) == "table" and not tp.disabled
+            and math.sqrt((x - e.pos.x) ^ 2 + (y - e.pos.y) ^ 2) > tp.min_distance then
+            return true
+        end
+        return ng.ignore_waypoints or waypoints_found(GR, e, x, y)
+    end)
+    return ok and valid and true or false
+end
+
+-- Lane-1 nodes of path pi, then of the paths it connects into (path_db.path_connections), in walking order.
+local function route_nodes(P, pi)
+    local routes = hero_routes[P.paths]
+    if not routes then
+        routes = {}
+        hero_routes[P.paths] = routes
+    end
+    if routes[pi] then return routes[pi] end
+    local conn = type(P.path_connections) == "table" and P.path_connections or {}
+    local nodes, seen, cur = {}, {}, pi
+    while cur ~= nil and not seen[cur] do
+        seen[cur] = true
+        local path = P.paths[cur]
+        local lane = type(path) == "table" and path[1]
+        if type(lane) ~= "table" then break end
+        for _, n in ipairs(lane) do
+            if type(n) == "table" and finite(n.x) and finite(n.y) then nodes[#nodes+1] = n end
+        end
+        cur = conn[cur]
+    end
+    routes[pi] = nodes
+    return nodes
+end
+
+local function route_point(e, nodes, progress)
+    if #nodes == 0 then return nil end
+    local target = math.floor(progress * (#nodes - 1) + 0.5) + 1
+    for d = 0, HERO_SEARCH do
+        for _, i in ipairs(d == 0 and {target} or {target + d, target - d}) do
+            local n = nodes[i]
+            if n then
+                local x, y = math.floor(n.x + 0.5), math.floor(n.y + 0.5)
+                if hero_point_valid(e, x, y) then return x, y end
+            end
+        end
+    end
+    return nil
+end
+
+local function level_exits(store)
+    local loc = type(store.level) == "table" and store.level.locations
+    local out = {}
+    for k, ex in ipairs(type(loc) == "table" and type(loc.exits) == "table" and loc.exits or {}) do
+        local p = type(ex) == "table" and ex.pos
+        if type(p) == "table" and finite(p.x) and finite(p.y) then out[#out+1] = {k=k, x=p.x, y=p.y} end
+    end
+    return out
+end
+
+-- As LU.insert_hero places a hero (the level's custom spawn point for heroes that use it, else exit 1) and the
+-- death script brings it back (hero.respawn_point, when it has one), rounded.
+local function hero_home(e, store)
+    local level = type(store.level) == "table" and store.level or {}
+    local rp = type(e.hero) == "table" and e.hero.respawn_point
+    local p = rp or (type(e.hero) == "table" and e.hero.use_custom_spawn_point and level.custom_spawn_pos)
+    if not p then
+        local exits = level_exits(store)
+        p = exits[1] and exits[1].k == 1 and exits[1]
+    end
+    if type(p) ~= "table" or not finite(p.x) or not finite(p.y) then return nil end
+    return math.floor(p.x + 0.5), math.floor(p.y + 0.5)
+end
+
+local function hero_options(e, s, store)
+    local P = package.loaded["path_db"]
+    if type(P) ~= "table" or type(P.paths) ~= "table" then return {} end
+    local out, used = {}, {}
+    local function offer(option, x, y)
+        if x == nil or #out >= HERO_LIMIT or used[x .. "," .. y] then return end
+        used[x .. "," .. y] = true
+        out[#out+1] = {option=option, x=x, y=y}
+    end
+    local ok = pcall(function()
+        local hx, hy = hero_home(e, store)
+        if hx then
+            if not hero_point_valid(e, hx, hy) then
+                local near = {}
+                for pi, path in ipairs(P.paths) do
+                    for ni, n in ipairs(type(path) == "table" and type(path[1]) == "table" and path[1] or {}) do
+                        local d = type(n) == "table" and finite(n.x) and finite(n.y) and (n.x - hx) ^ 2 + (n.y - hy) ^ 2
+                        if d and d <= ANCHOR_SPACING * ANCHOR_SPACING then near[#near+1] = {d=d, pi=pi, ni=ni, n=n} end
+                    end
+                end
+                table.sort(near, function(a, b)
+                    if a.d ~= b.d then return a.d < b.d end
+                    if a.pi ~= b.pi then return a.pi < b.pi end
+                    return a.ni < b.ni
+                end)
+                hx = nil
+                for i = 1, math.min(#near, 2 * HERO_SEARCH + 1) do
+                    local x, y = math.floor(near[i].n.x + 0.5), math.floor(near[i].n.y + 0.5)
+                    if hero_point_valid(e, x, y) then hx, hy = x, y; break end
+                end
+            end
+            offer("home", hx, hy)
+        end
+        local exits = level_exits(store)
+        if #exits > 0 then
+            local by_exit = {}
+            for pi in ipairs(P.paths) do
+                local nodes = route_nodes(P, pi)
+                local last = nodes[#nodes]
+                if last then
+                    local best, best_d
+                    for _, ex in ipairs(exits) do
+                        local d = (last.x - ex.x) ^ 2 + (last.y - ex.y) ^ 2
+                        if best == nil or d < best_d then best, best_d = ex, d end
+                    end
+                    by_exit[best.k] = by_exit[best.k] or pi
+                end
+            end
+            for _, ex in ipairs(exits) do
+                if by_exit[ex.k] then
+                    offer("exit:" .. ex.k, route_point(e, route_nodes(P, by_exit[ex.k]), EXIT_PROGRESS))
+                end
+            end
+        end
+        local up, seen = {}, {}
+        local function add_paths(list)
+            table.sort(list)
+            for _, pi in ipairs(list) do
+                if not seen[pi] then seen[pi] = true; up[#up+1] = pi end
+            end
+        end
+        local coming, live = {}, {}
+        local nw = type(s.next_wave) == "table" and s.next_wave.paths
+        for _, p in ipairs(type(nw) == "table" and nw or {}) do
+            if type(p) == "table" and finite(p.path_index) and type(P.paths[p.path_index]) == "table" then
+                coming[#coming+1] = p.path_index
+            end
+        end
+        for _, en in ipairs(type(s.enemies) == "table" and s.enemies or {}) do
+            if type(en) == "table" and not en.dormant and finite(en.path_index)
+                and type(P.paths[en.path_index]) == "table" then
+                live[#live+1] = en.path_index
+            end
+        end
+        add_paths(coming)
+        add_paths(live)
+        for _, pi in ipairs(up) do
+            offer("up:" .. pi, route_point(e, route_nodes(P, pi), UP_PROGRESS))
+        end
+    end)
+    return ok and out or {}
+end
+
+-- v4 exports per hero: what the GUI shows of it (clickable, stunned, a rally not yet taken by its script), its
+-- home point, while dead the seconds until the death script brings it back (health.death_ts + dead_lifetime), and
+-- its last move_hero order (point, tick, and whether and how a game script has replaced it since).
+local function augment_heroes(s, store)
+    for _, h in ipairs(type(s.heroes) == "table" and s.heroes or {}) do
+        local e = type(h) == "table" and store.entities[h.id]
+        if type(e) == "table" then
+            local health = e.health
+            local o = hero_orders[e]
+            if o then
+                local r = o.replaced
+                h.order = {x = o.x, y = o.y, tick = o.tick,
+                           replaced = r and {tick = r.tick, x = r.x, y = r.y, at_hero = r.at_hero} or nil}
+            end
+            h.can_click = type(e.ui) == "table" and e.ui.can_click ~= false
+            h.rally_new = type(e.nav_rally) == "table" and e.nav_rally.new == true
+            h.stunned = type(e.unit) == "table" and e.unit.is_stunned == true
+            h.home_x, h.home_y = hero_home(e, store)
+            if type(health) == "table" and health.dead and finite(health.death_ts) and finite(health.dead_lifetime)
+                and finite(store.tick_ts) then
+                h.respawn_remaining = math.max(0, health.dead_lifetime - (store.tick_ts - health.death_ts))
+            end
+        end
+    end
+end
+
 -- Live enemies that hold back an early wave call (v3: dormant bosses do not).
 local function wave_count(s)
-    if ACTION_SCOPE == "v3" then return s.active_enemy_count end
+    if V3PLUS then return s.active_enemy_count end
     return s.enemy_count
 end
 
@@ -639,7 +1072,7 @@ local function catalog_v2(s)
                     end
                 elseif item.action == "tw_sell" then
                     if tower.can_be_sold ~= false then add({action="sell_tower", tower_id=id, cost=0}) end
-                elseif item.action == "tw_rally" and ACTION_SCOPE == "v3" and type(e.barrack) == "table" then
+                elseif item.action == "tw_rally" and V3PLUS and type(e.barrack) == "table" then
                     for _, o in ipairs(rally_options(e, s)) do
                         add({action="set_rally", tower_id=id, option=o.option, x=o.point.x, y=o.point.y, cost=0})
                     end
@@ -657,7 +1090,7 @@ local function catalog_v2(s)
                         end
                     end
                 elseif item.action == "tw_point" and point_ready(e, store) then
-                    for _, a in ipairs(strong_anchors(ACTION_SCOPE == "v3" and targetable(s.enemies) or s.enemies)) do
+                    for _, a in ipairs(strong_anchors(V3PLUS and targetable(s.enemies) or s.enemies)) do
                         add({action="point_tower", tower_id=id, x=a.x, y=a.y, anchor_id=a.id, cost=0})
                     end
                 end
@@ -671,13 +1104,27 @@ local function catalog_v2(s)
                  template=type(e.template_name) == "string" and e.template_name or "", kind=need, cost=0})
         end
     end
-    local anchors = power_anchors(ACTION_SCOPE == "v3" and targetable(s.enemies) or s.enemies)
+    local anchors = power_anchors(V3PLUS and targetable(s.enemies) or s.enemies)
     for p = 1, 2 do
         local btn = power_button(p)
         if btn and btn.mode ~= nil and btn.mode ~= "locked" and btn.mode ~= "cooldown" then
             for _, a in ipairs(anchors) do
                 if power_point_valid(p, a.x, a.y) then
                     add({action="use_power", power=p, x=a.x, y=a.y, anchor_id=a.id, cost=0})
+                end
+            end
+            if V4 then
+                for _, o in ipairs(aim_options(p, s, store)) do
+                    add({action="aim_power", power=p, x=o.x, y=o.y, option=o.option, target_id=o.target_id, cost=0})
+                end
+            end
+        end
+    end
+    if V4 then
+        for id, e in pairs(store.entities or {}) do
+            if type(e) == "table" and type(e.hero) == "table" and hero_commandable(e) then
+                for _, o in ipairs(hero_options(e, s, store)) do
+                    add({action="move_hero", hero_id=id, x=o.x, y=o.y, option=o.option, cost=0})
                 end
             end
         end
@@ -690,7 +1137,8 @@ local function catalog_v2(s)
     local keys = {}
     for _, a in ipairs(out) do
         local named = type(a.power) == "string" and a.power or a.option
-        keys[a] = {a.action or "", a.holder_id or a.tower_id or a.entity_id or 0, a.tower_type or a.target or named or "",
+        keys[a] = {a.action or "", a.holder_id or a.tower_id or a.entity_id or a.hero_id or 0,
+                   a.tower_type or a.target or named or "",
                    type(a.power) == "number" and a.power or 0, a.x or 0, a.y or 0, a.anchor_id or 0}
     end
     table.sort(out, function(a, b)
@@ -717,8 +1165,9 @@ local function state()
         s.native_outcome = store.game_outcome
         s.level_won = store.game_outcome and store.game_outcome.victory==true or false
         s.level_lost = store.game_outcome and store.game_outcome.victory==false or false
-        if ACTION_SCOPE == "v3" then s.active_enemy_count = augment_enemies(s, store) end
-        if ACTION_SCOPE == "v2" or ACTION_SCOPE == "v3" then
+        if V3PLUS then s.active_enemy_count = augment_enemies(s, store) end
+        if V4 then augment_heroes(s, store) end
+        if ACTION_SCOPE == "v2" or V3PLUS then
             s.action_catalog = catalog_v2(s)
             s.powers_ui = powers_ui()
             s.action_scope = ACTION_SCOPE
@@ -829,6 +1278,7 @@ local function step(count)
     while store.tick - start_tick < count do
         store.step = true
         original_update(store.tick_length or 1/60)
+        if V4 then watch_hero_orders(store) end
         updates = updates + 1
         if updates > count*3+4 then error("Native tick failed to advance") end
         if game.store ~= store then error("Native store changed during step") end
@@ -845,13 +1295,13 @@ end
 -- build_tower's target is implied by tower_type and may be omitted, as in v1 menus;
 -- a stated target must still match.
 local function handle_v2(cmd)
-    if not (ACTION_SCOPE == "v3" and V3_ACTIONS or V2_ACTIONS)[cmd.action] then
+    if not (V4 and V4_ACTIONS or V3PLUS and V3_ACTIONS or V2_ACTIONS)[cmd.action] then
         error("Action not enabled in verified experiment scope")
     end
     local legal = false
     for _, a in ipairs(state().action_catalog or {}) do
         local same = true
-        for _, key in ipairs(V2_MATCH_KEYS) do
+        for _, key in ipairs(V4 and V4_MATCH_KEYS or V2_MATCH_KEYS) do
             local implied = key == "target" and a.action == "build_tower" and cmd.target == nil
             if not implied and cmd[key] ~= a[key] then same = false; break end
         end
@@ -884,7 +1334,8 @@ local function handle_v2(cmd)
         e.tower.spent = (e.tower.spent or 0) + price
         return {native_wire=native.codec.encode({type="ok", action="upgrade_power", tower_id=cmd.tower_id,
                                                  power=cmd.power, level=pw.level, cost=price})}
-    elseif cmd.action == "use_power" then
+    elseif cmd.action == "use_power" or cmd.action == "aim_power" then
+        -- An aimed spell is the same cast at its named point: the bridge's use_power (entity + cooldown).
         return {native_wire=native.command_json({action="use_power", power=cmd.power, x=cmd.x, y=cmd.y})}
     elseif cmd.action == "click_entity" then
         -- As the GUI's PickView click on this entity: its script consumes ui.clicked.
@@ -906,6 +1357,23 @@ local function handle_v2(cmd)
         e.user_selection.new_pos = {x=cmd.x, y=cmd.y}
         return {native_wire=native.codec.encode({type="ok", action="point_tower", tower_id=cmd.tower_id,
                                                  x=cmd.x, y=cmd.y, anchor_id=cmd.anchor_id})}
+    elseif cmd.action == "move_hero" then
+        -- As the GUI's GUI_MODE_RALLY_HERO click (game_gui L4998-5003): waypoints from the game's find_waypoints
+        -- (unless the hero ignores waypoints), rally new, new pos and center vectors; the hero's own script then
+        -- walks (or teleports) it there. Never the bridge's move_hero, which skips all of this. The order is
+        -- remembered (hero_orders), so the receipt can tell a script that replaced it from a click that failed.
+        local e = game.store.entities[cmd.hero_id]
+        if not e.nav_grid.ignore_waypoints then
+            e.nav_grid.waypoints = package.loaded["grid_db"]:find_waypoints(e.pos, e.nav_rally.pos, {x=cmd.x, y=cmd.y},
+                                                                             e.nav_grid.valid_terrains)
+        end
+        local pos = {x=cmd.x, y=cmd.y}
+        e.nav_rally.new = true
+        e.nav_rally.pos = pos
+        e.nav_rally.center = {x=cmd.x, y=cmd.y}
+        hero_orders[e] = {pos = pos, x = cmd.x, y = cmd.y, tick = game.store.tick}
+        return {native_wire=native.codec.encode({type="ok", action="move_hero", hero_id=cmd.hero_id,
+                                                 option=cmd.option, x=cmd.x, y=cmd.y})}
     end
     return {native_wire=native.command_json(cmd)}
 end
@@ -944,7 +1412,7 @@ local function handle(cmd)
         -- Cumulative random() call counts per calling chunk (diagnostic RNG modes only).
         local rng = ALPHARUSH_RNG
         return {mode = rng and rng.mode or "", counts = rng and plain(rng.counts, 3) or {}}
-    elseif ACTION_SCOPE == "v2" or ACTION_SCOPE == "v3" then return handle_v2(cmd)
+    elseif ACTION_SCOPE == "v2" or V3PLUS then return handle_v2(cmd)
     else
         if cmd.action=="build_tower" or cmd.action=="send_wave" then
             local legal=false
@@ -964,8 +1432,9 @@ local function handle(cmd)
 end
 
 function M.install(update)
-    if ACTION_SCOPE ~= "v1" and ACTION_SCOPE ~= "v2" and ACTION_SCOPE ~= "v3" then
-        error("Unsupported ALPHARUSH_ACTION_SCOPE " .. string.format("%q", ACTION_SCOPE) .. " (expected v1, v2 or v3)")
+    if ACTION_SCOPE ~= "v1" and ACTION_SCOPE ~= "v2" and not V3PLUS then
+        error("Unsupported ALPHARUSH_ACTION_SCOPE " .. string.format("%q", ACTION_SCOPE)
+              .. " (expected v1, v2, v3 or v4)")
     end
     original_update = update
     server = assert(socket.bind("127.0.0.1", tonumber(os.getenv("ALPHARUSH_PORT")) or 9879))

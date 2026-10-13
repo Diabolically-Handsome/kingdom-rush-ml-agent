@@ -1,0 +1,11 @@
+{
+ "note": "Journals larger than 50 MB are published as deterministic gzip files (no file name, mtime 0, level 9); original_sha256 is the SHA256 of the decompressed journal.",
+ "files": {
+  "runtime/rl/elite-v3/runs/native-eval-da28d8e25ce443c1b6c4c7f8724de6be/episodes.jsonl": {
+   "published": "runtime/rl/elite-v3/runs/native-eval-da28d8e25ce443c1b6c4c7f8724de6be/episodes.jsonl.gz",
+   "original_sha256": "16759f8af4307c787d73000190afa4712500086bc1d5c88b52fa25fc78a4541d",
+   "original_bytes": 263499145,
+   "gzip_sha256": "d7969a5d53bdd3da87f9e87dac4811bd735e8317fe018775124686bffb2fcc7c"
+  }
+ }
+}

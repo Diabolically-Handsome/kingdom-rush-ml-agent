@@ -1,0 +1,100 @@
+
+Loading weights:   0%|          | 0/531 [00:00<?, ?it/s]
+Loading weights:   0%|          | 1/531 [00:00<07:20,  1.20it/s]
+Loading weights:   0%|          | 2/531 [00:01<07:35,  1.16it/s]
+Loading weights:   1%|          | 4/531 [00:01<03:28,  2.53it/s]
+Loading weights:   1%|          | 5/531 [00:02<02:40,  3.28it/s]
+Loading weights:   2%|▏         | 8/531 [00:02<01:18,  6.66it/s]
+Loading weights:   2%|▏         | 13/531 [00:02<00:42, 12.15it/s]
+Loading weights:   3%|▎         | 16/531 [00:02<00:39, 13.00it/s]
+Loading weights:   4%|▍         | 22/531 [00:02<00:27, 18.82it/s]
+Loading weights:   5%|▍         | 25/531 [00:02<00:28, 18.05it/s]
+Loading weights:   6%|▌         | 31/531 [00:03<00:21, 23.20it/s]
+Loading weights:   6%|▋         | 34/531 [00:03<00:23, 21.15it/s]
+Loading weights:   8%|▊         | 40/531 [00:03<00:19, 25.52it/s]
+Loading weights:   8%|▊         | 43/531 [00:03<00:21, 22.64it/s]
+Loading weights:   9%|▉         | 49/531 [00:03<00:18, 26.72it/s]
+Loading weights:  10%|▉         | 52/531 [00:03<00:20, 23.31it/s]
+Loading weights:  11%|█         | 58/531 [00:04<00:17, 27.22it/s]
+Loading weights:  11%|█▏        | 61/531 [00:04<00:19, 23.75it/s]
+Loading weights:  13%|█▎        | 67/531 [00:04<00:16, 27.56it/s]
+Loading weights:  13%|█▎        | 70/531 [00:04<00:19, 23.78it/s]
+Loading weights:  14%|█▍        | 76/531 [00:04<00:16, 27.63it/s]
+Loading weights:  15%|█▍        | 79/531 [00:04<00:18, 23.92it/s]
+Loading weights:  16%|█▌        | 85/531 [00:05<00:16, 27.62it/s]
+Loading weights:  17%|█▋        | 88/531 [00:05<00:18, 24.09it/s]
+Loading weights:  18%|█▊        | 94/531 [00:05<00:15, 27.59it/s]
+Loading weights:  18%|█▊        | 97/531 [00:05<00:18, 23.95it/s]
+Loading weights:  19%|█▉        | 103/531 [00:05<00:15, 27.93it/s]
+Loading weights:  20%|█▉        | 106/531 [00:05<00:17, 24.19it/s]
+Loading weights:  21%|██        | 112/531 [00:06<00:15, 27.83it/s]
+Loading weights:  22%|██▏       | 115/531 [00:06<00:17, 24.25it/s]
+Loading weights:  23%|██▎       | 121/531 [00:06<00:14, 27.90it/s]
+Loading weights:  23%|██▎       | 124/531 [00:06<00:17, 23.87it/s]
+Loading weights:  24%|██▍       | 130/531 [00:06<00:14, 27.63it/s]
+Loading weights:  25%|██▌       | 133/531 [00:07<00:16, 23.43it/s]
+Loading weights:  26%|██▌       | 139/531 [00:07<00:14, 26.95it/s]
+Loading weights:  27%|██▋       | 142/531 [00:07<00:16, 23.28it/s]
+Loading weights:  28%|██▊       | 148/531 [00:07<00:14, 26.90it/s]
+Loading weights:  28%|██▊       | 151/531 [00:07<00:16, 23.40it/s]
+Loading weights:  30%|██▉       | 157/531 [00:07<00:14, 26.59it/s]
+Loading weights:  30%|███       | 160/531 [00:08<00:16, 23.06it/s]
+Loading weights:  31%|███▏      | 166/531 [00:08<00:13, 26.54it/s]
+Loading weights:  32%|███▏      | 169/531 [00:08<00:15, 22.72it/s]
+Loading weights:  33%|███▎      | 175/531 [00:08<00:13, 26.47it/s]
+Loading weights:  34%|███▎      | 178/531 [00:08<00:15, 22.79it/s]
+Loading weights:  35%|███▍      | 184/531 [00:09<00:13, 25.80it/s]
+Loading weights:  35%|███▌      | 187/531 [00:09<00:15, 22.63it/s]
+Loading weights:  36%|███▋      | 193/531 [00:09<00:12, 26.09it/s]
+Loading weights:  37%|███▋      | 196/531 [00:09<00:14, 22.77it/s]
+Loading weights:  38%|███▊      | 202/531 [00:09<00:12, 25.76it/s]
+Loading weights:  39%|███▊      | 205/531 [00:09<00:14, 22.45it/s]
+Loading weights:  40%|███▉      | 211/531 [00:10<00:12, 26.00it/s]
+Loading weights:  40%|████      | 214/531 [00:10<00:13, 22.79it/s]
+Loading weights:  41%|████▏     | 220/531 [00:10<00:11, 26.13it/s]
+Loading weights:  42%|████▏     | 223/531 [00:10<00:13, 22.73it/s]
+Loading weights:  43%|████▎     | 229/531 [00:10<00:11, 26.38it/s]
+Loading weights:  44%|████▎     | 232/531 [00:11<00:12, 23.04it/s]
+Loading weights:  45%|████▍     | 238/531 [00:11<00:10, 26.72it/s]
+Loading weights:  45%|████▌     | 241/531 [00:11<00:12, 23.27it/s]
+Loading weights:  47%|████▋     | 247/531 [00:11<00:10, 26.78it/s]
+Loading weights:  47%|████▋     | 250/531 [00:11<00:12, 23.31it/s]
+Loading weights:  48%|████▊     | 256/531 [00:11<00:10, 27.02it/s]
+Loading weights:  49%|████▉     | 259/531 [00:12<00:11, 23.43it/s]
+Loading weights:  50%|████▉     | 265/531 [00:12<00:09, 27.00it/s]
+Loading weights:  50%|█████     | 268/531 [00:12<00:11, 23.39it/s]
+Loading weights:  52%|█████▏    | 274/531 [00:12<00:09, 26.76it/s]
+Loading weights:  52%|█████▏    | 277/531 [00:12<00:10, 23.15it/s]
+Loading weights:  53%|█████▎    | 283/531 [00:13<00:09, 26.71it/s]
+Loading weights:  54%|█████▍    | 286/531 [00:13<00:10, 23.20it/s]
+Loading weights:  55%|█████▍    | 292/531 [00:13<00:09, 26.33it/s]
+Loading weights:  56%|█████▌    | 295/531 [00:13<00:10, 22.52it/s]
+Loading weights:  57%|█████▋    | 301/531 [00:13<00:08, 26.02it/s]
+Loading weights:  57%|█████▋    | 304/531 [00:13<00:09, 22.80it/s]
+Loading weights:  59%|█████▊    | 311/531 [00:14<00:07, 31.39it/s]
+Loading weights:  64%|██████▍   | 341/531 [00:14<00:02, 86.65it/s]
+Loading weights:  70%|███████   | 372/531 [00:14<00:01, 136.87it/s]
+Loading weights:  76%|███████▌  | 402/531 [00:14<00:00, 175.02it/s]
+Loading weights:  81%|████████  | 430/531 [00:14<00:00, 200.14it/s]
+Loading weights:  86%|████████▋ | 458/531 [00:14<00:00, 220.88it/s]
+Loading weights:  92%|█████████▏| 488/531 [00:14<00:00, 241.46it/s]
+Loading weights:  98%|█████████▊| 519/531 [00:14<00:00, 257.17it/s]
+Loading weights: 100%|██████████| 531/531 [00:14<00:00, 35.75it/s] 
+[transformers] `use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`.
+/home/<user>/alpharush/.venv/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py:1298: UserWarning: torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly. Starting in PyTorch 2.9, calling checkpoint without use_reentrant will raise an exception. use_reentrant=False is recommended, but if you need to preserve the current default behavior, you can pass use_reentrant=True. Refer to docs for more details on the differences between the two variants.
+  return fn(*args, **kwargs)
+step 20: loss 0.6890
+step 40: loss 0.6525
+step 60: loss 0.5837
+step 80: loss 0.6296
+step 100: loss 0.5920
+step 120: loss 0.5863
+step 140: loss 0.6080
+step 160: loss 0.5975
+step 180: loss 0.6162
+step 200: loss 0.5640
+step 220: loss 0.5519
+step 240: loss 0.5823
+[transformers] Calling `crop` with a positive value is deprecated and will be removed in version 5.18. Please use a negative integer to remove that number of tokens from the cache instead.
+holdout after {'examples': 1, 'accuracy': 0.0, 'mean_rank': 4.0}
+{"holdout_before": null, "holdout_after": {"examples": 1, "accuracy": 0.0, "mean_rank": 4.0}, "optimizer_steps": 253, "wall_seconds": 1500.1373536586761}

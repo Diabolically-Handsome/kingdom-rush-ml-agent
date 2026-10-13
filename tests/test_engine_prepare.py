@@ -332,7 +332,7 @@ class WorkerHygieneTests(TempGameMixin, unittest.TestCase):
             self.assertEqual(engine.Worker(rng_mode=mode).rng_mode, mode)
         with self.assertRaises(ValueError):
             engine.Worker(rng_mode="isolate")
-        self.assertEqual(engine.ACTION_SCOPES, ("v1", "v2", "v3"))
+        self.assertEqual(engine.ACTION_SCOPES, ("v1", "v2", "v3", "v4"))
         self.assertEqual(engine.Worker().action_scope, "v1")
         for scope in engine.ACTION_SCOPES:
             self.assertEqual(engine.Worker(action_scope=scope).action_scope, scope)

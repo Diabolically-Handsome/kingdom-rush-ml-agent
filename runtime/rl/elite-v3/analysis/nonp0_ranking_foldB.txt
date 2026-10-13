@@ -1,0 +1,7 @@
+consults with >= 2 deviations on seeds [1201, 1202]: 495 in 28 games; fixed ranking from [1203, 1204]: ['P3', 'P4', 'P2', 'P1']
+fixed_ranking  d_np +0.056 [+0.014,+0.096]  rho(nonP0) +0.074 [+0.011,+0.137]  minus fixed ranking +0.000 [+0.000,+0.000]
+lora_B_real    d_np +0.024 [-0.026,+0.073]  rho(nonP0) +0.056 [-0.008,+0.118]  minus fixed ranking -0.032 [-0.068,-0.004]
+lora_B_perm    d_np +0.042 [-0.002,+0.087]  rho(nonP0) +0.061 [-0.009,+0.129]  minus fixed ranking -0.015 [-0.040,+0.003]
+8b             d_np -0.026 [-0.052,+0.003]  rho(nonP0) -0.041 [-0.109,+0.024]  minus fixed ranking -0.083 [-0.144,-0.020]
+24b            d_np -0.022 [-0.052,+0.011]  rho(nonP0) -0.061 [-0.121,-0.002]  minus fixed ranking -0.079 [-0.141,-0.011]
+{"fixed_ranking": {"d_np": [0.0563, 0.0142, 0.0957], "spearman_nonp0": [0.074, 0.0111, 0.1368], "minus_fixed_ranking": [0.0, 0.0, 0.0]}, "lora_B_real": {"d_np": [0.0239, -0.0256, 0.0731], "spearman_nonp0": [0.0556, -0.0084, 0.118], "minus_fixed_ranking": [-0.0324, -0.0681, -0.0044]}, "lora_B_perm": {"d_np": [0.0416, -0.0018, 0.0866], "spearman_nonp0": [0.0615, -0.0088, 0.1288], "minus_fixed_ranking": [-0.0147, -0.0403, 0.0034]}, "8b": {"d_np": [-0.0264, -0.0523, 0.0026], "spearman_nonp0": [-0.0406, -0.1093, 0.0237], "minus_fixed_ranking": [-0.0827, -0.1445, -0.02]}, "24b": {"d_np": [-0.0224, -0.0516, 0.0113], "spearman_nonp0": [-0.0611, -0.1205, -0.0023], "minus_fixed_ranking": [-0.0787, -0.1409, -0.011]}}

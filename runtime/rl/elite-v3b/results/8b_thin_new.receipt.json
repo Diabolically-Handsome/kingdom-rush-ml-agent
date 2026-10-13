@@ -1,0 +1,17 @@
+{
+ "schema": "alpharush-v3b-scorer-v1",
+ "model": "mistralai/Ministral-3-8B-Instruct-2512-BF16@f6fae9795746f63c9be8344932f01275f3c63734:nf4-bf16:instruction-base:no-adapter",
+ "manifest_sha256": "7ec6bedd52b9b691238a8962fa176d26cfe7592cdcbacf605f16c1fd73bac678",
+ "tokenizer": "MistralCommonBackend",
+ "load_seconds": 19.7,
+ "gpu": "NVIDIA GeForce RTX 5090",
+ "mode": "label",
+ "requests": "runtime/rl/elite-v3b/requests/thin_new.jsonl",
+ "requests_sha256": "8689b34c518db9c936726906f2d3d993e18fb0dfef4043f9127c4c4bea93fcd2",
+ "consults": 985,
+ "script_sha256": "16b519c31d724e732f0b28c5f5872cd411ab515f91ce179ff46d122613b0facc",
+ "batch": 8,
+ "max_new_tokens": 250,
+ "seconds": 1012.6,
+ "output_sha256": "315370dbcee0428097e94cbc2e7fcfbf6c1f70885802a2188f3e4c67dd3ba60d"
+}

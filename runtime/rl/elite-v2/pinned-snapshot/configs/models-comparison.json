@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "plan_id": "KR1-8B-5080-vs-24B-5090-v1",
+  "status": "prepared_pending_live_validation_and_final_freeze",
+  "interpretation": "comparison_of_two_complete_deployment_schemes_not_causal_parameter_count_test",
+  "models_config": "configs/rl-deployment.json",
+  "adapters": "none_no_<other-project>_adapter_reuse",
+  "pool": "validation",
+  "seeds": [2001,2002,2003,2004],
+  "levels": [2],
+  "heldout_access": false,
+  "development_status": "future_level2_validation_comparison_pending_native_level2_action_and_replay_validation",
+  "initial_deployment_smoke": {
+    "pool": "train",
+    "level": 1,
+    "seed": 1001,
+    "kind": "exploratory_first_level_deployment_smoke",
+    "not_validation_or_heldout_evaluation": true,
+    "state_count": 1,
+    "warmup": 2,
+    "timed": 3
+  },
+  "heldout_policy": "reserve_for_future_once_only_frozen_judgment",
+  "matched_inputs": [
+    "identical_native_states",
+    "identical_exact_utf8_system_and_user_prompt_bytes",
+    "identical_complete_legal_menu_and_label_order",
+    "identical_supported_action_scope",
+    "identical_context_content_and_limits",
+    "identical_seed_level_difficulty_and_tick_windows",
+    "identical_rule_executor_and_action_receipt_verification"
+  ],
+  "context": {
+    "max_prompt_tokens": 4096,
+    "overflow": "reject_both_models_do_not_silently_truncate_one",
+    "full_context_identity": "hash_utf8_messages_and_record_each_tokenizer_count",
+    "prompt_tokens_comparability": "different_tokenizers_may_encode_same_bytes_to_different_token_counts"
+  },
+  "choice": {
+    "protocol": "complete_legal_label_plus_EOS_sequence_scores",
+    "mode": "deterministic_argmax",
+    "ties": "first_in_identical_label_order",
+    "legal_distribution": "report_conditional_distribution_over_identical_legal_sequence_candidates",
+    "illegal_rate": "pending_unconstrained_generation_calibration",
+    "masked_choice_is_not_illegal_rate_measurement": true
+  },
+  "timing": {
+    "warmup_requests_per_model": 2,
+    "warmup_separate": true,
+    "timed_requests_per_state": 3,
+    "record": ["model_load_seconds", "warmup_seconds", "queue_seconds", "tokenization_seconds", "forward_seconds", "total_request_seconds", "gpu_peak_memory_mib", "prompt_tokens", "legal_label_count"],
+    "report": ["per_state_paired_latency", "median", "p90", "end_to_end_episode_wall_time"],
+    "hardware_caveat": "8B_runs_5080_24B_runs_5090_hardware_and_models_both_differ"
+  },
+  "episode_comparison": {
+    "enabled_after": "both_native_brokers_and_same_rule_scaffold_verified",
+    "arms": ["8b_on_5080", "24b_on_5090"],
+    "change_between_arms": "selected_option_model_only",
+    "paired_seed_windows": true,
+    "record": ["native_win_loss", "lives_remaining", "stars_if_native_verified", "rules_decisions", "model_decisions", "rules_fallback_decisions", "invalid_raw_model_outputs", "verified_actions", "engineering_failures", "timeouts"],
+    "autonomy_ratio": "model_decisions_divided_by_all_decisions_with_rules_and_fallback_counts_separately_reported",
+    "engineering_failures": "preserve_and_report_do_not_count_as_zero_reward_or_model_loss",
+    "offline_choices_are_not_gameplay_effectiveness": true
+  },
+  "freeze_requirements": [
+    "sha256_of_both_local_base_model_file_manifests",
+    "sha256_of_broker_tokenizers_prompt_renderer_scoring_protocol_rule_scaffold_and_plan",
+    "record_GPU_UUID_driver_runtime_quantization_context_and_native_price_contract",
+    "native_four_gate_evidence_and_scoped_action_receipts",
+    "独立busy检查与进程锁预算门禁完成后才能正式发车"
+  ],
+  "causal_limitations": [
+    "base_model_families_and_release_versions_differ",
+    "tokenizers_and_instruction_formats_can_differ",
+    "GPU_hardware_differs",
+    "results_do_not_isolate_parameter_count_effect",
+    "validation_development_comparison_cannot_be_reported_as_untouched_heldout_result"
+  ]
+}

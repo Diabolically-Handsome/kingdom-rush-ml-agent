@@ -1,0 +1,108 @@
+complete consults (n>=2): 489 in 28 base games (10 won; 192 consults from won games)
+
+== brain vs branches (all complete consults); CI = 95% cluster bootstrap over base games ==
+brain              n  meanR  nonP0        d_all (chosen-mean all)       d_np (chosen-mean nonP0)  argmax  chance   rank
+-- all (489 consults, 28 games)
+steady           489  0.870   0.00         -0.019 [-0.125,+0.101]         -0.028 [-0.176,+0.127]   0.456   0.400  0.537
+lora_A_perm      489  0.870   0.00         -0.019 [-0.134,+0.093]         -0.028 [-0.186,+0.121]   0.456   0.400  0.537
+rule             489  0.897   0.57         +0.007 [-0.036,+0.055]         -0.001 [-0.073,+0.076]   0.450   0.400  0.538
+random(shadow)   489  0.913   0.75         +0.024 [-0.012,+0.060]         +0.015 [-0.042,+0.066]   0.419   0.400  0.520
+always_P1        489  0.862   1.00         -0.028 [-0.082,+0.027]         -0.036 [-0.068,-0.001]   0.333   0.400  0.456
+always_P2        454  0.865   1.00         -0.028 [-0.071,+0.018]         -0.032 [-0.067,+0.004]   0.337   0.386  0.456
+always_P4        489  0.942   1.00         +0.053 [-0.012,+0.115]         +0.044 [+0.002,+0.088]   0.462   0.400  0.545
+oracle           489  1.262   0.54         +0.373 [+0.318,+0.428]         +0.365 [+0.302,+0.430]   1.000   0.400  0.898
+-- base_lost (297 consults, 18 games)
+steady           297  0.408   0.00         -0.240 [-0.297,-0.183]         -0.319 [-0.393,-0.249]   0.347   0.425  0.429
+lora_A_perm      297  0.408   0.00         -0.240 [-0.297,-0.186]         -0.319 [-0.401,-0.247]   0.347   0.425  0.429
+rule             297  0.619   0.56         -0.028 [-0.074,+0.020]         -0.108 [-0.162,-0.054]   0.468   0.425  0.533
+random(shadow)   297  0.668   0.77         +0.021 [-0.034,+0.074]         -0.059 [-0.122,+0.002]   0.444   0.425  0.523
+always_P1        297  0.697   1.00         +0.050 [+0.000,+0.102]         -0.030 [-0.079,+0.018]   0.391   0.425  0.488
+always_P2        271  0.666   1.00         +0.017 [-0.034,+0.077]         -0.061 [-0.106,-0.016]   0.380   0.413  0.474
+always_P4        297  0.799   1.00         +0.152 [+0.106,+0.197]         +0.072 [+0.021,+0.121]   0.562   0.425  0.601
+oracle           297  1.038   0.65         +0.391 [+0.326,+0.454]         +0.311 [+0.257,+0.370]   1.000   0.425  0.883
+-- base_won (192 consults, 10 games)
+steady           192  1.585   0.00         +0.322 [+0.226,+0.413]         +0.423 [+0.300,+0.555]   0.625   0.361  0.706
+lora_A_perm      192  1.585   0.00         +0.322 [+0.220,+0.415]         +0.423 [+0.290,+0.553]   0.625   0.361  0.706
+rule             192  1.326   0.60         +0.062 [-0.013,+0.145]         +0.164 [+0.066,+0.275]   0.422   0.361  0.547
+random(shadow)   192  1.292   0.71         +0.028 [+0.008,+0.050]         +0.130 [+0.093,+0.165]   0.380   0.361  0.515
+always_P1        192  1.116   1.00         -0.148 [-0.203,-0.091]         -0.046 [-0.091,+0.002]   0.245   0.361  0.407
+always_P2        183  1.159   1.00         -0.094 [-0.156,-0.028]         +0.010 [-0.032,+0.058]   0.273   0.346  0.428
+always_P4        192  1.163   1.00         -0.101 [-0.178,-0.037]         +0.001 [-0.078,+0.068]   0.307   0.361  0.459
+oracle           192  1.609   0.38         +0.345 [+0.253,+0.443]         +0.447 [+0.314,+0.581]   1.000   0.361  0.922
+
+== regression to the mean: mean(non-P0) - P0, and share of non-P0 branches beating / losing to P0 ==
+base LOST: branches 901  mean(nonP0 - P0) +0.322  better 0.41 worse 0.27 identical 0.32
+base WON : branches 603  mean(nonP0 - P0) -0.432  better 0.20 worse 0.64 identical 0.16
+win/loss flips vs base among all non-P0 branches: 474/1504 = 0.315
+
+== permutation tests (1000x; statistic = mean chosen R; one-sided p = P(null >= observed)) ==
+lora_A_perm     uniform   obs 0.8701  null 0.8891 (sd 0.0186)  p 0.8442  n=489
+lora_A_perm     nonp0     obs 0.8701  null 0.8701 (sd 0.0000)  p 1.0000  n=489
+lora_A_perm     marginal  obs 0.8701  null 0.8701 (sd 0.0000)  p 1.0000  n=489
+rule            uniform   obs 0.8968  null 0.8892 (sd 0.0181)  p 0.3357  n=489
+rule            nonp0     obs 0.8968  null 0.8987 (sd 0.0123)  p 0.5564  n=489
+rule            marginal  obs 0.8968  null 0.8886 (sd 0.0161)  p 0.3007  n=489
+random(shadow)  uniform   obs 0.9130  null 0.8901 (sd 0.0185)  p 0.1099  n=489
+random(shadow)  nonp0     obs 0.9130  null 0.9014 (sd 0.0147)  p 0.2078  n=489
+random(shadow)  marginal  obs 0.9130  null 0.8933 (sd 0.0181)  p 0.1469  n=489
+always_P1       uniform   obs 0.8615  null 0.8890 (sd 0.0181)  p 0.9331  n=489
+always_P1       nonp0     obs 0.8615  null 0.8985 (sd 0.0164)  p 0.9860  n=489
+always_P1       marginal  obs 0.8615  null 0.8615 (sd 0.0000)  p 1.0000  n=489
+
+lora_A_perm p vs outcome, within-consult Spearman: +0.064 [-0.047,+0.176] over 432 consults with outcome ties broken; perm p 0.0100
+lora_A_perm top-play probability: median 0.476, mean 0.477
+
+== noise floor ==
+S1 rule - placebo (same plays, 1 tick later): tasks 56, mean +0.039, SD 0.447, win-discordant 8/56
+S1 rule - steady (different plays):             SD 0.731, win-discordant 20/56
+variance of non-P0 branch R: within consult 0.2043 (SD 0.452, df 1015); consult means within game 0.1578; game means 0.1012
+cross-seed replication of play-id effects: situations 215 (174 seen on >=2 seeds), seed-pair x play cells 716, split-seed corr +0.051, label-permutation p 0.1179
+
+== play-id main effects: y_j - mean(non-P0 of same consult) and y_j - y_0, cluster CI over games ==
+P1: consults  489  vs mean nonP0 -0.036 [-0.071,-0.002]   vs P0 -0.009 [-0.178,+0.158]
+P2: consults  454  vs mean nonP0 -0.032 [-0.068,+0.001]   vs P0 -0.016 [-0.171,+0.148]
+P3: consults   72  vs mean nonP0 +0.150 [+0.043,+0.268]   vs P0 +0.089 [-0.323,+0.484]
+P4: consults  489  vs mean nonP0 +0.044 [-0.003,+0.088]   vs P0 +0.072 [-0.095,+0.242]
+lora_A_perm chosen play ids on complete consults: {'P0': 489}
+rule chosen play ids on complete consults: {'P0': 208, 'P4': 163, 'P1': 118}
+lora_A_perm == always_P1 on 0/489 complete consults
+-> C:/Users/<user>/Documents/AlphaRush/runtime/rl/elite-v3/analysis/skill_lora_A_perm.json
+
+== extra: does anything beyond the play-id main effect replicate across seeds? ==
+situation-specific (play-id main effect removed) split-seed corr +0.041, perm p 0.2088
+
+== extra: play-id effect (vs mean non-P0) by level and by seed ==
+P1 by level: 15:-0.071(n93)  17:-0.012(n63)  19:-0.048(n76)  20:-0.032(n73)  21:-0.040(n70)  22:-0.026(n55)  26:-0.003(n59)
+P1 by seed: 1203:-0.051(n223)  1204:-0.024(n266)
+P4 by level: 15:+0.163(n93)  17:+0.046(n63)  19:-0.011(n76)  20:-0.014(n73)  21:+0.024(n70)  22:+0.058(n55)  26:+0.010(n59)
+P4 by seed: 1203:+0.050(n223)  1204:+0.039(n266)
+lora_A_perm mean probability by play id: {'P0': 0.4769, 'P1': 0.176, 'P2': 0.1595, 'P3': 0.1835, 'P4': 0.1721}
+
+== extra: build_commander_sft labels (MARGIN 0.01) by split, and the base games behind them ==
+train: consults 0, base games 0 (won 0), targets {}
+holdout: consults 489, base games 28 (won 10), targets {'P1': 85, 'P4': 101, 'P0': 223, 'P2': 72, 'P3': 8}
+   label==P0 iff base game won: 314/489
+
+== extra: v3_regret_eval-style gain vs steady on holdout seeds, naive vs cluster CI ==
+lora_A_perm     gain vs steady +0.000  naive +-0.000   cluster [+0.000,+0.000] (28 games, all base-lost: False)
+rule            gain vs steady +0.027  naive +-0.047   cluster [-0.087,+0.124] (28 games, all base-lost: False)
+random(shadow)  gain vs steady +0.043  naive +-0.051   cluster [-0.077,+0.155] (28 games, all base-lost: False)
+always_P1       gain vs steady -0.009  naive +-0.059   cluster [-0.170,+0.156] (28 games, all base-lost: False)
+always_P4       gain vs steady +0.072  naive +-0.062   cluster [-0.095,+0.234] (28 games, all base-lost: False)
+
+== extra: power for d_np (chosen - mean nonP0), cluster = base game ==
+lora_A_perm SD of per-game mean d_np 0.415 -> base games for 80% power: delta 0.05: 541, delta 0.10: 136
+always_P4  SD of per-game mean d_np 0.113 -> base games for 80% power: delta 0.05: 41, delta 0.10: 11
+rule       SD of per-game mean d_np 0.202 -> base games for 80% power: delta 0.05: 128, delta 0.10: 32
+whole-game paired arm-vs-steady (SD 0.731): tasks for 80% power: {0.05: 1676, 0.1: 419, 0.2: 105}
+
+forks with a trace identical to the base game: 38 (same R: 38)
+-> C:/Users/<user>/Documents/AlphaRush/runtime/rl/elite-v3/analysis/skill_lora_A_perm.json
+
+== extra: is the oracle just 'some re-roll wins'? (lost base games; independent-coin model) ==
+non-P0 branch win rate in lost base games q=0.293; consults with >=1 winning branch: observed 0.525, independent-coin prediction 0.646; win rate by play id P1 0.269 (n297), P2 0.240 (n271), P3 0.444 (n36), P4 0.347 (n297)
+
+== extra: deviation timing (does the brain deviate where deviating helps, within the same base game?) ==
+rule            within-game cov(deviate, mean nonP0) +0.02025  perm p 0.0140
+random(shadow)  within-game cov(deviate, mean nonP0) +0.00271  perm p 0.3636
+lora_A_perm     within-game cov(deviate, mean nonP0) +0.00000  perm p 1.0000

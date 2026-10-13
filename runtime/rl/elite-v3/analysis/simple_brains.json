@@ -1,0 +1,126 @@
+{
+ "fit [1201, 1202] -> score [1203, 1204]": {
+  "steady": {
+   "gain_vs_steady": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "d_np": [
+    0,
+    0,
+    0
+   ],
+   "deviations": 0,
+   "consults": 489,
+   "games": 28
+  },
+  "rule": {
+   "gain_vs_steady": [
+    0.0267,
+    -0.0737,
+    0.1279
+   ],
+   "d_np": [
+    -0.0033,
+    -0.0516,
+    0.0454
+   ],
+   "deviations": 281,
+   "consults": 489,
+   "games": 28
+  },
+  "rule_timing_best": {
+   "gain_vs_steady": [
+    0.0648,
+    -0.0273,
+    0.1503
+   ],
+   "d_np": [
+    0.063,
+    0.0163,
+    0.1132
+   ],
+   "deviations": 281,
+   "consults": 489,
+   "games": 28
+  },
+  "always_best": {
+   "gain_vs_steady": [
+    0.0983,
+    -0.0631,
+    0.2526
+   ],
+   "d_np": [
+    0.0706,
+    0.0305,
+    0.1129
+   ],
+   "deviations": 489,
+   "consults": 489,
+   "games": 28
+  }
+ },
+ "fit [1203, 1204] -> score [1201, 1202]": {
+  "steady": {
+   "gain_vs_steady": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "d_np": [
+    0,
+    0,
+    0
+   ],
+   "deviations": 0,
+   "consults": 496,
+   "games": 28
+  },
+  "rule": {
+   "gain_vs_steady": [
+    -0.1396,
+    -0.2406,
+    -0.0357
+   ],
+   "d_np": [
+    0.004,
+    -0.0421,
+    0.0459
+   ],
+   "deviations": 297,
+   "consults": 496,
+   "games": 28
+  },
+  "rule_timing_best": {
+   "gain_vs_steady": [
+    -0.0971,
+    -0.2026,
+    0.0143
+   ],
+   "d_np": [
+    0.0749,
+    0.0213,
+    0.1249
+   ],
+   "deviations": 297,
+   "consults": 496,
+   "games": 28
+  },
+  "always_best": {
+   "gain_vs_steady": [
+    -0.1819,
+    -0.3424,
+    -0.0061
+   ],
+   "d_np": [
+    0.0562,
+    0.0148,
+    0.0951
+   ],
+   "deviations": 496,
+   "consults": 496,
+   "games": 28
+  }
+ }
+}

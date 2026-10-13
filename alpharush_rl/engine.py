@@ -248,15 +248,17 @@ RNG_MODES = tuple("+".join(t for i, t in enumerate(RNG_TOKENS) if mask >> i & 1)
 # Sound-RNG isolation plus creation-order iteration of coroutine/object-keyed tables.
 DETERMINISTIC_MODE = "isolate_sound+stable_pairs"
 # Native action catalogs the host can serve; "v1" (build/send only) is the replay-stable default,
-# "v3" (elite stages) is v2 plus barracks rally points and dormant/boss-aware enemy data.
-ACTION_SCOPES = ("v1", "v2", "v3")
+# "v3" (elite stages) is v2 plus barracks rally points and dormant/boss-aware enemy data, "v4" (the
+# elite-v3 commander) is v3 plus aimed spells (aim_power) and hero moves (move_hero).
+ACTION_SCOPES = ("v1", "v2", "v3", "v4")
 MAIN_CAMPAIGN_LEVELS = 12
 
 
 def level_scope(action_scope, level):
-    """The scope a level is played in: v3 is the elite-stage scope, so a v3 job plays the main-campaign
+    """The scope a level is played in: v3 and v4 are elite-stage scopes, so their jobs play the main-campaign
     levels (1-12) in v2 and their validated plans and operator decisions stay exactly as before."""
-    if action_scope == "v3" and isinstance(level, int) and not isinstance(level, bool) and level <= MAIN_CAMPAIGN_LEVELS:
+    elite_scope = action_scope in ("v3", "v4")
+    if elite_scope and isinstance(level, int) and not isinstance(level, bool) and level <= MAIN_CAMPAIGN_LEVELS:
         return "v2"
     return action_scope
 

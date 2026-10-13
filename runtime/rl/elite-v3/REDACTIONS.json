@@ -1,0 +1,595 @@
+{
+ "note": "Files changed only by redaction in this publication (elite-v3, elite-v3b, the code tree and the development log). original_sha256 is the file before redaction; it is listed for the files pinned by elite-v3 (as the frozen jobs used them), for every redacted file under runtime/rl/elite-v3b/ (the pre-registration and the result receipts cite several of these) and for the four LoRA adapter_config.json files (each receipt.json cites the original). published_sha256 is the file here. Hash-chained journals are unmodified.",
+ "files": [
+  {
+   "path": "alpharush_rl/model_broker.py",
+   "original_sha256": "dec38272076482de973ff735552fb5bf9b242189fec4db833ab9b3119c5f5ea3",
+   "published_sha256": "9e501f21e790116e94295a9fe8a49b31fab586adbb984afa87b375172517a9d8",
+   "categories": [
+    "local user-name paths",
+    "name of an unrelated private project"
+   ]
+  },
+  {
+   "path": "tools/collect-level1-rewards.py",
+   "original_sha256": "436fdcf95f4460ee2191b9d33c32557a5b11b8edd7ba4f5f75163630fa4562d6",
+   "published_sha256": "b1a6bea5c2584fd09106dabc8e6ef73671c61cce5963df8bc22dcc868c423b06",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "tools/create-model-manifests.py",
+   "original_sha256": "80f95bd4050fc4edd4fa00e9ddf1ae2955b5b0c3cb8e9134cfe4128bc6444250",
+   "published_sha256": "72ce25fbd3517f00d6c3f6d690bb6bdea60c5bbb708e90a449ec6f549d8632fd",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "tools/model-preflight.py",
+   "original_sha256": "a7984f13ecd557c67f2d46b0bed4dbf2a474d52645ac2f9f6985f18e0682747f",
+   "published_sha256": "09dd9cbada20cb6a5b45f8e50a2f203b6999703a5ca07d6828ce5700d7643c66",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "tools/model-worker.py",
+   "original_sha256": "f598d8b378389b4015bc7a866c4533325a0a87e007c6925e0287f41240a65fa1",
+   "published_sha256": "d548eb81307985652bb2eb55ea4ffee745cd1c659d3de6842a1a3c1c8b432ab9",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "tools/setup-model-env.sh",
+   "original_sha256": "42d41b25b183ee2a7552847748df03f8451ace81554540a4da743e81e7a12930",
+   "published_sha256": "7b6583cc2fdd99feada4790355e2eed02d0b4e5c82c4d04079908e57712b6d90",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "tools/train-level1-24b.py",
+   "original_sha256": "031e3b32dbac8d7123c9469c25d2ffbdfa1e6918093e355813652909f67bb751",
+   "published_sha256": "a1f794e52172af13a3a0b26f0b325e04c5b037d357a791543a3927d8dde8e043",
+   "categories": [
+    "local user-name paths",
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "tools/train-llm-smoke.py",
+   "original_sha256": "1ca11a94c5e519448fe7c4b30f3ee52367bca28c9ac0f83dce19b91139d65bdc",
+   "published_sha256": "725f50ee56cb094b6a7abb23f12a7843a5921fdf0a6e5b2ea3d32509b05d2f2f",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "tests/test_phase.py",
+   "published_sha256": "b1737cc11b1ee3f88ef2297488fb2b86482a03dc26a88930256ef94f614d9a18",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "configs/level1-24b-training.json",
+   "original_sha256": "818ef9e49b10e5f77386a2ff6d9e424df51d70ca09ada956b560cdc58a7ca4db",
+   "published_sha256": "cda699dbb0de6d53ce068a8e1163205afab6a032c29cb516f5b695211ef12beb",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "configs/llm-smoke-r2.json",
+   "original_sha256": "3894302bf14d6cafb51c884bffcdee687eee37d593cb5ff747a8b80d76bbf497",
+   "published_sha256": "3bf098355ce61cf3eaeb6d15710ed65775a84f20e2aa2b6141411ff23cf62298",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "configs/llm-smoke.json",
+   "original_sha256": "051605203c38082d8ce6efaa17aeb5e57d8a2161020a0fc2bed6b72c757ed214",
+   "published_sha256": "2d6dad54a413646a34ac9fe2242ba7a4812438c12b7657d817bf53e4fd9ef481",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "configs/models-comparison.json",
+   "original_sha256": "c6f3688d827aa7775e3cca1a2c09f03129c1deac3cc630421663a7840a425f68",
+   "published_sha256": "be0fd647877811bbbc1f1f25bcaab7ec953a9440039d47f7fb7d947327865058",
+   "categories": [
+    "name of an unrelated private project"
+   ]
+  },
+  {
+   "path": "configs/phases/campaign-v1.json",
+   "original_sha256": "fd051a84cabd204fe2410b463882944ba035ea8f5333e05af59f5cef6c89a364",
+   "published_sha256": "05704c322f8beb7f5756cf79e8a9c916b1759d16988738c7de1b7e1f80a1f92f",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "configs/phases/elite-v1.json",
+   "original_sha256": "f212b56c0df64387a20637db10c0f66c5975a2fc4c9ba3caece2ebabb15c92fc",
+   "published_sha256": "0416e3bd22c43f58cca6cc6fef165d73c7c283a3c479f8862938a771543304fe",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "configs/phases/elite-v2.json",
+   "original_sha256": "4cceefcaceb61a4463f7af3c6cd0bebd2a44d6807c65362187a7b8dfd6675711",
+   "published_sha256": "9d8b0cc0d3a4915e234a7447a2ec0ea679833c5bbaf8a8d5b22c65124393061a",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "configs/phases/elite-v3.json",
+   "original_sha256": "03b2ba20e0f555bddffbc679055e922bd7d3db84b661807b48f3f600304b964c",
+   "published_sha256": "4ea4448c7a0bde66dacba9829f249d55539dfdb959376dfac73e1948d4576999",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "configs/rl-deployment.json",
+   "original_sha256": "ca8d046556c6359c6d7558a7b76fa980075b18fe94d6cec063e62ce8e14111ec",
+   "published_sha256": "6763685d60444c083d649c2b0d6dda2a53510a204aa12049c78f313dc01f14cd",
+   "categories": [
+    "local user-name paths",
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "docs/elite/elite-stages-study-2026-10-06.json",
+   "published_sha256": "995ecd313c1647374811c2537846676c86206752ae74f9fed3987a38f06be42c",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "docs/elite/l20-22-practice-plan-2026-10-07.md",
+   "published_sha256": "e98feba84c32219f2e23cba39fcbf7a14465cba6a7303df611ee886563a2b9bb",
+   "categories": [
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "docs/LEVEL1-TRAINING.md",
+   "published_sha256": "ec67bfc58ff82e4818dd282af701556cef7177a53a222ce7dabe76ac3df0520b",
+   "categories": [
+    "name of an unrelated private project"
+   ]
+  },
+  {
+   "path": "docs/MODEL-DEPLOYMENT.md",
+   "published_sha256": "4d6e750098b0d85d3be0ac39b55604284311ba61c4ba468d75bcab98f86e0d77",
+   "categories": [
+    "local user-name paths",
+    "name of an unrelated private project"
+   ]
+  },
+  {
+   "path": "docs/RL-ARCHITECTURE.md",
+   "published_sha256": "2e1f91846d3b012b3afc32101d7ac4e405d42353ce4072d42674e63ab06a5a76",
+   "categories": [
+    "name of an unrelated private project"
+   ]
+  },
+  {
+   "path": "DEPLOYMENT.md",
+   "published_sha256": "0293e5a5cf4285b71e117dc81e5c77b2647d4c7e044fab151cdc9728f4833cde",
+   "categories": [
+    "local user-name paths",
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "docs/DEV-LOG.zh-CN.md",
+   "published_sha256": "8962219b60fd228307918840a48dfd4bcdf2dad6e1d9aba036027085de33e38f",
+   "categories": [
+    "local user-name paths",
+    "name of an unrelated private project",
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/analysis/skill_24b_full.txt",
+   "published_sha256": "2e634d292a60679139fdb9c523bb0ee27b17c6d4dae2e68e67955bfdc4dae7bf",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/analysis/skill_8b_full.txt",
+   "published_sha256": "2033478b71f968cf30fc3798ce32a43b35d9d87d0bce55f1fcbaad8bc91883b5",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/analysis/skill_lora_A_perm.txt",
+   "published_sha256": "b409a2625b3fb08cd4a12bc317de9d76eddce0675b28a5545b476980a7b61c4e",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/analysis/skill_lora_A_real.txt",
+   "published_sha256": "2d8592cbe08c75aaa4953d043c57030ad9d6f185bcaaf4c5267fc4c3d30262fd",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/analysis/skill_lora_B_perm.txt",
+   "published_sha256": "28b0e7fa2ebfa86e77ade09f30c768a3f4bd0584cd578bce227c250c0e30068e",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/analysis/skill_lora_B_real.txt",
+   "published_sha256": "726f041a4bc48a168c101cdc830c5c540437fe354ef9223f58cfadff2c6328e8",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/analysis/v3_analysis.py",
+   "published_sha256": "f17591fc54d5c05332264f1f560f094e8318784913f0cf62d0c48fa8f26a22cc",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/analysis/v3_llm_offline.py",
+   "published_sha256": "60ec0eaff5dbb470491b826f8b913d647add086ba5c687f8809b3747f375c540",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/analysis/v3_llm_timing.py",
+   "published_sha256": "d42ee8ea61a50b28912ab85a42b83f2a1168e44abd16089a115a55e658414659",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/analysis/v3_nonp0_ranking.py",
+   "published_sha256": "b32946e4adaeb7a7cad8e7133963d7151cb30e6274ed6e50f2d5bf3e6ef8ebca",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/analysis/v3_simple_brains.py",
+   "published_sha256": "62d19f466d4171355f0c5bbfb50db44fbc56b281fd2c90fd9a6b83c8fc6f509b",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/analysis/v3_skill_tests.py",
+   "published_sha256": "18963c03cc3a802d27ebe9a1651c06d6062feff19ff894b459405429f94ceb00",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/analysis/v3_timing_robust.py",
+   "published_sha256": "3fec5ff1a913bf735492f69c6d53085682039d2eea38489919f8fc70d617c530",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/lora/build_commander_sft.py",
+   "published_sha256": "a8407dd9bd45fde783903245a53dc807fc207747e30d4bee0c582500f40b7cb6",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/lora/run_lora.sh",
+   "published_sha256": "3967a4a608bf1a438d832b7ab5db672a4b038f5897009e99565548a15d8b2882",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/lora/train_commander_lora.py",
+   "published_sha256": "ad77a2d8c36e680fde8c6a0778d9a78348d81b211a83ff8c687b8e656cd813ba",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/lora/logs/A_perm.log",
+   "published_sha256": "f6b8513cb9b9825edad32f0b54ea0689684334bcc32d02806e6d28f8b09227f2",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/lora/logs/A_real.log",
+   "published_sha256": "5342455e64cf055241b148513156a4819cc1efc6cc91215f9a3a6843d7cf94f1",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/lora/logs/B_perm.log",
+   "published_sha256": "1b56ee344ed745ac28a6a3f88efaee6ba0ed95c5288b3ed478817a990b3a91f0",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/lora/logs/B_real.log",
+   "published_sha256": "6fe444ebb1b7c77fa5ec2b7a06335cf93c6be4b849a8fe1adfb6a075bf4488e7",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/lora/data/A_perm/meta.json",
+   "published_sha256": "d97e4069ac572e97efa95046dba75dce5ff7882efd39f45a9e0bc99578ae3790",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/lora/data/A_real/meta.json",
+   "published_sha256": "ad11815058c4274d8dc47972b846a880466c7ce4cee681032ac7b72f519555b3",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/lora/data/B_perm/meta.json",
+   "published_sha256": "d6fd6007baacd97e0116762bbc0583ebadff5e13858f0938f79f6c6226d8b597",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/lora/data/B_real/meta.json",
+   "published_sha256": "b52e452454669dc0e37c80f44ec0f76d99065a78572f90af8533b67824d99d8e",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/lora/adapters/A_perm/receipt.json",
+   "published_sha256": "173bdaf63d1cf823788b8f684d78337dbf939ca5fde42ac20038649f9bc7215f",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/lora/adapters/A_perm/adapter_config.json",
+   "original_sha256": "e12ebc778ad841acff54ba8df8bfcb57249ceea3cee667604689049aa3d9072f",
+   "published_sha256": "f3576ad4b965cdf4c44f53f6077ddaa48fcd44b07afcc25988963383587d5b17",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/lora/adapters/A_real/receipt.json",
+   "published_sha256": "3f50cb13089343d44a3c9fd2db6c4faf4101741fb5103894a4d61ee9702a634b",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/lora/adapters/A_real/adapter_config.json",
+   "original_sha256": "10d7a98c1b77c054f267ff40b9c9d84f26f5e65eda353b55b1f2ffd45c7830cf",
+   "published_sha256": "a619ae68b90a9675b56261ed155004f853397cb21f1c758e104296f2d3ae79ba",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/lora/adapters/B_perm/receipt.json",
+   "published_sha256": "022013dc1f7de2e60a7ff65c1586b272e0b748b17a6de9f7b82155ac6349a3bf",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/lora/adapters/B_perm/adapter_config.json",
+   "original_sha256": "b84de824bdda1926a98d6b300660ebe8e350d0dccdd49b6642010a9184548c6d",
+   "published_sha256": "0d3d79162ce008b0c33189029c3efda34351a847de4ea53dc929f614e52809f5",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/lora/adapters/B_real/receipt.json",
+   "published_sha256": "a4b72aef8f0874b7317cb6ef7854ff05e94d306bf6bda8e88944b8bee4f079e0",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/lora/adapters/B_real/adapter_config.json",
+   "original_sha256": "f878c163af1f23e59f196e5c6fa5cb2c817f0a84a5f1f021928d4dc462455c0a",
+   "published_sha256": "44a4d0e2d86ff7940e2beb768381ca0404e638519830926576955dfc5caad658",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/scripts/config_elite_v3.py",
+   "published_sha256": "6ad6ba24cde0a1c3dd37edec807ff45d66383c2d2c9bb3324586c3d4ad83deda",
+   "categories": [
+    "local user-name paths",
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/scripts/apply_v4.sh",
+   "published_sha256": "fe93e827e35381cffa67d185a0e6dae553d60834e73f079b23bbfa8552fb7711",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/scripts/probe_cold_v3.py",
+   "published_sha256": "4cc935448919b314fdf4c0373e6dd56ed08c90b80515b033a0499514134fbf3e",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/scripts/config_v3_s1.py",
+   "published_sha256": "ecfeb0fd563b02897b9e4b6116a8c522d19053195b9fc2c6c3fc1b798e1087d8",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/scripts/config_v3_fork.py",
+   "published_sha256": "1e621e5fbf4e76decd075ba20634ac0c5a8a87ed7fceb03ce8fccae5b23781f5",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/scripts/v3_llm_offline.py",
+   "published_sha256": "60ec0eaff5dbb470491b826f8b913d647add086ba5c687f8809b3747f375c540",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/scripts/v3_analysis.py",
+   "published_sha256": "f17591fc54d5c05332264f1f560f094e8318784913f0cf62d0c48fa8f26a22cc",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/scripts/v3_skill_tests.py",
+   "published_sha256": "18963c03cc3a802d27ebe9a1651c06d6062feff19ff894b459405429f94ceb00",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/scripts/v3_simple_brains.py",
+   "published_sha256": "62d19f466d4171355f0c5bbfb50db44fbc56b281fd2c90fd9a6b83c8fc6f509b",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/scripts/v3_nonp0_ranking.py",
+   "published_sha256": "b32946e4adaeb7a7cad8e7133963d7151cb30e6274ed6e50f2d5bf3e6ef8ebca",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/scripts/v3_llm_timing.py",
+   "published_sha256": "d42ee8ea61a50b28912ab85a42b83f2a1168e44abd16089a115a55e658414659",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/scripts/v3_timing_robust.py",
+   "published_sha256": "3fec5ff1a913bf735492f69c6d53085682039d2eea38489919f8fc70d617c530",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/scripts/v3_regret_eval.py",
+   "published_sha256": "0ffd528da978995f3261ee3fa14f420318871abbe055dd1397ad30feb4732341",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/scripts/config_v3b_replay.py",
+   "published_sha256": "2902161cad8baed9de01cda84bf44a5c3cede57907ddfa86a482700799a14729",
+   "categories": [
+    "local user-name paths",
+    "the user's chat messages"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3/scripts/config_v3_seal.py",
+   "published_sha256": "ee0884fe8116fb5f21dfaf8b773416b187a39ee2684291b92bf8eeb211b84e7b",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3b/scripts/v3b_analysis.py",
+   "original_sha256": "07e5f9296cc82faf6e95f70c10398c69161ae0f2c316b377e408258d5dc95a35",
+   "published_sha256": "1d03808961a7bd2ac6e8aab0482ebe1eb77858b98350787f6411998f3c011af8",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3b/scripts/v3b_calibration.py",
+   "original_sha256": "c1dc1482b01e634ee2b8863aed802a7266286748bff1c7a2789da4014a8dca34",
+   "published_sha256": "f671a56dfbf4574f29101898e33aa6aba01a0fe2af74e69fed5631d85929ec0a",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3b/scripts/v3b_prompts.py",
+   "original_sha256": "bdcba8ccc64deaa3510c4538a69f127b7a8fbb1492e88a474c086d7e43af4224",
+   "published_sha256": "7b75434bc23b32583f7bcf7a42bbced8493eea47f7ba0a327cacd8b6206b803c",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3b/scripts/v3b_scorer.py",
+   "original_sha256": "16b519c31d724e732f0b28c5f5872cd411ab515f91ce179ff46d122613b0facc",
+   "published_sha256": "1ee3ba499dec733ede422ad7a7b3e82d40d034c9d3c63d91039f2917d9706bd7",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3b/scripts/v3b_verify_replay.py",
+   "original_sha256": "b217ac7e03384984282d8a49452f3594cf3f3325d7acb7e954f9a4f80d0d1679",
+   "published_sha256": "5f4af7e57ec15cbf55b40fc0be3fc577ea7379049e6be57cca61bbc2d616023f",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3b/geometry/provenance/geo_probe.py",
+   "original_sha256": "e324ff6494b05e86b1216a490b23fbbdfa744c6b1086bde1e72224fcbfca5b23",
+   "published_sha256": "ab50150998099e6040fd0503eecc78483b4697668b997d80ee5fdb92454401e4",
+   "categories": [
+    "local user-name paths"
+   ]
+  },
+  {
+   "path": "runtime/rl/elite-v3b/geometry/provenance/tower_probe.py",
+   "original_sha256": "08e28129c82ce3e1fcefeebbb7a8077dfb659c7b963a5b65eeb1b586a031ad6e",
+   "published_sha256": "ea52508ef8458b1d3cdd4bcd686675566dea6c0a1d97d4c4634b0219fa675ecd",
+   "categories": [
+    "local user-name paths"
+   ]
+  }
+ ]
+}

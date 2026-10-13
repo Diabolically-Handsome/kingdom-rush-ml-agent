@@ -67,8 +67,10 @@ RNG_TOKENS = ("audit", "isolate_sound", "stable_pairs")
 RNG_MODES = tuple("+".join(t for i, t in enumerate(RNG_TOKENS) if mask >> i & 1) for mask in range(8))
 # Must equal alpharush_rl.engine.ACTION_SCOPES (checked by a test). "v1" is the
 # build/send_wave scope every earlier plan was recorded under.
-ACTION_SCOPES = ("v1", "v2", "v3")
+ACTION_SCOPES = ("v1", "v2", "v3", "v4")
 DEFAULT_ACTION_SCOPE = "v1"
+# Scopes of the native jobs that play plans (v4 = v3 plus the commander's aimed spells and hero moves).
+PLAN_SCOPES = ("v2", "v3", "v4")
 SURVEY_RUN_ID = re.compile(r"native-survey-[0-9a-f]{32}")
 DIFF_LIMIT = 40
 DEFAULT_TIME_RESERVE_SECONDS = 0
@@ -380,8 +382,9 @@ def plan_survey(config=CONFIG, job_kind=JOB_KIND):
         issues.extend(f"search: {problem}" for problem in problems)
         if plan["rng_mode"] not in RNG_MODES:
             issues.append(f"rng_mode {plan['rng_mode']!r} is not one of {list(RNG_MODES)}")
-        if plan["action_scope"] not in ("v2", "v3"):
+        if plan["action_scope"] not in PLAN_SCOPES:
             issues.append("a build-order search needs action_scope v2 or v3")
+        issues.extend(_v4_problems(job, False, job_kind))
         if spec:
             issues.extend(_elite_problems(job, root, spec["levels"], None))
         if spec and fraction is not None:
@@ -394,8 +397,10 @@ def plan_survey(config=CONFIG, job_kind=JOB_KIND):
         spec, problems = campaign_run.check_campaign(job["campaign"], pools, phase)
         issues.extend(f"campaign: {problem}" for problem in problems)
         issues.extend(_operator_problems(job, root))
-        if plan["action_scope"] not in ("v2", "v3") or "isolate_sound" not in plan["rng_mode"].split("+"):
-            issues.append("a campaign needs action_scope v2 or v3 and a deterministic rng_mode")
+        if plan["action_scope"] not in PLAN_SCOPES or "isolate_sound" not in plan["rng_mode"].split("+"):
+            issues.append("a campaign needs action_scope v2, v3 or v4 and a deterministic rng_mode")
+        issues.extend(_v4_problems(job, isinstance(job["campaign"], dict)
+                                   and job["campaign"].get("policy") in ("operator", "steps")))
         if spec and not _operator_problems(job, root):
             issues.extend(_campaign_elite_problems(job, root, spec))
         if spec:
@@ -411,8 +416,14 @@ def plan_survey(config=CONFIG, job_kind=JOB_KIND):
             issues.extend(_operator_problems({**job, "campaign": {"policy": "operator"}}, root))
         if spec and "llm_steps" in spec["players"] and job.get("gpu") != "external-inference":
             issues.append("an llm_steps evaluation must declare gpu=\"external-inference\"")
-        if plan["action_scope"] not in ("v2", "v3") or "isolate_sound" not in plan["rng_mode"].split("+"):
-            issues.append("evaluation needs action_scope v2 or v3 and a deterministic rng_mode")
+        if plan["action_scope"] not in PLAN_SCOPES or "isolate_sound" not in plan["rng_mode"].split("+"):
+            issues.append("evaluation needs action_scope v2, v3 or v4 and a deterministic rng_mode")
+        if spec and set(eval_job.COMMANDER_PLAYERS) & set(spec["players"]) and plan["action_scope"] != "v4":
+            issues.append("commander players (cmd_*) need action_scope v4")
+        if spec and eval_job.needs_language_model(spec) and job.get("gpu") != "external-inference":
+            issues.append("an 8B commander evaluation must declare gpu=\"external-inference\"")
+        if spec:
+            issues.extend(_v4_problems(job, bool({"operator", "llm_steps"} & set(spec["players"]))))
         if spec:
             uses_net = bool({"operator", "llm_steps"} & set(spec["players"]))
             if not uses_net or not _operator_problems({**job, "campaign": {"policy": "operator"}}, root):
@@ -436,8 +447,10 @@ def plan_survey(config=CONFIG, job_kind=JOB_KIND):
         spec, problems = campaign_run.check_campaign(job["campaign"], pools, phase)
         issues.extend(f"campaign: {problem}" for problem in problems)
         issues.extend(_operator_problems(job, root))
-        if plan["action_scope"] not in ("v2", "v3") or "isolate_sound" not in plan["rng_mode"].split("+"):
-            issues.append("a campaign needs action_scope v2 or v3 and a deterministic rng_mode")
+        if plan["action_scope"] not in PLAN_SCOPES or "isolate_sound" not in plan["rng_mode"].split("+"):
+            issues.append("a campaign needs action_scope v2, v3 or v4 and a deterministic rng_mode")
+        issues.extend(_v4_problems(job, isinstance(job["campaign"], dict)
+                                   and job["campaign"].get("policy") in ("operator", "steps")))
         if spec and not _operator_problems(job, root):
             issues.extend(_campaign_elite_problems(job, root, spec))
         if spec:
@@ -455,8 +468,9 @@ def plan_survey(config=CONFIG, job_kind=JOB_KIND):
         issues.extend(f"collect: {problem}" for problem in problems)
         if spec and spec.get("dagger") is not None:
             issues.extend(_operator_problems({**job, "campaign": {"policy": "operator"}}, root))
-        if plan["action_scope"] not in ("v2", "v3") or "isolate_sound" not in plan["rng_mode"].split("+"):
+        if plan["action_scope"] not in PLAN_SCOPES or "isolate_sound" not in plan["rng_mode"].split("+"):
             issues.append("collection needs action_scope v2 or v3 and a deterministic rng_mode")
+        issues.extend(_v4_problems(job, spec is not None and spec.get("dagger") is not None, job_kind))
         if spec:
             dagger = spec.get("dagger") is not None
             if not dagger or not _operator_problems({**job, "campaign": {"policy": "operator"}}, root):
@@ -923,7 +937,7 @@ def _elite_problems(job, root, levels, operator):
     elite = any(level > 12 for level in levels)
     main = any(level <= 12 for level in levels)
     issues = []
-    if elite and job.get("action_scope") != "v3":
+    if elite and job.get("action_scope") not in ("v3", "v4"):  # v4 is v3 plus the commander's options
         issues.append("elite stages (levels 13-26) need action_scope v3")
     if operator is None:
         if "elite_operator_weights" in job:
@@ -951,6 +965,20 @@ def _elite_problems(job, root, levels, operator):
     except (OSError, ValueError, KeyError, TypeError, GateRefused) as exc:
         issues.append(f"operator weights unreadable: {exc}")
     return issues
+
+
+def _v4_problems(job, network, job_kind=None):
+    """Action scope v4 adds the commander's options (aim_power, move_hero): the plan executor never takes them
+    and the commander players filter them, but an operator network would score them as unknown actions. Plan
+    searches and operator data collection stay on v2/v3 until a feature layout (v5) describes those options."""
+    if job.get("action_scope") != "v4":
+        return []
+    if job_kind in ("native-collect", "native-search"):
+        return [f"action scope v4 has no operator feature layout yet (v5): {job_kind} needs v2 or v3"]
+    if network:
+        return ["action scope v4 is played by the plan executor and the commander players (cmd_*) only; "
+                "operator networks need v2 or v3"]
+    return []
 
 
 def _task_levels(tasks, operator):
@@ -1330,6 +1358,18 @@ def _eval_main(config, permit, ctx, job, pools, run_dir, job_kind):
         solo = data.get("solo") is True  # a solo network ignores the plan's instructions
         name = ("solo:" if solo else "operator:") + job["operator_weights"]["sha256"][:12]
         make_operator = lambda genome: OperatorPolicy(net, None if solo else genome, name=name)
+    make_commander = None
+    if eval_job.needs_language_model(spec):
+        # The 8B commander scores its plays on the same strategy worker as the campaigns' 8B brain.
+        from alpharush_rl.commander import make_player
+        from alpharush_rl.model_broker import LanguageModelBroker, RetryingBroker
+        health = _brain_health()
+        ctx.record("strategy_brain", endpoint=BRAIN_ENDPOINT, model=health.get("model"))
+
+        def retried(request_id, attempt, exc):
+            print(f"8B request {request_id} failed ({exc!r}); retry {attempt}", file=sys.stderr, flush=True)
+        broker = RetryingBroker(LanguageModelBroker(BRAIN_ENDPOINT, timeout=180), on_retry=retried)
+        make_commander = lambda player, genome, task: make_player(player, genome, task, broker=broker)
     ports = _job_ports(spec["workers"])
     for port in ports:
         _probe_port(port)
@@ -1346,7 +1386,7 @@ def _eval_main(config, permit, ctx, job, pools, run_dir, job_kind):
                          mode=task.get("mode", 1))
     summary = eval_job.eval_loop(spec, make, ctx, Journal(run_dir / EPISODES), pools=pools,
                                  protocol=episode_protocol(job), ports=ports, make_operator=make_operator,
-                                 make_steps=make_steps)
+                                 make_steps=make_steps, make_commander=make_commander)
     return _finish(config, permit, run_dir, job_kind, summary, engine_before, job)
 
 

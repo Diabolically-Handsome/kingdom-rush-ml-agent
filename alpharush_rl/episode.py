@@ -4,7 +4,10 @@ The policy is asked only at decision events: a non-trivial menu that is new,
 whose option set differs from the last decision's (a wait-only menu in between
 clears that set), or that has not been re-asked for ``max_interval_ticks``.
 A spell option counts by its kind only (``option_key``): its moving anchor alone
-never makes a new decision event.
+never makes a new decision event. The commander's options of action scope v4
+(aimed spells, hero moves) never count, so a policy that ignores them is asked
+at exactly the v3 decision points. A policy may also ask for decisions of its
+own (``wants_decision(state)``, see ``run_episode``).
 Otherwise the loop waits one fixed block. A policy
 error or illegal choice voids the episode; it is never replaced by a scripted
 action, so no decision is credited to the wrong source.
@@ -35,6 +38,8 @@ from .menus import build_menu, menu_sha256
 
 SCHEMA = "alpharush-episode-v1"
 STATUSES = ("terminal", "stalled", "void")
+# Action scope v4 options only a commander (alpharush_rl.commander) chooses; they never make a decision event.
+COMMANDER_ACTIONS = frozenset(("aim_power", "move_hero"))
 
 
 def _positive_int(value) -> bool:
@@ -163,6 +168,17 @@ def run_episode(env, policy: Policy, protocol: EpisodeProtocol, *, seed: int, le
     No reward is computed here and the env is not closed here. With
     ``observe_meta`` the env's read-only ``meta()`` is recorded once after reset
     as ``level_meta`` (a failure is recorded, never fatal).
+
+    A policy may define ``wants_decision(state)``, asked with a copy of the state
+    at every step. True makes the step a decision of the policy's own, even if the
+    option set is unchanged: it leaves the loop's option-set memory untouched, so a
+    decision event due now is still due at the next step and the events of the
+    policy's wrapped executor stay where they were. ``{"hold": n}`` with an integer
+    0 < n < ``wait_ticks`` holds the step for n ticks instead (no decision now, a
+    due one included; e.g. a command held back one tick), at most once per due
+    event: a further hold before that event's decision is not granted and the due
+    decision is taken. False changes nothing; any other value voids the episode
+    (``invalid_wants_decision``). Policies without the method are unaffected.
     """
     if not isinstance(protocol, EpisodeProtocol):
         raise TypeError("protocol must be an EpisodeProtocol")
@@ -182,12 +198,14 @@ def run_episode(env, policy: Policy, protocol: EpisodeProtocol, *, seed: int, le
         except Exception as exc:
             level_meta = {"error": f"{type(exc).__name__}: {exc}"}
     wait = {"action": "wait", "ticks": protocol.wait_ticks}
+    wants = getattr(policy, "wants_decision", None)
     decisions: list[dict] = []
     forced_waits = 0
     status = stall_reason = void_reason = None
     # Option set and tick of the last decision. A non-trivial menu never equals
     # the empty set, so the first one is always a decision event.
     decided_keys, decided_tick = frozenset(), None
+    due_held = False  # the due decision event has already been held once
     if protocol.click_ticks and isinstance(getattr(env, "action_ticks", None), dict):
         env.action_ticks["click_entity"] = protocol.click_ticks
     while True:
@@ -206,7 +224,8 @@ def run_episode(env, policy: Policy, protocol: EpisodeProtocol, *, seed: int, le
             status, stall_reason = "stalled", "first_wave_not_started"
             break
         menu = build_menu(state, wait_ticks=protocol.wait_ticks)
-        option_keys = frozenset(option_key(item["action"]) for item in menu[1:])
+        option_keys = frozenset(option_key(item["action"]) for item in menu[1:]
+                                if item["action"].get("action") not in COMMANDER_ACTIONS)
         if not option_keys and protocol.reset_on_trivial_menu:
             # Nothing decided is still offered: options that reappear later
             # (e.g. the next wave_ready with no affordable build) are new.
@@ -216,7 +235,29 @@ def run_episode(env, policy: Policy, protocol: EpisodeProtocol, *, seed: int, le
         if protocol.click_ticks and any(item["action"].get("action") == "click_entity" for item in menu[1:]):
             due = True  # a tap the game is waiting for: a human does not wait for the menu to change
         if not due:
-            void_reason = _act(env, wait, tick)
+            due_held = False
+        requested, hold = False, None
+        if callable(wants):
+            try:
+                wanted = wants(copy.deepcopy(state))
+            except Exception as exc:
+                status, void_reason = "void", f"policy_error: {type(exc).__name__}: {exc}"
+                break
+            if wanted is True:
+                requested = True  # the policy's own decision comes first; one due now stays due
+            elif wanted is False:
+                pass
+            elif isinstance(wanted, dict) and set(wanted) == {"hold"} and _positive_int(wanted["hold"]) \
+                    and wanted["hold"] < protocol.wait_ticks:
+                if not (due and due_held):
+                    hold, due_held = wanted["hold"], due
+            else:
+                status = "void"
+                void_reason = (f"invalid_wants_decision: {wanted!r:.80} (expected True, False or "
+                               f"{{'hold': n}} with 0 < n < {protocol.wait_ticks})")
+                break
+        if hold is not None or not (due or requested):
+            void_reason = _act(env, wait if hold is None else {"action": "wait", "ticks": hold}, tick)
             if void_reason:
                 status = "void"
                 break
@@ -249,7 +290,8 @@ def run_episode(env, policy: Policy, protocol: EpisodeProtocol, *, seed: int, le
                           "action": copy.deepcopy(item["action"]), "provenance": choice["provenance"],
                           "distribution": choice["distribution"], "latency_seconds": latency,
                           "meta": choice["meta"]})
-        decided_keys, decided_tick = option_keys, tick
+        if not requested:
+            decided_keys, decided_tick, due_held = option_keys, tick, False
         void_reason = _act(env, item["action"], tick)
         if void_reason:
             status = "void"

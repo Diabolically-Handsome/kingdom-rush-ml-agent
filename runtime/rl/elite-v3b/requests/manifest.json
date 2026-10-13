@@ -1,0 +1,35 @@
+{
+ "s1": "native-eval-d043199d066d4c6db33991b4685ff6f3",
+ "replay": "native-eval-f18114d98c9044228f1fb1d5ae5160a2",
+ "table": "runtime/rl/elite-v3/analysis/fork_table_c7f8724de6be.json",
+ "table_sha256": "651829508e5360ce451d576b9661c91c71b4b0eb3f479d0ad682835266ba3bdd",
+ "consults": 985,
+ "thin_old_prompt_hash_mismatches": 0,
+ "leaks": [],
+ "files": {
+  "thin_old": {
+   "rows": 985,
+   "sha256": "780a89cf1d1300d6ae2d8f601b7b867c1d7ce1fbd15d14563cf12d41f423532f",
+   "chars_median": 1622,
+   "chars_max": 2139
+  },
+  "thin_new": {
+   "rows": 985,
+   "sha256": "8689b34c518db9c936726906f2d3d993e18fb0dfef4043f9127c4c4bea93fcd2",
+   "chars_median": 3087,
+   "chars_max": 3705
+  },
+  "rich": {
+   "rows": 985,
+   "sha256": "1e3bb232d3434dfcbd0c9e247075ddc370b155a9ab3c9a2ddf999eef6cba79e9",
+   "chars_median": 4928,
+   "chars_max": 7723
+  },
+  "rich_reason": {
+   "rows": 985,
+   "sha256": "bfea2ada78cbddd127c356b9220d94b10a0c74c3e50e96c27354420049464d34",
+   "chars_median": 9028,
+   "chars_max": 14618
+  }
+ }
+}

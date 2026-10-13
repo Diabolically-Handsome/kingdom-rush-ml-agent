@@ -13,6 +13,12 @@ from alpharush_rl.ops import GateRefused, sha256_file
 
 WORKSPACE = Path(__file__).resolve().parents[1]
 REAL_PHASE = WORKSPACE / "configs/phases/campaign-v1.json"
+def _published_with_redactions(*paths):
+    """True in the public repository copy, where the owner's chat messages in these files were replaced by a
+    redaction placeholder before publishing (see the README's Redactions section)."""
+    marks = ("user's message omitted", "redacted: the user's authorization message")
+    return any(any(m in p.read_text(encoding="utf-8") for m in marks) for p in paths if p.exists())
+
 REAL_POOLS = WORKSPACE / "configs/pools-campaign-v1.json"
 AUTHORIZATION = [
     "[用户原话已省略 / user's message omitted]",
@@ -90,6 +96,8 @@ class RealCampaignConfigTests(unittest.TestCase):
             for seed in old["pools"][role]["seeds"]:
                 self.assertEqual("retired", phase.seed_role(pools, seed))
 
+    @unittest.skipIf(_published_with_redactions(REAL_PHASE),
+                     "the public copy's approval texts are redacted (see the README's Redactions section)")
     def test_campaign_phase_config_is_approved_and_selects_pins_by_glob(self):
         cp, cfg, root = phase.load_phase(REAL_PHASE)
         self.assertEqual(WORKSPACE, root)

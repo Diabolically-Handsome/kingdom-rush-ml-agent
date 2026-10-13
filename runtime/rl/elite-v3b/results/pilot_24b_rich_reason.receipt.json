@@ -1,0 +1,23 @@
+{
+ "schema": "alpharush-v3b-scorer-v1",
+ "model": "mistralai/Mistral-Small-3.2-24B-Instruct-2506@95a6d26c4bfb886c58daf9d3f7332c857cb27b43:nf4-bf16:instruction-base:no-adapter",
+ "manifest_sha256": "a0847dd785aba8b18e45327f2deb8723df978f9fdf9b8e39d89710315c590594",
+ "tokenizer": "MistralCommonBackend",
+ "load_seconds": 184.3,
+ "gpu": "NVIDIA GeForce RTX 5090",
+ "mode": "reason",
+ "requests": "runtime/rl/elite-v3b/requests/rich_reason.jsonl",
+ "requests_sha256": "bfea2ada78cbddd127c356b9220d94b10a0c74c3e50e96c27354420049464d34",
+ "consults": 20,
+ "script_sha256": "16b519c31d724e732f0b28c5f5872cd411ab515f91ce179ff46d122613b0facc",
+ "batch": 8,
+ "max_new_tokens": 250,
+ "seconds": 165.4,
+ "output_sha256": "089eb7703813a4b0ca25097c6e68ebf89c9355c2c2dc6f37ebb903777d58abf7",
+ "generation_seconds": 50.2,
+ "batch_plan": "sorted by key, fixed batch size",
+ "batch1_check": 8,
+ "batch1_divergent": 6,
+ "stated_parsed": 18,
+ "mean_reasoning_tokens": 191.1
+}

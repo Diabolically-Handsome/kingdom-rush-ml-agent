@@ -1,0 +1,374 @@
+[
+ {
+  "range": 169.4,
+  "has_barrack": false,
+  "name": "tower_archer_1",
+  "attacks": [
+   {
+    "i": 1,
+    "flags": 2,
+    "bans": 0,
+    "bans_flying": false
+   }
+  ]
+ },
+ {
+  "range": 193.6,
+  "has_barrack": false,
+  "name": "tower_archer_2",
+  "attacks": [
+   {
+    "i": 1,
+    "flags": 2,
+    "bans": 0,
+    "bans_flying": false
+   }
+  ]
+ },
+ {
+  "range": 217.8,
+  "has_barrack": false,
+  "name": "tower_archer_3",
+  "attacks": [
+   {
+    "i": 1,
+    "flags": 2,
+    "bans": 0,
+    "bans_flying": false
+   }
+  ]
+ },
+ {
+  "range": 242,
+  "has_barrack": false,
+  "name": "tower_ranger",
+  "attacks": [
+   {
+    "i": 1,
+    "flags": 2,
+    "bans": 0,
+    "bans_flying": false
+   }
+  ]
+ },
+ {
+  "range": 284.35,
+  "has_barrack": false,
+  "name": "tower_musketeer",
+  "attacks": [
+   {
+    "i": 1,
+    "flags": 2,
+    "bans": 0,
+    "bans_flying": false
+   },
+   {
+    "i": 2,
+    "flags": 524288,
+    "bans": 32,
+    "range": 426.525,
+    "bans_flying": false
+   },
+   {
+    "i": 3,
+    "flags": 524288,
+    "bans": 32,
+    "range": 426.525,
+    "bans_flying": false
+   },
+   {
+    "i": 4,
+    "flags": 2,
+    "bans": 128,
+    "range": 142.175,
+    "bans_flying": true
+   }
+  ]
+ },
+ {
+  "range": 154,
+  "has_barrack": false,
+  "name": "tower_mage_1",
+  "attacks": [
+   {
+    "i": 1,
+    "flags": 2,
+    "bans": 0,
+    "bans_flying": false
+   }
+  ]
+ },
+ {
+  "range": 176,
+  "has_barrack": false,
+  "name": "tower_mage_2",
+  "attacks": [
+   {
+    "i": 1,
+    "flags": 2,
+    "bans": 0,
+    "bans_flying": false
+   }
+  ]
+ },
+ {
+  "range": 198,
+  "has_barrack": false,
+  "name": "tower_mage_3",
+  "attacks": [
+   {
+    "i": 1,
+    "flags": 2,
+    "bans": 0,
+    "bans_flying": false
+   }
+  ]
+ },
+ {
+  "range": 220,
+  "has_barrack": false,
+  "name": "tower_arcane_wizard",
+  "attacks": [
+   {
+    "i": 1,
+    "flags": 2,
+    "bans": 0,
+    "bans_flying": false
+   },
+   {
+    "i": 2,
+    "flags": 134217728,
+    "bans": 32,
+    "bans_flying": false
+   },
+   {
+    "i": 3,
+    "flags": 8388614,
+    "bans": 268435488,
+    "bans_flying": false
+   }
+  ]
+ },
+ {
+  "range": 220,
+  "has_barrack": true,
+  "name": "tower_sorcerer",
+  "attacks": [
+   {
+    "i": 1,
+    "flags": 2,
+    "bans": 0,
+    "bans_flying": false
+   },
+   {
+    "i": 2,
+    "flags": 2097158,
+    "bans": 32,
+    "bans_flying": false
+   }
+  ]
+ },
+ {
+  "range": 176,
+  "has_barrack": false,
+  "name": "tower_engineer_1",
+  "attacks": [
+   {
+    "i": 1,
+    "flags": 2,
+    "bans": 128,
+    "bans_flying": true
+   }
+  ]
+ },
+ {
+  "range": 176,
+  "has_barrack": false,
+  "name": "tower_engineer_2",
+  "attacks": [
+   {
+    "i": 1,
+    "flags": 2,
+    "bans": 128,
+    "bans_flying": true
+   }
+  ]
+ },
+ {
+  "range": 198,
+  "has_barrack": false,
+  "name": "tower_engineer_3",
+  "attacks": [
+   {
+    "i": 1,
+    "flags": 2,
+    "bans": 128,
+    "bans_flying": true
+   }
+  ]
+ },
+ {
+  "range": 199,
+  "has_barrack": false,
+  "name": "tower_bfg",
+  "attacks": [
+   {
+    "i": 1,
+    "flags": 2,
+    "bans": 128,
+    "range": 199,
+    "bans_flying": true
+   },
+   {
+    "i": 2,
+    "flags": 6,
+    "bans": 0,
+    "bans_flying": false
+   },
+   {
+    "i": 3,
+    "flags": 2,
+    "bans": 128,
+    "range": 180,
+    "bans_flying": true
+   }
+  ]
+ },
+ {
+  "range": 182,
+  "has_barrack": false,
+  "name": "tower_tesla",
+  "attacks": [
+   {
+    "i": 1,
+    "flags": 2,
+    "bans": 0,
+    "range": 182,
+    "bans_flying": false
+   },
+   {
+    "i": 2,
+    "flags": 0,
+    "bans": 0,
+    "bans_flying": false
+   }
+  ]
+ },
+ {
+  "has_barrack": true,
+  "name": "tower_barrack_1",
+  "attacks": {}
+ },
+ {
+  "has_barrack": true,
+  "name": "tower_barrack_2",
+  "attacks": {}
+ },
+ {
+  "has_barrack": true,
+  "name": "tower_barrack_3",
+  "attacks": {}
+ },
+ {
+  "has_barrack": true,
+  "name": "tower_paladin",
+  "attacks": {}
+ },
+ {
+  "has_barrack": true,
+  "name": "tower_barbarian",
+  "attacks": {}
+ },
+ {
+  "has_barrack": false,
+  "name": "hero_ignus",
+  "attacks": [
+   {
+    "i": "melee:1",
+    "bans_flying": false
+   }
+  ]
+ },
+ {
+  "has_barrack": false,
+  "name": "hero_bolin",
+  "attacks": [
+   {
+    "i": "melee:1",
+    "bans_flying": false
+   }
+  ]
+ },
+ {
+  "has_barrack": false,
+  "name": "hero_magnus",
+  "attacks": [
+   {
+    "i": "melee:1",
+    "bans_flying": false
+   },
+   {
+    "i": "ranged:1",
+    "bans_flying": false,
+    "range": 150
+   }
+  ]
+ },
+ {
+  "has_barrack": false,
+  "name": "hero_ingvar",
+  "attacks": [
+   {
+    "i": "melee:1",
+    "bans_flying": false
+   },
+   {
+    "i": "melee:2",
+    "bans_flying": false
+   },
+   {
+    "i": "melee:3",
+    "bans_flying": false
+   }
+  ]
+ },
+ {
+  "has_barrack": false,
+  "name": "hero_hacksaw",
+  "attacks": [
+   {
+    "i": "melee:1",
+    "bans_flying": false
+   },
+   {
+    "i": "melee:2",
+    "bans_flying": false
+   },
+   {
+    "i": "ranged:1",
+    "bans_flying": false,
+    "range": 150
+   }
+  ]
+ },
+ {
+  "has_barrack": false,
+  "name": "hero_elora",
+  "attacks": [
+   {
+    "i": "melee:1",
+    "bans_flying": false
+   },
+   {
+    "i": "ranged:1",
+    "bans_flying": false,
+    "range": 166.4
+   },
+   {
+    "i": "ranged:2",
+    "bans_flying": false,
+    "range": 166.4
+   }
+  ]
+ }
+]

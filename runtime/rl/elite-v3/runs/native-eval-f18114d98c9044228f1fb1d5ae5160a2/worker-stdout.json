@@ -1,0 +1,95 @@
+{
+  "schema": "alpharush-eval-v1",
+  "run_id": "native-eval-f18114d98c9044228f1fb1d5ae5160a2",
+  "players": [
+    "cmd_steady_capture"
+  ],
+  "results": {
+    "cmd_steady_capture": {
+      "17": {
+        "games": 8,
+        "wins": 3,
+        "lives": [
+          13,
+          5,
+          8
+        ]
+      },
+      "19": {
+        "games": 8,
+        "wins": 4,
+        "lives": [
+          5,
+          14,
+          11,
+          8
+        ]
+      },
+      "15": {
+        "games": 8,
+        "wins": 3,
+        "lives": [
+          20,
+          10,
+          9
+        ]
+      },
+      "20": {
+        "games": 8,
+        "wins": 7,
+        "lives": [
+          7,
+          4,
+          12,
+          12,
+          12,
+          5,
+          1
+        ]
+      },
+      "22": {
+        "games": 8,
+        "wins": 2,
+        "lives": [
+          12,
+          3
+        ]
+      },
+      "21": {
+        "games": 8,
+        "wins": 4,
+        "lives": [
+          5,
+          1,
+          4,
+          1
+        ]
+      },
+      "26": {
+        "games": 8,
+        "wins": 1,
+        "lives": [
+          3
+        ]
+      }
+    }
+  },
+  "episode_errors": [],
+  "games_played": 56,
+  "stopped_reason": null,
+  "episodes_journal": {
+    "integrity_verified": true,
+    "entries": 56,
+    "tip_sha256": "7d605c1598b1baf6dc9b6c4596c920722fcc08c4fd2d7aeb28e924330c808f31",
+    "engine_replay_verified": false
+  },
+  "optimizer_steps": 0,
+  "engine": {
+    "manifest_sha256": "f4c5ac958ff7824e7416874ed12e1b69211c7cd47f6dd260938c50bb9edd19aa",
+    "recipe_sha256": "8e06a59561d8c50eeaf5341aec8ebcab72aa1d06d135b239748d889a4db6c72c",
+    "exe_sha256": "3fa71b3ee5431b02b0e6944dec39209fe3f0229431291013a0a5a803dc56eb81",
+    "host_copy_sha256": "1c2cc0ecd518930157f79bc89c72f638a853168f88b40a87bf049031318795d5"
+  },
+  "rng_mode": "isolate_sound+stable_pairs",
+  "action_scope": "v4"
+}

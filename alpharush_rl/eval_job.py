@@ -2,21 +2,51 @@
 
 Each task plays one level on one seed with one plan, either through the scripted
 plan executor ("plan") or through the operator network following the plan's
-instructions ("operator"). Seeds may be train or evaluation seeds: nothing here
-updates any weights. The summary reports wins and lives per level and player.
+instructions ("operator"). The commander players ("cmd_*", action scope v4) wrap
+the plan executor with an in-battle commander brain (alpharush_rl.commander);
+"cmd_fork" plays a task's fork: its base brain, with one consult forced to one
+play. Seeds may be train or evaluation seeds: nothing here updates any weights.
+Commander players are development evidence for now: elite stages on train seeds
+only. The summary reports wins and lives per level and player.
 """
 
 import concurrent.futures as futures
 import queue
 
-from . import phase
-from .campaign import task_profile
+from . import commander, phase
+from .campaign import LAST_LEVEL, MAIN_LEVELS, task_profile
 from .episode import EpisodeProtocol, run_episode
+from .journal import canonical_json
 from .ops import GateRefused
 from .search import BuildOrderPolicy, check_genome, genome_id
 
 EVAL_KEYS = {"tasks", "workers", "profile_stars_per_level", "players"}
-PLAYERS = ("plan", "operator", "llm_steps")
+TASK_KEYS = {"level", "seed", "genome", "mode", "fork"}
+COMMANDER_PLAYERS = tuple(commander.PLAYER_BRAINS) + ("cmd_fork",)
+PLAYERS = ("plan", "operator", "llm_steps") + COMMANDER_PLAYERS
+FORK_KEYS = {"base", "consult", "play"}
+# A fork's base brain plays on after the forced consult: a rule brain that acts. The 8B joins only once its
+# determinism check (the same prompt scored twice gives the same p) has passed.
+FORK_BASES = ("steady", "rule", "random", "placebo")
+
+
+def needs_language_model(spec):
+    """True when a commander player of this eval spec consults the 8B (cmd_8b, or a fork on it)."""
+    return "cmd_8b" in spec["players"] or ("cmd_fork" in spec["players"] and any(
+        task.get("fork", {}).get("base") == "8b" for task in spec["tasks"]))
+
+
+def _fork_problems(fork):
+    if not isinstance(fork, dict) or set(fork) != FORK_KEYS:
+        return [f"fork must be an object with exactly the keys {sorted(FORK_KEYS)}"]
+    issues = []
+    if fork["base"] not in FORK_BASES:
+        issues.append(f"fork base must be one of {FORK_BASES}")
+    if not isinstance(fork["consult"], int) or isinstance(fork["consult"], bool) or fork["consult"] < 0:
+        issues.append("fork consult must be a consult index >= 0")
+    if not isinstance(fork["play"], int) or isinstance(fork["play"], bool) or not 0 <= fork["play"] < commander.MAX_PLAYS:
+        issues.append(f"fork play must be a play index 0..{commander.MAX_PLAYS - 1}")
+    return issues
 
 
 def check_eval(spec, pools):
@@ -34,11 +64,26 @@ def check_eval(spec, pools):
     tasks = spec["tasks"]
     if not isinstance(tasks, list) or not tasks:
         return None, issues + ["tasks must be a nonempty list"]
+    forking = isinstance(spec["players"], list) and "cmd_fork" in spec["players"]
+    if forking and spec["players"] != ["cmd_fork"]:
+        issues.append("cmd_fork is played alone (each fork task is one forced consult)")
+    # Commander players (cmd_*, cmd_fork included) are development evidence (plan section 5.2): elite stages on
+    # train seeds only, never an evaluation seed.
+    commanding = isinstance(spec["players"], list) and any(
+        isinstance(player, str) and player in COMMANDER_PLAYERS for player in spec["players"])
     roles, seen = set(), set()
     for index, task in enumerate(tasks):
-        if not isinstance(task, dict) or not {"level", "seed", "genome"} <= set(task) <= {"level", "seed", "genome", "mode"}:
-            issues.append(f"tasks[{index}] must have exactly level, seed and genome (and optionally mode)")
+        if not isinstance(task, dict) or not {"level", "seed", "genome"} <= set(task) <= TASK_KEYS:
+            issues.append(f"tasks[{index}] must have exactly level, seed and genome (and optionally mode and fork)")
             continue
+        if forking != ("fork" in task):
+            issues.append(f"tasks[{index}]: a fork task (with fork) is played by cmd_fork, and only fork tasks are")
+            continue
+        if "fork" in task:
+            problems = _fork_problems(task["fork"])
+            if problems:
+                issues.extend(f"tasks[{index}]: {problem}" for problem in problems)
+                continue
         if task.get("mode", 1) not in (1, 2, 3) or isinstance(task.get("mode"), bool) or (
                 task.get("mode", 1) != 1 and not (isinstance(task["level"], int) and 1 <= task["level"] <= 12)):
             issues.append(f"tasks[{index}]: mode must be 1, or 2/3 (Heroic/Iron) on levels 1-12")
@@ -47,8 +92,18 @@ def check_eval(spec, pools):
         roles.add(role)
         if role not in ("train", "evaluation"):
             issues.append(f"tasks[{index}]: seed {task['seed']!r} is {role}")
+        elif commanding and role != "train":
+            issues.append(f"tasks[{index}]: commander players (cmd_*) play train seeds only; seed {task['seed']!r} "
+                          f"is {role}")
+        level = task["level"]
+        if commanding and (isinstance(level, bool) or not isinstance(level, int)
+                           or not MAIN_LEVELS < level <= LAST_LEVEL):
+            issues.append(f"tasks[{index}]: commander players (cmd_*) play only the elite stages "
+                          f"(levels {MAIN_LEVELS + 1}-{LAST_LEVEL}), not level {level!r}")
         try:
             key = (task["level"], task.get("mode", 1), task["seed"], genome_id(check_genome(task["genome"])))
+            if "fork" in task:
+                key += (canonical_json(task["fork"]),)
         except ValueError as exc:
             issues.append(f"tasks[{index}]: {exc}")
             continue
@@ -59,8 +114,10 @@ def check_eval(spec, pools):
 
 
 def eval_loop(spec, env_factory, ctx, out, *, pools, protocol, ports, make_operator=None, make_steps=None,
-              difficulty=2):
-    """``env_factory(task, profile, index, player, port)``; ``make_operator(genome)`` for operator players."""
+              difficulty=2, make_commander=None):
+    """``env_factory(task, profile, index, player, port)``; ``make_operator(genome)`` for operator players;
+    ``make_commander(player, genome, task)`` for commander players (default: commander.make_player without a
+    language model, which serves every brain but the 8B)."""
     spec, issues = check_eval(spec, pools)
     if issues:
         raise GateRefused("; ".join(issues))
@@ -70,6 +127,9 @@ def eval_loop(spec, env_factory, ctx, out, *, pools, protocol, ports, make_opera
         raise GateRefused("an operator evaluation needs operator weights")
     if "llm_steps" in spec["players"] and make_steps is None:
         raise GateRefused("an llm_steps evaluation needs the operator weights and the strategy worker")
+    if needs_language_model(spec) and make_commander is None:
+        raise GateRefused("an 8B commander evaluation needs the strategy worker")
+    make_commander = make_commander or commander.make_player
     free = queue.Queue()
     for port in ports[:spec["workers"]]:
         free.put(port)
@@ -86,14 +146,23 @@ def eval_loop(spec, env_factory, ctx, out, *, pools, protocol, ports, make_opera
                 policy = BuildOrderPolicy(genome)
             elif player == "operator":
                 policy = make_operator(genome)
+            elif player in COMMANDER_PLAYERS:
+                policy = make_commander(player, genome, task)
             else:
                 policy = make_steps(genome)
             env = env_factory(task, profile, index, player, port)
             try:
-                return run_episode(env, policy, protocol, seed=task["seed"], level=task["level"], difficulty=difficulty,
-                                   episode_id=f"{ctx.run_id}-{index:05d}-{player}", check=ctx.check)
+                result = run_episode(env, policy, protocol, seed=task["seed"], level=task["level"],
+                                     difficulty=difficulty, episode_id=f"{ctx.run_id}-{index:05d}-{player}",
+                                     check=ctx.check)
             finally:
                 env.close()
+            if player in COMMANDER_PLAYERS:
+                # The journal row drops the decisions: keep every consult (briefing, plays, choice, shadows), the
+                # commander's own commands and the post-hoc pace check (a violation voids the run in analysis).
+                result["commander"] = {**policy.summary(), "command_log": commander.command_log(result["decisions"]),
+                                       "pace_violations": commander.pace_violations(result["decisions"])}
+            return result
         finally:
             free.put(port)
 
@@ -117,7 +186,8 @@ def eval_loop(spec, env_factory, ctx, out, *, pools, protocol, ports, make_opera
                 index, player, task = inflight.pop(future)
                 base = {"run_id": ctx.run_id, "index": index, "player": player, "level": task["level"],
                         "seed": task["seed"], "genome_id": genome_id(task["genome"]),
-                        **({"mode": task["mode"]} if task.get("mode", 1) != 1 else {})}
+                        **({"mode": task["mode"]} if task.get("mode", 1) != 1 else {}),
+                        **({"fork": task["fork"]} if "fork" in task else {})}
                 try:
                     result = future.result()
                 except GateRefused:

@@ -12,14 +12,19 @@ SCOPE_V1 = ("wait", "build_tower", "send_wave")
 SCOPES = {"v1": SCOPE_V1, "v2": SCOPE_V1 + ("upgrade_tower", "upgrade_power", "sell_tower", "use_power",
                                            "point_tower", "click_entity")}
 SCOPES["v3"] = SCOPES["v2"] + ("set_rally",)
+# v4 (the elite-v3 commander): spells aimed at a named point and hero moves, both offered by the host catalog.
+SCOPES["v4"] = SCOPES["v3"] + ("aim_power", "move_hero")
 # Native ticks advanced after each verified action before its receipt is checked.
 BUILD_TICKS = 180
 UPGRADE_TICKS = 30
 SELL_TICKS = 30
 CLICK_TICKS = 30
 RALLY_TICKS = 30
+# A hero order is two GUI clicks (the hero, then the point), like a barracks rally. An aimed spell keeps
+# use_power's 2 ticks, so the commander arms and the plan executor's casts cost the same time.
+HERO_TICKS = 30
 ACTION_TICKS = {"build_tower": BUILD_TICKS, "upgrade_tower": UPGRADE_TICKS, "sell_tower": SELL_TICKS,
-                "click_entity": CLICK_TICKS, "set_rally": RALLY_TICKS}
+                "click_entity": CLICK_TICKS, "set_rally": RALLY_TICKS, "move_hero": HERO_TICKS}
 
 
 def observation(raw):
@@ -127,12 +132,63 @@ def _set_rally_receipt(before, after, action, cost):
             "rally_after": list(rally) if tower is not None else None}
 
 
+def _hero(state, hero_id):
+    return next((h for h in state.get("heroes") or [] if isinstance(h, dict) and h.get("id") == hero_id), None)
+
+
+def _finite(value):
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
+
+
+def _order_replaced_by_own_position(hero, before, after, action, rally):
+    """The host's record (v4 hero ``order``) of this very click, written at the action's tick, and replaced inside
+    the receipt window by the hero's own position as its rally pos and center, which the hero still reports:
+    what Ignus' Surge of Flame does to a click that lands during its dash (host.lua hero_orders)."""
+    order = (hero or {}).get("order")
+    replaced = order.get("replaced") if isinstance(order, dict) else None
+    if not isinstance(replaced, dict):
+        return False
+    tick = replaced.get("tick")
+    point = replaced.get("x"), replaced.get("y")
+    return (order.get("x") == action["x"] and order.get("y") == action["y"] and order.get("tick") == before["tick"]
+            and replaced.get("at_hero") is True and _finite(tick) and before["tick"] < tick <= after["tick"]
+            and all(_finite(v) for v in point + rally)
+            and abs(rally[0] - point[0]) <= 1 and abs(rally[1] - point[1]) <= 1)
+
+
+def _move_hero_receipt(before, after, action, cost):
+    """The hero (same entity) now reports the clicked point as its rally point, within a pixel (the bridge
+    exports the native vector), or the order was demonstrably superseded by the hero's own script: the click was
+    written as the GUI writes it, and inside the window the hero's script replaced it with its own position (Ignus'
+    Surge of Flame, which ignores clicks during its dash, as it ignores a player's). Anything else fails. Evidence:
+    whether the hero consumed the order, how far it was from the point before and after (a jump instead of a walk
+    is a teleport), and the host's record of a replacement."""
+    def distance(hero):
+        if hero is None or not (_finite(hero.get("x")) and _finite(hero.get("y"))):
+            return None
+        return math.hypot(hero["x"] - action["x"], hero["y"] - action["y"])
+    hero, previous = _hero(after, action["hero_id"]), _hero(before, action["hero_id"])
+    rally = (hero or {}).get("rally_x"), (hero or {}).get("rally_y")
+    at_target = all(_finite(v) for v in rally) and abs(rally[0] - action["x"]) <= 1 \
+        and abs(rally[1] - action["y"]) <= 1
+    superseded = hero is not None and not at_target \
+        and _order_replaced_by_own_position(hero, before, after, action, rally)
+    order = (hero or {}).get("order")
+    return {"executed": hero is not None and (at_target or superseded),
+            "rally_after": list(rally) if hero is not None else None,
+            "rally_new_after": (hero or {}).get("rally_new"), "distance_before": distance(previous),
+            "distance_after": distance(hero), "superseded_by_hero_script": superseded,
+            "order_replaced": order.get("replaced") if isinstance(order, dict) else None}
+
+
 # v2 completion receipts: each returns {"executed": bool, ...evidence} from the before/after
-# snapshots, the verified action and its menu cost.
+# snapshots, the verified action and its menu cost. An aimed spell (v4) is proven like use_power: the
+# GUI cast puts the button on cooldown.
 V2_RECEIPTS = {"upgrade_tower": _upgrade_tower_receipt, "upgrade_power": _upgrade_power_receipt,
                "sell_tower": _sell_tower_receipt, "use_power": _use_power_receipt,
                "point_tower": _point_tower_receipt, "click_entity": _click_entity_receipt,
-               "set_rally": _set_rally_receipt}
+               "set_rally": _set_rally_receipt, "aim_power": _use_power_receipt,
+               "move_hero": _move_hero_receipt}
 
 
 class NativeEnv:

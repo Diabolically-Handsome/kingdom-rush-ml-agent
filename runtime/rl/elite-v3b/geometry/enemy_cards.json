@@ -1,0 +1,531 @@
+{
+ "eb_blackburn": {
+  "key": "ENEMY_BOSS_BLACKBURN",
+  "name": "Lord Blackburn",
+  "card": [],
+  "special": "Boss",
+  "flying_template": false
+ },
+ "eb_greenmuck": {
+  "key": "ENEMY_ROTTEN_TREE_BOSS",
+  "name": "Greenmuck",
+  "card": [],
+  "special": "Boss",
+  "flying_template": false
+ },
+ "eb_kingpin": {
+  "key": "ENEMY_BOSS_BANDIT",
+  "name": "The Kingpin",
+  "card": [],
+  "special": "Boss",
+  "flying_template": false
+ },
+ "eb_moloch": {
+  "key": "ENEMY_DEMON_MOLOCH",
+  "name": "Moloch",
+  "card": [],
+  "special": "Boss",
+  "flying_template": false
+ },
+ "eb_myconid": {
+  "key": "ENEMY_ROTTEN_MYCONID",
+  "name": "Myconid",
+  "card": [],
+  "special": "Boss",
+  "flying_template": false
+ },
+ "eb_ulgukhai": {
+  "key": "ENEMY_TROLL_BOSS",
+  "name": "Ulguk-Hai",
+  "card": [
+   "very high damage",
+   "health regeneration",
+   "average speed"
+  ],
+  "special": "Boss",
+  "flying_template": false
+ },
+ "enemy_abomination": {
+  "key": "ENEMY_HALLOWEEN_ABOMINATION",
+  "name": "Abomination",
+  "card": [
+   "slow speed",
+   "explodes on death"
+  ],
+  "special": "Explodes on death",
+  "flying_template": false
+ },
+ "enemy_bandit": {
+  "key": "ENEMY_BANDIT",
+  "name": "Bandit",
+  "card": [
+   "fast speed",
+   "very high damage",
+   "can dodge melee attacks"
+  ],
+  "special": "Can dodge melee attacks.",
+  "flying_template": false
+ },
+ "enemy_brigand": {
+  "key": "ENEMY_BRIGAND",
+  "name": "Brigand",
+  "card": [
+   "average speed",
+   "medium armor"
+  ],
+  "special": "",
+  "flying_template": false
+ },
+ "enemy_demon": {
+  "key": "ENEMY_DEMON",
+  "name": "Demon Spawn",
+  "card": [
+   "magic resistance",
+   "infernal combustion"
+  ],
+  "special": "Infernal combustion",
+  "flying_template": false
+ },
+ "enemy_demon_cerberus": {
+  "key": "ENEMY_DEMON_CERBERUS",
+  "name": "Cerberus",
+  "card": [
+   "area attack",
+   "high armor",
+   "miniboss"
+  ],
+  "special": "Miniboss, Infernal combustion",
+  "flying_template": false
+ },
+ "enemy_demon_flareon": {
+  "key": "ENEMY_DEMON_FLAREON",
+  "name": "Flareon",
+  "card": [
+   "ranged fire attack",
+   "fast",
+   "magic resistance"
+  ],
+  "special": "Ranged attack, Infernal combustion",
+  "flying_template": false
+ },
+ "enemy_demon_gulaemon": {
+  "key": "ENEMY_DEMON_GULAEMON",
+  "name": "Gulaemon",
+  "card": [
+   "slow speed",
+   "can fly",
+   "very tough"
+  ],
+  "special": "Can fly, Infernal combustion",
+  "flying_template": false
+ },
+ "enemy_demon_imp": {
+  "key": "ENEMY_DEMON_IMP",
+  "name": "Demon Imp",
+  "card": [
+   "flying",
+   "average speed"
+  ],
+  "special": "Flying",
+  "flying_template": true
+ },
+ "enemy_demon_legion": {
+  "key": "ENEMY_DEMON_LEGION",
+  "name": "Demon Legion",
+  "card": [
+   "high armor",
+   "can duplicate itself"
+  ],
+  "special": "Duplicates, Infernal combustion",
+  "flying_template": false
+ },
+ "enemy_demon_mage": {
+  "key": "ENEMY_DEMON_MAGE",
+  "name": "Demon Lord",
+  "card": [
+   "shields others demons",
+   "magic resistance",
+   "infernal combustion"
+  ],
+  "special": "Shields other demons, Infernal combustion",
+  "flying_template": false
+ },
+ "enemy_demon_wolf": {
+  "key": "ENEMY_DEMON_WOLF",
+  "name": "Demon Hound",
+  "card": [
+   "magic resistance",
+   "infernal combustion",
+   "fast speed"
+  ],
+  "special": "Infernal combustion",
+  "flying_template": false
+ },
+ "enemy_fallen_knight": {
+  "key": "ENEMY_FALLEN_KNIGHT",
+  "name": "Fallen Knight",
+  "card": [
+   "high magic resistance",
+   "high damage",
+   "returns as an undead"
+  ],
+  "special": "Returns as an undead",
+  "flying_template": false
+ },
+ "enemy_gargoyle": {
+  "key": "ENEMY_GARGOYLE",
+  "name": "Gargoyle",
+  "card": [
+   "flying",
+   "average speed"
+  ],
+  "special": "Flying",
+  "flying_template": true
+ },
+ "enemy_giant_rat": {
+  "key": "ENEMY_GIANT_RAT",
+  "name": "Giant Rat",
+  "card": [
+   "fast speed",
+   "spreads deadly disease",
+   "may spawn from trash"
+  ],
+  "special": "Spreads deadly disease, May spawn from trash",
+  "flying_template": false
+ },
+ "enemy_halloween_zombie": {
+  "key": "ENEMY_HALLOWEEN_ZOMBIE",
+  "name": "Zombie",
+  "card": [
+   "slow speed"
+  ],
+  "special": "",
+  "flying_template": false
+ },
+ "enemy_lycan": {
+  "key": "ENEMY_HALLOWEEN_LYCAN",
+  "name": "Lycan",
+  "card": [
+   "health regeneration",
+   "spreads lycanthropy",
+   "can shift into a werewolf"
+  ],
+  "special": "",
+  "flying_template": false
+ },
+ "enemy_lycan_werewolf": {
+  "key": "ENEMY_HALLOWEEN_LYCAN",
+  "name": "Lycan",
+  "card": [
+   "health regeneration",
+   "spreads lycanthropy",
+   "can shift into a werewolf"
+  ],
+  "special": "",
+  "flying_template": false
+ },
+ "enemy_marauder": {
+  "key": "ENEMY_MARAUDER",
+  "name": "Marauder",
+  "card": [
+   "slow speed",
+   "medium armor",
+   "costs 3 lives"
+  ],
+  "special": "",
+  "flying_template": false
+ },
+ "enemy_necromancer": {
+  "key": "ENEMY_NECROMANCER",
+  "name": "Necromancer",
+  "card": [
+   "summons undead",
+   "ranged attack",
+   "slow speed"
+  ],
+  "special": "Summons undead, Ranged attack",
+  "flying_template": false
+ },
+ "enemy_pillager": {
+  "key": "ENEMY_PILLAGER",
+  "name": "Pillager",
+  "card": [
+   "area attack",
+   "costs 5 lives"
+  ],
+  "special": "Area attack",
+  "flying_template": false
+ },
+ "enemy_raider": {
+  "key": "ENEMY_RAIDER",
+  "name": "Raider",
+  "card": [
+   "slow speed",
+   "great armor",
+   "costs 3 lives",
+   "ranged magic attack"
+  ],
+  "special": "Ranged magic attack",
+  "flying_template": false
+ },
+ "enemy_rotten_lesser": {
+  "key": "ENEMY_ROTTEN_LESSER",
+  "name": "Rotshroom",
+  "card": [
+   "poisonous spores"
+  ],
+  "special": "Poisonous spores",
+  "flying_template": false
+ },
+ "enemy_rotten_tree": {
+  "key": "ENEMY_ROTTEN_TREE",
+  "name": "Tainted Treant",
+  "card": [
+   "high armor",
+   "tough"
+  ],
+  "special": "",
+  "flying_template": false
+ },
+ "enemy_sheep_ground": {
+  "key": "ENEMY_SHEEP",
+  "name": "Sheep",
+  "card": [],
+  "special": "",
+  "flying_template": false
+ },
+ "enemy_skeleton": {
+  "key": "ENEMY_SKELETON",
+  "name": "Skeleton",
+  "card": [],
+  "special": "",
+  "flying_template": false
+ },
+ "enemy_skeleton_big": {
+  "key": "ENEMY_SKELETON_BIG",
+  "name": "Skeleton Knight",
+  "card": [],
+  "special": "",
+  "flying_template": false
+ },
+ "enemy_skeleton_blackburn": {
+  "key": "ENEMY_SKELETON",
+  "name": "Skeleton",
+  "card": [],
+  "special": "",
+  "flying_template": false
+ },
+ "enemy_spectral_knight": {
+  "key": "ENEMY_SPECTRAL_KNIGHT",
+  "name": "Spectral Knight",
+  "card": [
+   "high magic resistance",
+   "high damage",
+   "bolsters fallen knights"
+  ],
+  "special": "Bolsters Fallen Knights",
+  "flying_template": false
+ },
+ "enemy_spectral_knight_spawn": {
+  "key": "ENEMY_SPECTRAL_KNIGHT",
+  "name": "Spectral Knight",
+  "card": [
+   "high magic resistance",
+   "high damage",
+   "bolsters fallen knights"
+  ],
+  "special": "Bolsters Fallen Knights",
+  "flying_template": false
+ },
+ "enemy_spider_big": {
+  "key": "ENEMY_SPIDER",
+  "name": "Spider Matriarch",
+  "card": [
+   "high magic resistance",
+   "spawns spiderlings",
+   "costs 2 lives",
+   "average speed"
+  ],
+  "special": "Spawns spiderlings",
+  "flying_template": false
+ },
+ "enemy_spider_rotten": {
+  "key": "ENEMY_SPIDER_ROTTEN",
+  "name": "Noxious Creeper",
+  "card": [
+   "medium magic resistance",
+   "spawns spiderlings",
+   "costs 3 lives"
+  ],
+  "special": "Spawns mutated spiderlings",
+  "flying_template": false
+ },
+ "enemy_spider_rotten_tiny": {
+  "key": "ENEMY_SPIDERTINY_ROTTEN",
+  "name": "Mutated Hatchling",
+  "card": [],
+  "special": "",
+  "flying_template": false
+ },
+ "enemy_spider_small": {
+  "key": "ENEMY_SPIDERSMALL",
+  "name": "Giant Spider",
+  "card": [
+   "high magic resistance",
+   "low health",
+   "fast speed"
+  ],
+  "special": "",
+  "flying_template": false
+ },
+ "enemy_spider_tiny": {
+  "key": "ENEMY_SPIDERTINY",
+  "name": "Spider Hatchling",
+  "card": [],
+  "special": "",
+  "flying_template": false
+ },
+ "enemy_swamp_thing": {
+  "key": "ENEMY_SWAMP_THING",
+  "name": "Swamp Thing",
+  "card": [
+   "very tough",
+   "ranged attack",
+   "regeneration"
+  ],
+  "special": "Regeneration, Area attack, Ranged attack",
+  "flying_template": false
+ },
+ "enemy_troll": {
+  "key": "ENEMY_TROLL",
+  "name": "Troll",
+  "card": [
+   "very high damage",
+   "health regeneration",
+   "average speed"
+  ],
+  "special": "Regen",
+  "flying_template": false
+ },
+ "enemy_troll_axe_thrower": {
+  "key": "ENEMY_TROLL_AXE_THROWER",
+  "name": "Troll Champion",
+  "card": [
+   "ranged attack",
+   "health regeneration",
+   "average speed"
+  ],
+  "special": "Regen, Throws armor piercing axes",
+  "flying_template": false
+ },
+ "enemy_troll_brute": {
+  "key": "ENEMY_TROLL_BRUTE",
+  "name": "Troll Breaker",
+  "card": [
+   "very high damage",
+   "superb regeneration",
+   "low speed"
+  ],
+  "special": "Regeneration",
+  "flying_template": false
+ },
+ "enemy_troll_chieftain": {
+  "key": "ENEMY_TROLL_CHIEFTAIN",
+  "name": "Troll Chieftain",
+  "card": [
+   "high health regeneration",
+   "can enrage other trolls",
+   "very slow speed",
+   "costs 6 lives"
+  ],
+  "special": "Regen, Can enrage allies",
+  "flying_template": false
+ },
+ "enemy_troll_skater": {
+  "key": "ENEMY_TROLL_SKATER",
+  "name": "Troll Pathfinder",
+  "card": [
+   "unblockable on ice",
+   "health regeneration",
+   "average speed"
+  ],
+  "special": "Regen, Unblockable on ice",
+  "flying_template": false
+ },
+ "enemy_wererat": {
+  "key": "ENEMY_WERERAT",
+  "name": "Wererat",
+  "card": [
+   "fast speed",
+   "low armor",
+   "spreads deadly disease"
+  ],
+  "special": "Spreads deadly disease",
+  "flying_template": false
+ },
+ "enemy_werewolf": {
+  "key": "ENEMY_HALLOWEEN_WEREWOLF",
+  "name": "Werewolf",
+  "card": [
+   "fast speed",
+   "high damage",
+   "health regeneration"
+  ],
+  "special": "",
+  "flying_template": false
+ },
+ "enemy_whitewolf": {
+  "key": "ENEMY_WHITE_WOLF",
+  "name": "Winter Wolf",
+  "card": [
+   "magic resistance",
+   "can dodge melee attacks",
+   "very fast speed"
+  ],
+  "special": "Can dodge melee attacks.",
+  "flying_template": false
+ },
+ "enemy_witch": {
+  "key": "ENEMY_WITCH",
+  "name": "Black Hag",
+  "card": [
+   "flying",
+   "toad's curse",
+   "high magic resistance"
+  ],
+  "special": "Flying, Toad's curse",
+  "flying_template": true
+ },
+ "enemy_wolf": {
+  "key": "ENEMY_WORG",
+  "name": "Worg",
+  "card": [
+   "magic resistance",
+   "can dodge melee attacks",
+   "very fast speed"
+  ],
+  "special": "Can dodge melee attacks.",
+  "flying_template": false
+ },
+ "enemy_wolf_small": {
+  "key": "ENEMY_WULF",
+  "name": "Wulf",
+  "card": [
+   "can dodge melee attacks",
+   "low health",
+   "very fast speed"
+  ],
+  "special": "Can dodge melee attacks.",
+  "flying_template": false
+ },
+ "enemy_zombie": {
+  "key": "ENEMY_ZOMBIE",
+  "name": "Husk",
+  "card": [
+   "slow speed",
+   "medium armor"
+  ],
+  "special": "",
+  "flying_template": false
+ }
+}

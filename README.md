@@ -20,6 +20,12 @@ stages) the agent cleared 79 of 130 levels; two of five seeds won 21 levels incl
 others the unchanged main-campaign agent lost level 11, so the main campaign was cleared on 3 of these 5 new seeds
 ([details](#elite-stages-2026-10-07)).
 
+**Project status (2026-10-12): archived.** After the full clear we tested whether a local language model could make
+the agent's in-battle tactical decisions. In a pre-registered fair re-test, with richer information and reasoning, the
+two local models we tried (8B and 24B, 4-bit) still showed no measurable skill at this decision layer and stayed below a
+fixed ranking of the plays (measured one decision at a time, on training seeds; [details](#an-in-battle-language-model-commander-a-pre-registered-null-result-2026-10-12)).
+The project is archived here.
+
 [中文说明 / Chinese README](README.zh-CN.md)
 
 ## Results
@@ -134,6 +140,108 @@ in-game decision) and the campaign route. Giving the language model decisions th
 **Correction to the 2026-10-06 video:** its captions give speeds of "≈8–20×", computed with 30 game ticks per
 second; the game runs 60 ticks per second, so the replay runs at about 4–10× game speed.
 
+## An in-battle language-model commander: a pre-registered null result (2026-10-12)
+
+After the full clear we asked whether a local language model could make the in-battle judgement calls a human player
+makes. (In the final above, the 8B model only chooses plans and star upgrades, and its measured contribution is about
+zero.) On the evidence below the answer is **no, not with the models and the decision layer we built**. This is
+development evidence on training seeds only: no evaluation or final seed was used, and nothing here changes the agent
+above.
+
+**What we built (action scope v4).** Two human abilities the agent lacked: moving the hero (to its start point, an exit, or upstream
+on a path), and aiming Rain of Fire and reinforcements at more than the leading enemies (up to six candidate points per
+spell: threat, lead and cluster points for Rain of Fire; block and cluster points for reinforcements). Both are offered only where the game's own GUI rules allow them (hero rally points through the
+game's path-finding, spell targets through its cast-validity check), and golden transcripts prove the earlier action
+scopes byte-for-byte unchanged. On top of the plan executor, a *commander* is consulted when a next-wave flag appears
+(plus at most one alarm per wave) and picks one of at most six *plays*: P0 *steady* (the executor's own behaviour, which
+the plans were searched with), counter one of the two biggest threats (the hero intercepts them upstream, Rain of Fire is
+saved for them, reinforcements are called at them when they are on the field), guard an exit, or focus both spells on the top threat. A deterministic translator executes the play. The game is paused while
+the model thinks (a declared deviation from real-time play).
+
+**How we measured.** 56 base games were played steady (7 hard elite stages x 2 plans x train seeds 1201-1204). At each
+of their 985 consults with a choice, the game was replayed taking each other play once, everything else steady: 3,026
+fork games, each identical to its base game up to the branch point. A play's value at a consult is the outcome of its
+branch: 1 for a win + 0.5 x the share of waves reached + 0.25 x lives left / 20 (at most 1.75). The main metric, **M1**, is the outcome of the
+model's preferred deviation minus the mean of all deviations at that consult (0 = a random deviation), with 95%
+intervals from a cluster bootstrap over base games.
+
+**Results.**
+* Taking over every wave hurts. Over whole games on the same 56 tasks: steady 24/56 wins, a rule commander 14/56,
+  random plays 5/56.
+* Zero-shot, both the 8B model (Ministral 3 8B) and a 24B model (Mistral Small 3.2 24B, both 4-bit) behave like
+  "always counter the biggest threat": P1 in 955 and 937 of 985 consults. Both choose slightly worse than random among
+  the deviations. A LoRA fine-tune of the 8B on fork labels collapsed to "always steady".
+* The owner then asked whether the models simply got too little information. In a pre-registered fair re-test on the
+  same consults and the same measured outcomes, each play was described exactly as executed, a neutral note said that P0 is the default the
+  plans were tuned with, and the basic rules were stated. Then we added what a player sees on screen: tower coverage of every quarter of every path, the map, each
+  enemy's in-game card, the hero's class and level, and the lives lost per path so far. Last, the models reasoned
+  before answering. M1 (95% CI):
+
+| Prompt | 8B | 24B |
+|---|---|---|
+| original prompt | -0.032 [-0.052, -0.010] | -0.030 [-0.054, -0.008] |
+| honest play texts + P0 note + basic rules | +0.027 [+0.002, +0.052] | -0.011 [-0.036, +0.012] |
+| + on-screen information | +0.009 [-0.016, +0.033] | -0.002 [-0.025, +0.021] |
+| + reasoning first | +0.001 [-0.019, +0.022] | +0.009 [-0.011, +0.029] |
+| *reference: a fixed ranking of the play types, learned on the other half of the seeds* | +0.063 [+0.035, +0.092] | |
+
+All three pre-registered tiers failed:
+* the on-screen information gave no detectable improvement for either model;
+* the primary arm (24B, rich information, reasoning) reached neither zero with confidence nor half of the fixed ranking;
+* that arm was significantly worse than the fixed ranking (-0.054 [-0.088, -0.019]).
+
+The models still deviated from the plan's default on 83-99% of consults. They almost never chose to guard an exit,
+which is the best deviation on level 19, and in their reasoning they often called the default "passive". A blind
+calibration by a larger general-purpose model (Claude Fable 5.1, shown only 20 of the rich prompts) kept the default in
+17 of 20.
+
+**Our reading.**
+* The plans were searched together with the default play, and the game is chaotic at this scale. Delaying every
+  command by one tick changed the winner in 8 of 56 games, and a single branch outcome varies with an SD of about 0.46,
+  while the play effects are about 0.1.
+* The structure that replicates across seeds is per level: guard the exit on level 19, focus the spells on level 15. A
+  lookup table captures it.
+* The extra value of reading the situation is small; we estimate at most about +0.02-0.04 beyond a per-level lookup.
+  The extra information changed about a third (24B) to half (8B) of the models' preferred deviations, but not for
+  the better; the 24B's reasoning rarely cited coverage (14%), exits (8%) or lives lost (3%). One pre-registered
+  secondary test did find a signal: with the rich prompt, the 8B leaned towards deviating more at the moments when
+  deviating paid off more (timing z 3.30, p 0.001, the only one of 16 timing tests that survives a Bonferroni
+  correction). It still deviated 98% of the time, and its actual choices were not better than steady (choice minus
+  steady: -0.096 [-0.223, +0.032]).
+* The in-battle commander line is therefore closed. A more promising use of a language model here may be proposing
+  plan changes for the search to test.
+
+**Caveats.**
+* The measure is one-step (one changed decision per fork), not whole games with the model in control, and the models
+  are 4-bit.
+* Batched generation is not bit-reproducible: regenerating 20 consults one at a time changed most reasoning texts.
+* In the reasoning arms, 133 of the 24B's 985 final answers (79 named a letter instead of a play id, 54 were cut off
+  at 250 tokens) and 230 of the 8B's (mostly bold-formatted answers that agree with its scores) could not be parsed;
+  their stated choice fell back to the scored distribution (the deviation rates use the stated choices). M1 always uses
+  the scored distribution, so it is unaffected, but the primary arm's +0.009 sits almost entirely in those 133 consults
+  (+0.054 there, +0.002 on the 852 parsed).
+* The pre-registered same-information rule baseline (rule_rich, M1 +0.049) turned out to encode the play ranking found
+  on the same 56 games and was not cross-validated. Departing from the pre-registration, its secondary contrasts (both
+  models lower) are not used here.
+
+Evidence:
+* [`runtime/rl/elite-v3/`](runtime/rl/elite-v3/): runs, fork table, analyses, LoRA receipts;
+* [`runtime/rl/elite-v3b/`](runtime/rl/elite-v3b/): the exact prompts, the model outputs, the analysis;
+* the plan and the pre-registration in [`docs/elite/`](docs/elite/).
+
+`verify_evidence.py` checks C1-C8:
+* hash-chained journals;
+* the four evaluation jobs and the sealed configuration;
+* training seeds only (and none of the earlier phases' final or rehearsal seeds);
+* the recomputed whole-game wins;
+* the fork table recomputed from its journal, each fork game identical to its base game up to the branch point;
+* the replay;
+* the zero-shot 8B/24B choice files (every consult; P1 955 and 937 times);
+* the frozen pre-registered files, the parity gate, the M1 of every language-model arm and of the fixed ranking, and the
+  tiers (T2, T3 and the 8B's T1 fail on recomputed values; the 24B's T1 on the published bootstrap interval).
+
+**Project status: archived on 2026-10-12.**
+
 ## Elite stages (2026-10-07)
 
 The second phase takes on the 14 elite stages (levels 13–26), still as a campaign on Normal from a brand-new save.
@@ -188,6 +296,9 @@ configuration, recomputes the 5/5 result from the attempt records, and confirms 
 other run; it does the same for the 2026-10-07 elite-stage final (and checks its re-execution and strategy-replay
 records), and runs checks V1–V8 on the 2026-10-11 final (the recomputed 120/130 and seed 8101's 26/26, seed
 isolation across all phases, the re-execution, replay and video records, and the 123 vs 122 ablation counts).
+It then runs checks C1–C8 on the 2026-10-12 language-model experiments. These decompress the fork pilot's journal,
+recompute the fork table and the M1 of every language-model arm and of the fixed ranking, confirm the pre-registered
+files, and recompute the tier verdicts (the 24B's T1 interval is taken from the published bootstrap).
 Expected output ends with `ALL CHECKS PASSED`.
 
 ## What the agent is
@@ -244,6 +355,14 @@ ledger and hash-chained per-run journals. All of those are published in [`runtim
    option orders fixed its choices.
 5. **A journal bug** (integer dictionary keys sort differently from their JSON string form once there are ten)
    stopped the first rehearsal; the published verifier checks that entry under the pre-fix rule.
+6. **More information did not make the language models better commanders.** The new prompt format (honest play
+   texts, a neutral note that P0 is the tuned default, basic rules) moved the 8B from mostly P1 to mostly P4, still
+   slightly below always choosing P4. Adding what a player sees on screen, then reasoning, gave no detectable gain, and a fixed ranking of the play
+   types beat every model arm ([details](#an-in-battle-language-model-commander-a-pre-registered-null-result-2026-10-12)).
+7. **Evaluate one-step decisions carefully.** Our first held-out evaluation was confounded: the held-out seeds'
+   base games happened to be all losses, and after a loss almost any change looks good. An adversarial review caught
+   it. The re-test then used a pre-registered metric that does not depend on whether the base game was won, with
+   game-clustered intervals.
 
 The full development log (Chinese) is in [`docs/DEV-LOG.zh-CN.md`](docs/DEV-LOG.zh-CN.md).
 
@@ -272,7 +391,10 @@ The full development log (Chinese) is in [`docs/DEV-LOG.zh-CN.md`](docs/DEV-LOG.
 * Normal difficulty only; the heroes the game's hero room offers by campaign progress (all 13 from level 12 on),
   no purchases or shop items.
 * Spells and reinforcements target only the leading enemies; the hero is not moved during a level; early wave
-  calls with enemies on the field are implemented but unused (see above).
+  calls with enemies on the field are implemented but unused (see above). (The 2026-10-12 commander experiments added
+  hero moves and more spell targets, up to six candidate points per spell, under the GUI rules, without a measurable
+  gain.)
+* The language-model experiments are development evidence on training seeds, measured one decision at a time.
 
 ## Reproducing
 
@@ -294,12 +416,29 @@ Text quoted from the project owner's chat messages (authorizations, requests and
 paths and scratch directories, and the name of an unrelated private project were
 removed from some text files before publishing. Every such file is listed in
 [`runtime/rl/campaign-v1/REDACTIONS.json`](runtime/rl/campaign-v1/REDACTIONS.json),
-[`runtime/rl/elite-v1/REDACTIONS.json`](runtime/rl/elite-v1/REDACTIONS.json) and
-[`runtime/rl/elite-v2/REDACTIONS.json`](runtime/rl/elite-v2/REDACTIONS.json) with its published SHA256 and, for
-files pinned by a frozen job, its original SHA256 (the hash that job used). Hash-chained journals were not modified. The code tree has moved on
+[`runtime/rl/elite-v1/REDACTIONS.json`](runtime/rl/elite-v1/REDACTIONS.json),
+[`runtime/rl/elite-v2/REDACTIONS.json`](runtime/rl/elite-v2/REDACTIONS.json) and
+[`runtime/rl/elite-v3/REDACTIONS.json`](runtime/rl/elite-v3/REDACTIONS.json) with its published SHA256 and, for
+files pinned by a frozen job, its original SHA256 (the hash that job used; the elite-v3 list also gives the originals
+of the re-test's files and of the LoRA adapter configs, which the pre-registration and the receipts cite). Hash-chained journals were not modified. The code tree has moved on
 since the earlier results; the files their jobs pinned are kept in
-[`runtime/rl/campaign-v1/pinned-snapshot/`](runtime/rl/campaign-v1/pinned-snapshot/) and
-[`runtime/rl/elite-v1/pinned-snapshot/`](runtime/rl/elite-v1/pinned-snapshot/).
+[`runtime/rl/campaign-v1/pinned-snapshot/`](runtime/rl/campaign-v1/pinned-snapshot/),
+[`runtime/rl/elite-v1/pinned-snapshot/`](runtime/rl/elite-v1/pinned-snapshot/) and
+[`runtime/rl/elite-v2/pinned-snapshot/`](runtime/rl/elite-v2/pinned-snapshot/).
+
+Not published:
+* The language-model experiments' probe-read level files (`level_<L>.json`: path nodes, exits, ice, build spots) and
+  the game's full English string table. Published instead, with the probe scripts: small probe outputs, namely tower and
+  hero ranges with the raw target-flag masks and the derived flying reach (`towers.json`), enemy string-table keys
+  (`enemy_keys.json`), and enemy names and short card bullets quoted from the game (`enemy_cards.json`, see
+  [NOTICE.md](NOTICE.md)). The capture-replay journal
+  (`runtime/rl/elite-v3/runs/native-eval-f18114d98c9044228f1fb1d5ae5160a2/episodes.jsonl`) records the observed state
+  at every consult (enemy positions with path progress, built towers' positions, the hero's start point), from which
+  path shapes and build spots can be approximately recovered.
+* The LoRA adapter weights (4 x 178 MB); their SHA256s are in the training receipts.
+
+The fork pilot's 263 MB journal is published as a deterministic gzip; its original SHA256 is in
+[`runtime/rl/elite-v3/COMPRESSED.json`](runtime/rl/elite-v3/COMPRESSED.json).
 
 ## License and notices
 

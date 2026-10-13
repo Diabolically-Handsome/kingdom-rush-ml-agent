@@ -1,0 +1,3 @@
+# LoRA runs (elite-v3)
+
+Four 8B LoRA trainings on fork-pilot labels (two seed folds x real / permuted-label control), hyperparameters fixed in advance (1 epoch, lr 1e-4, rank 16, accumulate 8, seed 0). Published: the scripts, the driver log, each fold's data manifest (`data/*/meta.json`: label per consult), each adapter's training receipt (data SHA256s, losses, and the SHA256 of every adapter file) and the held-out predictions (`preds/`). Not published: the adapter weights (4 x 178 MB) and the per-rotation training rows (29 MB), which `build_commander_sft.py` rebuilds from the published fork table and S1b run.

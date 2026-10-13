@@ -6,6 +6,8 @@
 
 The videos (`media/` and the GitHub releases) are muted screen recordings of the agent's own games, made to document the results; the game artwork visible in them is © Ironhide Game Studio.
 
+The language-model experiments of 2026-10-11/12 publish the prompts the models were shown and their outputs (`runtime/rl/elite-v3b/`, with `geometry/enemy_cards.json`). These quote enemy, tower and hero names and short in-game card descriptors from the game's English text, © Ironhide Game Studio, only to document what the models saw; the game's string table and the probe-read level files are not redistributed (the capture-replay journal records the observed positions of enemies, towers and the hero; see the README's Redactions section).
+
 ## Lumi_Nox (MIT)
 
 The engine host of this project builds on the in-game TCP bridge `games/kingdom_rush/bridge.lua` of [Lumi_Nox](https://github.com/MIO-456/Lumi_Nox) (commit 77f973431c49f5ab72d3b2501c0e89286997ec46), which is not redistributed here; clone it to `./Lumi_Nox`. Its license:
@@ -37,3 +39,5 @@ SOFTWARE.
 ## Models
 
 The strategy brain uses Mistral AI's Ministral-3-8B-Instruct, which is not included; download it under its own license.
+
+The language-model commander experiments (2026-10-11/12) also used Mistral AI's Mistral-Small-3.2-24B-Instruct-2506, likewise not included; the LoRA adapters trained on the 8B model are not published (their SHA256s are in the training receipts).

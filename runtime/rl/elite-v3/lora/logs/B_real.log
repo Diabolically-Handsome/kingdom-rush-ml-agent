@@ -1,0 +1,47 @@
+
+Loading weights:   0%|          | 0/531 [00:00<?, ?it/s]
+Loading weights:   0%|          | 1/531 [00:00<01:24,  6.26it/s]
+Loading weights:   0%|          | 2/531 [00:00<04:12,  2.10it/s]
+Loading weights:   1%|          | 4/531 [00:01<02:16,  3.87it/s]
+Loading weights:   3%|▎         | 14/531 [00:01<00:29, 17.61it/s]
+Loading weights:   5%|▌         | 28/531 [00:01<00:13, 38.35it/s]
+Loading weights:   8%|▊         | 41/531 [00:01<00:08, 55.88it/s]
+Loading weights:  10%|█         | 55/531 [00:01<00:06, 73.93it/s]
+Loading weights:  13%|█▎        | 68/531 [00:01<00:05, 84.57it/s]
+Loading weights:  16%|█▌        | 83/531 [00:01<00:04, 100.48it/s]
+Loading weights:  18%|█▊        | 96/531 [00:01<00:04, 102.99it/s]
+Loading weights:  21%|██        | 112/531 [00:01<00:03, 117.21it/s]
+Loading weights:  24%|██▎       | 125/531 [00:02<00:03, 118.66it/s]
+Loading weights:  26%|██▌       | 139/531 [00:02<00:03, 122.18it/s]
+Loading weights:  29%|██▊       | 152/531 [00:02<00:03, 122.94it/s]
+Loading weights:  31%|███▏      | 166/531 [00:02<00:02, 127.53it/s]
+Loading weights:  34%|███▍      | 180/531 [00:02<00:02, 125.53it/s]
+Loading weights:  37%|███▋      | 194/531 [00:02<00:02, 126.54it/s]
+Loading weights:  39%|███▉      | 208/531 [00:02<00:02, 129.87it/s]
+Loading weights:  42%|████▏     | 222/531 [00:02<00:02, 126.17it/s]
+Loading weights:  45%|████▌     | 239/531 [00:02<00:02, 131.99it/s]
+Loading weights:  48%|████▊     | 254/531 [00:03<00:02, 136.43it/s]
+Loading weights:  50%|█████     | 268/531 [00:03<00:02, 127.66it/s]
+Loading weights:  53%|█████▎    | 283/531 [00:03<00:01, 132.69it/s]
+Loading weights:  56%|█████▌    | 297/531 [00:03<00:01, 129.02it/s]
+Loading weights:  62%|██████▏   | 330/531 [00:03<00:01, 184.13it/s]
+Loading weights:  82%|████████▏ | 434/531 [00:03<00:00, 425.76it/s]
+Loading weights: 100%|██████████| 531/531 [00:03<00:00, 143.82it/s]
+[transformers] `use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`.
+/home/<user>/alpharush/.venv/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py:1298: UserWarning: torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly. Starting in PyTorch 2.9, calling checkpoint without use_reentrant will raise an exception. use_reentrant=False is recommended, but if you need to preserve the current default behavior, you can pass use_reentrant=True. Refer to docs for more details on the differences between the two variants.
+  return fn(*args, **kwargs)
+step 20: loss 0.7236
+step 40: loss 0.7195
+step 60: loss 0.6919
+step 80: loss 0.6848
+step 100: loss 0.6876
+step 120: loss 0.6787
+step 140: loss 0.7079
+step 160: loss 0.6996
+step 180: loss 0.6601
+step 200: loss 0.6642
+step 220: loss 0.6867
+step 240: loss 0.6517
+[transformers] Calling `crop` with a positive value is deprecated and will be removed in version 5.18. Please use a negative integer to remove that number of tokens from the cache instead.
+holdout after {'examples': 1, 'accuracy': 1.0, 'mean_rank': 1.0}
+{"holdout_before": null, "holdout_after": {"examples": 1, "accuracy": 1.0, "mean_rank": 1.0}, "optimizer_steps": 250, "wall_seconds": 1490.037537097931}

@@ -2,16 +2,27 @@
 from __future__ import annotations
 
 import math
+import re
 
 from .journal import canonical_json, sha256_data
 
 SUPPORTED_ACTIONS = frozenset(("wait", "build_tower", "upgrade_tower", "send_wave",
                                "upgrade_power", "sell_tower", "use_power", "point_tower", "click_entity",
-                               "set_rally"))
+                               "set_rally", "aim_power", "move_hero"))
 RALLY_TEXT = {"entry": "the most upstream", "center": "the most central", "exit": "the most downstream",
               "boss": "the boss's"}
 # Global spells by native button number (game_gui.power_1/power_2).
 POWER_TEXT = {1: "Cast rain of fire", 2: "Call reinforcements"}
+# Action scope v4: the host's named spell points (aim_power) and hero destinations (move_hero). An option that
+# names an enemy carries its id, which must be a live enemy of the snapshot (aim_power: as ``target_id``).
+# Each spell has its own kinds of point; a hero the state shows stunned or not clickable takes no order.
+AIM_OPTION = re.compile(r"(lead|threat|block):(\d+)|cluster:(\d+)")
+AIM_KINDS = {1: ("lead", "threat", "cluster"), 2: ("block", "cluster")}
+AIM_TEXT = {"lead": "where enemy {} will be in 1.2 s", "threat": "on threat enemy {}",
+            "block": "ahead of enemy {} to block it", "cluster": "on enemy cluster {}"}
+HERO_OPTION = re.compile(r"home|(exit|up|block):(\d+)")
+HERO_TEXT = {"home": "back to its start point", "exit": "to exit {}", "up": "upstream on path {}",
+             "block": "in front of enemy {} to block it"}
 
 
 def option_label(index: int) -> str:
@@ -34,6 +45,11 @@ def _cost(item: dict) -> float | None:
 
 def _integer(value) -> bool:
     return isinstance(value, int) and not isinstance(value, bool)
+
+
+def _live_enemy(state: dict, enemy_id) -> bool:
+    enemies = state.get("enemies")
+    return isinstance(enemies, list) and any(isinstance(e, dict) and e.get("id") == enemy_id for e in enemies)
 
 
 def build_menu(state: dict, wait_ticks: int = 30) -> list[dict]:
@@ -142,6 +158,34 @@ def build_menu(state: dict, wait_ticks: int = 30) -> list[dict]:
                             "x": x, "y": y}, 0.0
             text = (f"Rally tower {native['tower_id']} ({tower.get('template')}) soldiers to {RALLY_TEXT[option]}"
                     f" path point in range ({x},{y})")
+        elif action_name == "aim_power":
+            power, x, y, option = (native.get(key) for key in ("power", "x", "y", "option"))
+            named = AIM_OPTION.fullmatch(option) if isinstance(option, str) else None
+            if not _integer(power) or power not in POWER_TEXT or not (_integer(x) and _integer(y)) or named is None:
+                continue
+            if (named.group(1) or "cluster") not in AIM_KINDS[power]:
+                continue
+            action = {"action": action_name, "power": power, "x": x, "y": y, "option": option}
+            if named.group(1):
+                target = native.get("target_id")
+                if not _integer(target) or target != int(named.group(2)) or not _live_enemy(state, target):
+                    continue
+                action["target_id"] = target
+            kind = named.group(1) or "cluster"
+            cost, text = 0.0, f"{POWER_TEXT[power]} at ({x},{y}) " + AIM_TEXT[kind].format(
+                named.group(2) or named.group(3))
+        elif action_name == "move_hero":
+            hero_id, x, y, option = (native.get(key) for key in ("hero_id", "x", "y", "option"))
+            hero = next((h for h in state.get("heroes") or [] if isinstance(h, dict) and h.get("id") == hero_id), None)
+            named = HERO_OPTION.fullmatch(option) if isinstance(option, str) else None
+            if not (_integer(hero_id) and _integer(x) and _integer(y)) or hero is None or hero.get("dead") \
+                    or hero.get("stunned") is True or hero.get("can_click") is False or named is None:
+                continue
+            if named.group(1) == "block" and not _live_enemy(state, int(named.group(2))):
+                continue
+            action, cost = {"action": action_name, "hero_id": hero_id, "x": x, "y": y, "option": option}, 0.0
+            where = HERO_TEXT[named.group(1) or "home"].format(named.group(2))
+            text = f"Move hero {hero.get('template')} {where} ({x},{y})"
         elif action_name == "send_wave":
             if state.get("wave_ready") is not True:
                 continue
